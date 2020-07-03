@@ -9,7 +9,8 @@
 class Shader
 {
 public:
-	unsigned int ID; 	// Unique ID of the shader program
+	/* Attributes */
+	unsigned int ID;	// This ID corresponds to the ID of the shader program
 
 	/* Constructor */
 	Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
@@ -30,7 +31,6 @@ public:
 	void setMat4(const std::string &name, const glm::mat4 &mat) const;
 
 private:
-
 	/* Utility Functions */
 	void checkCompileErrors(unsigned int shader, std::string type);
 };

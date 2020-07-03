@@ -230,7 +230,7 @@ int main(void)
 		processInput(window);
 
 		// Render
-		GLCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
+		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		// Tectures
@@ -276,7 +276,6 @@ void processInput(GLFWwindow *window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
-
 	}
 
 	// TODO: Change Camera to be dependent on Mouse Movements (as specified in the assignment)
