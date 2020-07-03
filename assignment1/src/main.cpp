@@ -1,7 +1,14 @@
-//
-// COMP 371 Assignment Framework
-//
-
+/*
+	COMP 371 - Section CC
+	Practical Assignment #1
+	Written By:
+		Benjamin Therien (Add your SN# when you make a commit)
+		Sean Heinrichs (40075789)
+		Wayne St Amand (Add your SN# when you make a commit)
+		Isabelle Gourchette (Add your SN# when you make a commit)
+		Ziming Wang (Add your SN# when you make a commit)
+	Due:  July 9th, 2020
+*/
 
 #include <iostream>
 #include <fstream>
@@ -10,11 +17,16 @@
 #include <filesystem>
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
+#define STB_IMAGE_IMPLEMENTATION
 
-#include <GL/glew.h>    // Include GLEW - OpenGL Extension Wrangler
+#include "Shaders/Shader.h"
+#include "stb_image.h"	// For texture mapping (might be useful for the grid?)
 
-#include <GLFW/glfw3.h> // GLFW provides a cross-platform interface for creating a graphical context,
-						// initializing OpenGL and binding inputs
+#include <GL/glew.h>    
+#include <GLFW/glfw3.h> 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
@@ -22,57 +34,27 @@
 #define GLFW_CONTEXT_VERSION_MINOR 3
 #define GLFW_OPENGL_PROFILE GLFW_OPENGL_CORE_PROFILE
 
+/* USED FOR DEBUGGING - Every OpenGL function call we use should be wrapped in a GLCall() */
 #define ASSERT(x) if (!(x)) __debugbreak();
-
 #define GLCall(x) GLClearError();\
 	x;\
 	ASSERT(GLLogCall(#x, __FILE__, __LINE__))
 
-struct ShaderProgramSource {
-	std::string VertexSource;
-	std::string FragmentSource;
-};
+/* Function Declarations */
+void processInput(GLFWwindow *window);
 
+/* Global Constants */
+const unsigned int WINDOW_WIDTH = 1024;
+const unsigned int WINDOW_HEIGHT = 768;
 
-static ShaderProgramSource ParseShader(const std::string& filepath)
-{
-	std::ifstream stream(filepath);
+/* Camera Setup */
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
-	enum class ShaderType {
-		NONE = -1, VERTEX = 0, FRAGMENT = 1
-	};
-
-
-	std::string line;
-	std::stringstream ss[2];
-
-	ShaderType type = ShaderType::NONE;
-
-
-	while (getline(stream, line))
-	{
-		if (line.find("#shader") != std::string::npos)
-		{
-			if (line.find("fragment") != std::string::npos)
-			{
-				type = ShaderType::FRAGMENT;
-			}
-			else if (line.find("vertex") != std::string::npos)
-			{
-				type = ShaderType::VERTEX;
-			}
-		}
-		else {
-			ss[(int)type] << line << "\n";
-		}
-
-
-	}
-
-	return { ss[0].str(), ss[1].str() };
-
-}
-
+/* Error Handling */
 static void GLClearError() {
 	while (glGetError() != GL_NO_ERROR);
 }
@@ -88,79 +70,25 @@ static bool GLLogCall(const char* function, const char* file, int line)
 	return true;
 }
 
-
-
-
-static unsigned int CompileShader(unsigned int type, const std::string& source)
-{
-	unsigned int id = glCreateShader(type);
-	const char* src = source.c_str();
-	glShaderSource(id, 1, &src, nullptr);
-	glCompileShader(id);
-
-	int result;
-	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-	if (result == GL_FALSE)
-	{
-		int length;
-		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-		char* message = (char*)alloca(length * sizeof(char));
-		glGetShaderInfoLog(id, length, &length, message);
-		std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << "shader!" << std::endl;
-		std::cout << message << std::endl;
-
-		glDeleteShader(id);
-		return 0;
-
-	}
-
-	return id;
-
-
-}
-
-static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
-{
-	unsigned int program = glCreateProgram();
-	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
-
-	glAttachShader(program, vs);
-	glAttachShader(program, fs);
-
-	glLinkProgram(program);
-	glValidateProgram(program);
-
-	glDeleteShader(vs);
-	glDeleteShader(fs);
-
-	return program;
-
-}
-
-
-
-
 int main(void)
 {
-	GLFWwindow* window;
-
-	/* Initialize the library */
+	/* Initialize GLFW */
 	if (!glfwInit())
+	{
+		std::cout << "Failed to initialize GLFW" << std::endl;
 		return -1;
+	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSON_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+	// TODO: Add double buffering support for the window
+	// TODO: Use perspective view
+	GLFWwindow* window;
 
-
-	/* get monitors */
-	//int count;
-	//GLFWmonitor** monitors = glfwGetMonitors(&count);
-
-	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(1080, 1080, "Hello World", NULL, NULL);
+	/* Create a window and its OpenGL context */
+	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "COMP 371 - Assignment 1", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -170,114 +98,195 @@ int main(void)
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
 
+	/* Initialize GLEW */
 	if (glewInit() != GLEW_OK)
-		std::cout << "error" << std::endl;
+	{
+		std::cout << "Failed to initialize GLEW" << std::endl;
+		return -1;
+	}
 
-	std::cout << glGetString(GL_VERSION) << std::endl;
+	/* Enable depth test for 3D rendering */
+	GLCall(glEnable(GL_DEPTH_TEST));
 
-	float positions[12] = {
-	   -0.5f, -0.5f,
-		0.5f, -0.5f,
-		0.5f, 0.5f,
-		-0.5f, 0.5f
+	/* Build and Compile Shader Program */
+	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader"); 
+
+	// TEMPORARY CODE: Will be removed once Cube class is finalized 
+	float vertices[] = {
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 
-	unsigned int indices[] = {
-		0,1,2,
-		2,3,0
+	// TEMPORARY CODE: Will be removed once Cube class is finalized 
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
 	};
 
-	unsigned int vao;
-	GLCall(glGenVertexArrays(1, &vao));
-	GLCall(glBindVertexArray(vao));
+	// TEMPORARY CODE - Will be changed once we use Cube to render all alphanumeric objects
+	unsigned int VBO, VAO;
+	GLCall(glGenVertexArrays(1, &VAO));
+	GLCall(glGenBuffers(1, &VBO));
 
-	unsigned int buffer;
+	GLCall(glBindVertexArray(VAO));
 
-	// The below function allows users to retrieve the id of the buffer that open gl creates through the buffer variable that is passed
-	GLCall(glGenBuffers(1, &buffer));
-	GLCall(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
 
+	// Set Position
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
 	GLCall(glEnableVertexAttribArray(0));
-	GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
+	
+	// Set Textures
+	GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(1));
 
+	/* Textures */ 
 
-	unsigned int ibo;
+	// TEMPORARY CODE: Either to be removed or moved to grid class (depending on whether we are using textures)
+	unsigned int texture;
+	GLCall(glGenTextures(1, &texture));
+	GLCall(glBindTexture(GL_TEXTURE_2D, texture));
 
-	// The below function allows users to retrieve the id of the buffer that open gl creates through the buffer variable that is passed
-	GLCall(glGenBuffers(1, &ibo));
-	// NOW we have created a buffer, we can immediately fill it with data or fill it later
-	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
-	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
+	// Set texture wrapping parameters
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
 
+	// Set texture filtering parameters
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
-	ShaderProgramSource source = ParseShader("comp371/assignment1/src/basic.shader");
+	// Load image, create texture and generate mipmaps
+	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true); 
+	
+	// Get image from resources folder
+	unsigned char *data = stbi_load("comp371/assignment1/src/Resources/container.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data));
+		GLCall(glGenerateMipmap(GL_TEXTURE_2D));
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
 
-	std::cout << source.FragmentSource << std::endl;
-	std::cout << source.VertexSource << std::endl;
+	shaderProgram.use();
+	shaderProgram.setInt("texture", 0);
 
-	unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
+	/* Setup Camera Projection */
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+	shaderProgram.setMat4("projection", projection);
 
-	GLCall(glUseProgram(shader));
-
-	int location = glGetUniformLocation(shader, "u_Color");
-	ASSERT(location != -1);
-	GLCall(glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f));
-
-	GLCall(glBindVertexArray(0));
-	GLCall(glUseProgram(0));
-	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
-	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-
-
-	float r = 0.0f;
-	float increment = 0.05f;
-
-
-
-	/* Loop until the user closes the window */
+	/* Main Loop */
 	while (!glfwWindowShouldClose(window))
 	{
+		// Set frame for Camera (taken from LearnOpenGL)
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 
-		glClearColor(
-			0.0,
-			0.0,
-			0.0,
-			0.0
-		);
+		// Event Handling
+		processInput(window);
 
-		/* Render here */
-		glClear(GL_COLOR_BUFFER_BIT);
+		// Render
+		GLCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
+		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-		// there are two ways to draw what you have put into the actual buffer
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		// Tectures
+		// TEMPORARY CODE: Either to be removed or moved to grid class (depending on whether we are using textures)
+		GLCall(glActiveTexture(GL_TEXTURE0));
+		GLCall(glBindTexture(GL_TEXTURE_2D, texture));
 
-		GLCall(glUseProgram(shader));
+		// Activate the shader
+		shaderProgram.use();
 
-		GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
+		// Handles camera views and transformations
+		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		shaderProgram.setMat4("view", view);
 
-		GLCall(glBindVertexArray(vao));
-		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+		// TEMPORARY CODE: Will be changed once Cube class is finalized 
+		GLCall(glBindVertexArray(VAO));
 
-		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+			glm::mat4 model = glm::mat4(1.0f); // always start with initialize to identity matrix first
+			model = glm::translate(model, cubePositions[0]);
+			model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+			shaderProgram.setMat4("model", model);
 
-		if (r > 1.0f)
-			increment = -0.05f;
-		else if (r < 0.0f)
-			increment = 0.05f;
+			GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
 
-		r += increment;
-
-		// another way to display would be glDrawElements
-
-		/* Swap front and back buffers */
+		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
-
-		/* Poll for and process events */
 		glfwPollEvents();
 	}
 
-	glDeleteProgram(shader);
+	/* De-allocate resources */
+	GLCall(glDeleteVertexArrays(1, &VAO));
+	GLCall(glDeleteBuffers(1, &VBO));
+	
+	/* Terminate Program */
 	glfwTerminate();
 	return 0;
+}
+
+/* Import all event handling functions here */
+void processInput(GLFWwindow *window)
+{
+	/* Example call */
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+
+	}
+
+	// TODO: Change Camera to be dependent on Mouse Movements (as specified in the assignment)
+	float cameraSpeed = 2.5 * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
