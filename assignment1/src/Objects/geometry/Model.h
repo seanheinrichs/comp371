@@ -1,13 +1,14 @@
 #pragma once
 #include <vector>
 #include <glm/glm.hpp>
-class Polygon {};
+#include "Polygon.h"
 
 class Model
 {
 public:
-	std::vector<Polygon> polygons;
-	void addPolygon(Polygon poly);
+	std::vector<Polygon*> polygons;
+	void addPolygon(Polygon* poly);
+	Model();
 
 	float* getVertexArray();
 	int getVAComponentCount();

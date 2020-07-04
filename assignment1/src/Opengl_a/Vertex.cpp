@@ -35,13 +35,11 @@ void Vertex::setTexture(glm::vec2 tex)
 
 float* Vertex::getVertex()
 {
-	float verts[5] = {
-		position.x,
-		position.y,
-		position.z,
-		texture.x,
-		texture.y };
-
-
+	float* verts = new float[5]; 
+	verts[0] = position.x;
+	verts[1] = position.y;
+	verts[2] = position.z;
+	verts[3] = texture.x;
+	verts[4] = texture.y;
 	return verts;
 }

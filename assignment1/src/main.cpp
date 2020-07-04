@@ -22,11 +22,14 @@
 
 #include "stb_image.h"	// For texture mapping (might be useful for the grid?)
 #include "Objects/geometry/Cube.h"
+#include "Objects/geometry/Model.h"
+#include "Objects/geometry/Polygon.h"
 
 #include <GL/glew.h>    
 #include <GLFW/glfw3.h> 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
@@ -70,10 +73,11 @@ static bool GLLogCall(const char* function, const char* file, int line)
 	}
 	return true;
 }
-
+#include <vector>
 int main(void)
 {
 	
+
 	
 	/* Initialize GLFW */
 	if (!glfwInit())
@@ -142,10 +146,37 @@ int main(void)
 	GLCall(glBindVertexArray(VAO));
 
 
-	Cube cb1(glm::vec3(0.0f, 0.0f, 0.0f));
-	std::cout << "byte size " << cb1.getVAByteSize() << std::endl;
-	std::cout << "byte size " << 180 * sizeof(float) << std::endl;
-	std::cout << "Component Count " << cb1.getVAComponentCount() << std::endl;
+	Cube cb1(glm::vec3(0.5f, 0.5f, -1.5f));
+	cb1.translate_fromOrigin();
+	
+
+	Cube cb2(glm::vec3(-0.5f, 0.5f, -1.0f));
+	cb2.translate_fromOrigin();
+
+	Cube cb3(glm::vec3(-0.5f, -0.5f, -0.5f));
+	cb3.translate_fromOrigin();
+
+	Cube cb4(glm::vec3(0.5f, -0.5f, -0.5f));
+	cb4.translate_fromOrigin();
+
+	Cube cb5(glm::vec3(-0.5f, 1.0f, -1.0f));
+	cb5.translate_fromOrigin();
+
+	Cube cb6(glm::vec3(-0.5f, 1.5f, -1.5f));
+	cb6.translate_fromOrigin();
+
+	Model m1; 
+	m1.addPolygon(&cb1);
+	m1.addPolygon(&cb2);
+	m1.addPolygon(&cb3);
+	m1.addPolygon(&cb4);
+	m1.addPolygon(&cb5);
+	m1.addPolygon(&cb6);
+
+	std::cout << "byte size " << m1.getVAByteSize() << std::endl;
+	std::cout << "byte size " << 180 * 3* sizeof(float) << std::endl;
+	std::cout << "Component Count " << m1.getVAComponentCount() << std::endl;
+
 
 	//float *arr = cb1.getVertexArray();
 
@@ -154,7 +185,7 @@ int main(void)
 
 
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, cb1.getVAByteSize(), cb1.getVertexArray(), GL_STATIC_DRAW));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, 3*m1.getVAByteSize(), m1.getVertexArray(), GL_STATIC_DRAW));
 
 	// Set Position
 	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
@@ -252,7 +283,7 @@ int main(void)
 			model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.3f, 0.5f));
 			shaderProgram.setMat4("model", model);
 
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, 72));
+			GLCall(glDrawArrays(GL_TRIANGLES, 0, 216));
 
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);

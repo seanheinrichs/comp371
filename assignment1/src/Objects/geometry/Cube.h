@@ -1,20 +1,25 @@
 // Cube code will go here in actual PR
 //#include "polygon.h"
+/*
+This is the cube class, it is meant to be the basis for any cube
 
-#include "../../Opengl_a/vertex.h"
 
-class Polygon {};
+*/
+
+
+#include "Polygon.h"
+
 
 class Cube : public Polygon{
 
 	public:
 		Cube(glm::vec3 origin_a);
-		void transform(glm::mat4 transmat);
+		virtual void transform(glm::mat4 transmat);
 		void translate_fromOrigin();
 		void translate_tst();
-		float* getVertexArray();
-		int getVAComponentCount();
-		int getVAByteSize();
+		virtual float* getVertexArray();
+		virtual int getVAComponentCount();
+		virtual int getVAByteSize();
 		
 
 		glm::vec3 origin;

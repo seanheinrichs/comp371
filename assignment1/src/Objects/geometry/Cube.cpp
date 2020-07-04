@@ -68,21 +68,11 @@ float* Cube::getVertexArray(){
 	for(int x=0;x < sizeof(vertices)/sizeof(vertices[0]); x++)
 	{
 		float* arr1 = vertices[x].getVertex();
-
-		verts[(x*components)] = arr1[0];
-		verts[(x*components) + 1] = arr1[1];
-		verts[(x*components) + 2] = arr1[2];
-		verts[(x*components) + 3] = arr1[3];
-		verts[(x*components) + 4] = arr1[4];
-		/*
 		for(int i=0; i<components;i++)
 		{
 			std::cout << arr1[i] << std::endl;
 		}
 		std::copy(arr1, arr1 + components, verts + x * components);
-		std::cout << x << std::endl;
-
-		*/
 	}
 	return verts;
 }

@@ -1,22 +1,25 @@
 #pragma once
 
 #include "Model.h"
-#include "Polygon.h"
+#include <iostream>
 
 
-void Model::addPolygon(Polygon poly) 
+Model::Model()
+{
+	origin = glm::vec3(0.f);
+}
+
+void Model::addPolygon(Polygon* poly) 
 {
 	polygons.push_back(poly);
 }
 
-
-
 int Model::getVAComponentCount()
 {
 	int totalComponents = 0;
-	for (std::vector<Polygon>::iterator it = polygons.begin(); it < polygons.end(); it++) 
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++) 
 	{
-		totalComponents += it->getVAComponentCount();
+		totalComponents += (**it).getVAComponentCount();
 	}
 	vaComponentCount = totalComponents;
 	return vaComponentCount;
@@ -32,12 +35,13 @@ float* Model::getVertexArray()
 {
 	float* va = new float[getVAComponentCount()];
 	int filled = 0;
-	for (std::vector<Polygon>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
 	{
-		float* a = it->getVertices();
-		int vertexCount = it->getVAComponentCount();
+		int vertexCount = (**it).getVAComponentCount();
+		float* a = (**it).getVertexArray();
 		std::copy(a, a + vertexCount, va + filled);
 		filled += vertexCount;
+		std::cout << "filled: " << filled << std::endl;
 	}
 	return va;
 
