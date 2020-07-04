@@ -1,10 +1,16 @@
-// Cube code will go here in actual PR
-//#include "polygon.h"
 /*
-This is the cube class, it is meant to be the basis for any cube
+Cube
+
+Depends on: Polygon.h
+
+Description: A 3d cube that forms the basis for amy cubes  we may want to construct in the future
 
 
+origin: the point of origin for this particular polygon
+vaComponentCount: the number of vertex components in this Cube 
+vaByteSize: the number Bytes required to contain the vertices of this cube
 */
+
 
 
 #include "Polygon.h"

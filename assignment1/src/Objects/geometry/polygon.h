@@ -1,3 +1,14 @@
+/*
+Polygon 
+
+Description: A base class for any polygons we may need to create. The virtual methods bellow
+are a necessary API for interacting with the model object that will be able to
+
+Note: The virtual methods below must be overriden to for correct polymorphic behaviour
+
+
+*/
+
 #pragma once
 
 #include "../../Opengl_a/vertex.h"
