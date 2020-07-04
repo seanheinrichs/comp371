@@ -2,7 +2,7 @@
 	COMP 371 - Section CC
 	Practical Assignment #1
 	Written By:
-		Benjamin Therien (Add your SN# when you make a commit)
+		Benjamin Therien (40034572)
 		Sean Heinrichs (40075789)
 		Wayne St Amand (Add your SN# when you make a commit)
 		Isabelle Gourchette (Add your SN# when you make a commit)
@@ -21,6 +21,7 @@
 
 #include "Shaders/Shader.h"
 #include "stb_image.h"	// For texture mapping (might be useful for the grid?)
+#include "Objects/Cube/Cube.cpp"
 
 #include <GL/glew.h>    
 #include <GLFW/glfw3.h> 
@@ -54,7 +55,11 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-/* Error Handling */
+/* Error Handling 
+
+The following functions are ripped from cherno's videos and we need to modify them
+
+*/
 static void GLClearError() {
 	while (glGetError() != GL_NO_ERROR);
 }
@@ -72,16 +77,14 @@ static bool GLLogCall(const char* function, const char* file, int line)
 
 int main(void)
 {
+	
+	
 	/* Initialize GLFW */
 	if (!glfwInit())
 	{
 		std::cout << "Failed to initialize GLFW" << std::endl;
 		return -1;
 	}
-
-	glfwWindowHint(GLFW_CONTEXT_VERSON_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// TODO: Add double buffering support for the window
 	// TODO: Use perspective view
@@ -111,50 +114,22 @@ int main(void)
 	/* Build and Compile Shader Program */
 	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader"); 
 
-	// TEMPORARY CODE: Will be removed once Cube class is finalized 
-	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	Cube cb1(glm::vec3(-1.0f,-1.0f,0.0f));
+	cb1.translate_tst();
+	cb1.translate_fromOrigin();
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	Cube cb2(glm::vec3(0.0f, 0.0f, 0.0f));
+	cb2.translate_tst();
+	cb2.translate_fromOrigin();
 
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-	};
+	float * result = new float[180+180];
+	std::copy(cb1.vertices, cb1.vertices + 180, result);
+	std::copy(cb2.vertices, cb2.vertices + 180, result + 180);
+	
+	//for(int x=0; x<180*2; x++)
+	//	std::cout << result[x] << std::endl;
 
 	// TEMPORARY CODE: Will be removed once Cube class is finalized 
 	glm::vec3 cubePositions[] = {
@@ -169,7 +144,7 @@ int main(void)
 	GLCall(glBindVertexArray(VAO));
 
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, 180 * 2 * sizeof(float), result, GL_STATIC_DRAW));
 
 	// Set Position
 	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
@@ -218,9 +193,19 @@ int main(void)
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 	shaderProgram.setMat4("projection", projection);
 
+
+	/*Setup basic translation*/
+
+	glm::mat4 translation(1.0f);
+	translation = glm::translate(translation, glm::vec3(0.0f, 0.0f, 0.0f));
+	shaderProgram.setMat4("translation", translation);
+
+	int count = 1;
+
 	/* Main Loop */
 	while (!glfwWindowShouldClose(window))
 	{
+
 		// Set frame for Camera (taken from LearnOpenGL)
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -245,6 +230,10 @@ int main(void)
 		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		shaderProgram.setMat4("view", view);
 
+		//throw in a little translation
+		//translation = glm::translate(translation, glm::vec3(0.0f, count * 0.1f, 0.0f));
+		//shaderProgram.setMat4("translation", translation);
+
 		// TEMPORARY CODE: Will be changed once Cube class is finalized 
 		GLCall(glBindVertexArray(VAO));
 
@@ -253,7 +242,7 @@ int main(void)
 			model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.3f, 0.5f));
 			shaderProgram.setMat4("model", model);
 
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+			GLCall(glDrawArrays(GL_TRIANGLES, 0, 72));
 
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
