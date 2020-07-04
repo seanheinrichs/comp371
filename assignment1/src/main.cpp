@@ -19,15 +19,12 @@
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "Shaders/Shader.h"
+
 #include "stb_image.h"	// For texture mapping (might be useful for the grid?)
-#include "Objects/Cube/Cube.cpp"
+#include "Objects/geometry/Cube.cpp"
 
 #include <GL/glew.h>    
 #include <GLFW/glfw3.h> 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
@@ -114,7 +111,7 @@ int main(void)
 	/* Build and Compile Shader Program */
 	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader"); 
 
-
+	/*
 	Cube cb1(glm::vec3(-1.0f,-1.0f,0.0f));
 	cb1.translate_tst();
 	cb1.translate_fromOrigin();
@@ -127,7 +124,9 @@ int main(void)
 	float * result = new float[180+180];
 	std::copy(cb1.vertices, cb1.vertices + 180, result);
 	std::copy(cb2.vertices, cb2.vertices + 180, result + 180);
-	
+	*/
+
+
 	//for(int x=0; x<180*2; x++)
 	//	std::cout << result[x] << std::endl;
 
@@ -143,8 +142,13 @@ int main(void)
 
 	GLCall(glBindVertexArray(VAO));
 
+
+	Cube cb1(glm::vec3(0.0f, 0.0f, 0.0f));
+	std::cout << "byte size" << cb1.getVAByteSize() << std::endl;
+
+
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, 180 * 2 * sizeof(float), result, GL_STATIC_DRAW));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, cb1.getVAByteSize(), cb1.getVertexArray(), GL_STATIC_DRAW));
 
 	// Set Position
 	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
