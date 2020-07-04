@@ -21,16 +21,15 @@
 
 
 #include "stb_image.h"	// For texture mapping (might be useful for the grid?)
-#include "Objects/geometry/Cube.cpp"
+#include "Objects/geometry/Cube.h"
 
 #include <GL/glew.h>    
 #include <GLFW/glfw3.h> 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
-#define GLFW_CONTEXT_VERSON_MAJOR 3
-#define GLFW_CONTEXT_VERSION_MINOR 3
-#define GLFW_OPENGL_PROFILE GLFW_OPENGL_CORE_PROFILE
 
 /* USED FOR DEBUGGING - Every OpenGL function call we use should be wrapped in a GLCall() */
 #define ASSERT(x) if (!(x)) __debugbreak();
