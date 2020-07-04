@@ -10,7 +10,7 @@
 Cube::Cube(glm::vec3 origin_a)
 {
 	origin = origin_a;
-	std::cout << "here" << std::endl;
+	translate_fromOrigin();
 }
 
 void Cube::transform(glm::mat4 transmat)
@@ -68,10 +68,6 @@ float* Cube::getVertexArray(){
 	for(int x=0;x < sizeof(vertices)/sizeof(vertices[0]); x++)
 	{
 		float* arr1 = vertices[x].getVertex();
-		for(int i=0; i<components;i++)
-		{
-			std::cout << arr1[i] << std::endl;
-		}
 		std::copy(arr1, arr1 + components, verts + x * components);
 	}
 	return verts;

@@ -41,6 +41,14 @@ int Model::getVAComponentCount()
 	return vaComponentCount;
 }
 
+void Model::transform(glm::mat4 transmat)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		(**it).transform(transmat);
+	}
+}
+
 int Model::getVAByteSize()
 {
 	vaByteSize = getVAComponentCount() * sizeof(float);
@@ -57,7 +65,6 @@ float* Model::getVertexArray()
 		float* a = (**it).getVertexArray();
 		std::copy(a, a + vertexCount, va + filled);
 		filled += vertexCount;
-		std::cout << "filled: " << filled << std::endl;
 	}
 	return va;
 

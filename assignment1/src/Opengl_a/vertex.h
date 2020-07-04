@@ -24,6 +24,8 @@ class Vertex
 public:
 	glm::vec3 position;
 	glm::vec2 texture;
+	
+
 
 	Vertex(glm::vec3 pos, glm::vec2 tex);
 	float* getVertex();

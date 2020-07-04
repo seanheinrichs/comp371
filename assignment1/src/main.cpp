@@ -114,24 +114,7 @@ int main(void)
 	/* Build and Compile Shader Program */
 	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader"); 
 
-	/*
-	Cube cb1(glm::vec3(-1.0f,-1.0f,0.0f));
-	cb1.translate_tst();
-	cb1.translate_fromOrigin();
-
-	Cube cb2(glm::vec3(0.0f, 0.0f, 0.0f));
-	cb2.translate_tst();
-	cb2.translate_fromOrigin();
-
-
-	float * result = new float[180+180];
-	std::copy(cb1.vertices, cb1.vertices + 180, result);
-	std::copy(cb2.vertices, cb2.vertices + 180, result + 180);
-	*/
-
-
-	//for(int x=0; x<180*2; x++)
-	//	std::cout << result[x] << std::endl;
+	
 
 	// TEMPORARY CODE: Will be removed once Cube class is finalized 
 	glm::vec3 cubePositions[] = {
@@ -147,23 +130,23 @@ int main(void)
 
 
 	Cube cb1(glm::vec3(0.5f, 0.5f, -1.5f));
-	cb1.translate_fromOrigin();
+	//cb1.translate_fromOrigin();
 	
 
 	Cube cb2(glm::vec3(-0.5f, 0.5f, -1.0f));
-	cb2.translate_fromOrigin();
+	//cb2.translate_fromOrigin();
 
 	Cube cb3(glm::vec3(-0.5f, -0.5f, -0.5f));
-	cb3.translate_fromOrigin();
+	//cb3.translate_fromOrigin();
 
 	Cube cb4(glm::vec3(0.5f, -0.5f, -0.5f));
-	cb4.translate_fromOrigin();
+	//cb4.translate_fromOrigin();
 
 	Cube cb5(glm::vec3(-0.5f, 1.0f, -1.0f));
-	cb5.translate_fromOrigin();
+	//cb5.translate_fromOrigin();
 
 	Cube cb6(glm::vec3(-0.5f, 1.5f, -1.5f));
-	cb6.translate_fromOrigin();
+	//cb6.translate_fromOrigin();
 
 	Model m1; 
 	m1.addPolygon(&cb1);
@@ -174,18 +157,28 @@ int main(void)
 	m1.addPolygon(&cb6);
 
 	std::cout << "byte size " << m1.getVAByteSize() << std::endl;
-	std::cout << "byte size " << 180 * 3* sizeof(float) << std::endl;
 	std::cout << "Component Count " << m1.getVAComponentCount() << std::endl;
 
+	/*Setup basic translation*/
 
-	//float *arr = cb1.getVertexArray();
+	glm::mat4 translation(1.0f);
+	translation = glm::translate(translation, glm::vec3(0.0f, 0.0f, -2.0f));
+	translation = glm::rotate(translation, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	shaderProgram.setMat4("translation", translation);
 
-	//for(int x = 0; x < cb1.getVAComponentCount(); x++)
-	//	std::cout<<arr[x]<<std::endl;
+
+	/*
+	
+	[THIS IS THE NEW LINE OF CODE]
+	
+	*/
+	m1.transform(translation);
+
+
 
 
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, 3*m1.getVAByteSize(), m1.getVertexArray(), GL_STATIC_DRAW));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, m1.getVAByteSize(), m1.getVertexArray(), GL_STATIC_DRAW));
 
 	// Set Position
 	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
@@ -235,11 +228,7 @@ int main(void)
 	shaderProgram.setMat4("projection", projection);
 
 
-	/*Setup basic translation*/
-
-	glm::mat4 translation(1.0f);
-	translation = glm::translate(translation, glm::vec3(0.0f, 0.0f, 0.0f));
-	shaderProgram.setMat4("translation", translation);
+	
 
 	int count = 1;
 

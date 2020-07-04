@@ -26,6 +26,7 @@ int Vertex::getByteSize()
 {
 	//this method is hardcoded for the time being
 	//it should eventually be replaced by some code that retrieve the byte size automatically
+
 	return 5 * sizeof(float);
 
 }

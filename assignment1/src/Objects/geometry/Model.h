@@ -4,7 +4,7 @@ Model
 Depends on: Polygon.h
 
 Description: A container for groups of related geometry. It handles the creation of
-arbitrarily sized vertex arrays from the polgons that it contains.
+arbitrarily sized vertex arrays from the polygons that it contains.
 
 TODO: Create API for one origin point for the entire polygon
 
@@ -22,6 +22,7 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 class Model
 {
 public:
+	void transform(glm::mat4 transmat);
 	std::vector<Polygon*> polygons;
 	void addPolygon(Polygon* poly);
 	Model();
