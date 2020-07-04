@@ -40,8 +40,6 @@ void Cube::translate_tst()
 	std::cout << "z: " << m.z << std::endl;
 }
 
-
-
 void Cube::translate_fromOrigin()
 {
 	glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.0 + origin.x, 0.0 + origin.y, 0.0 + origin.z));
