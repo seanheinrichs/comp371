@@ -2,7 +2,7 @@
 	COMP 371 - Section CC
 	Practical Assignment #1
 	Written By:
-		Benjamin Therien (Add your SN# when you make a commit)
+		Benjamin Therien (40034572)
 		Sean Heinrichs (40075789)
 		Wayne St Amand (Add your SN# when you make a commit)
 		Isabelle Gourchette (Add your SN# when you make a commit)
@@ -19,20 +19,20 @@
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "Shaders/Shader.h"
+
 #include "stb_image.h"	// For texture mapping (might be useful for the grid?)
+#include "Objects/geometry/Cube.h"
+#include "Objects/geometry/Model.h"
+#include "Objects/geometry/Polygon.h"
 
 #include <GL/glew.h>    
 #include <GLFW/glfw3.h> 
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
-#define GLFW_CONTEXT_VERSON_MAJOR 3
-#define GLFW_CONTEXT_VERSION_MINOR 3
-#define GLFW_OPENGL_PROFILE GLFW_OPENGL_CORE_PROFILE
 
 /* USED FOR DEBUGGING - Every OpenGL function call we use should be wrapped in a GLCall() */
 #define ASSERT(x) if (!(x)) __debugbreak();
@@ -54,7 +54,11 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-/* Error Handling */
+/* Error Handling 
+
+The following functions are ripped from cherno's videos and we need to modify them
+
+*/
 static void GLClearError() {
 	while (glGetError() != GL_NO_ERROR);
 }
@@ -69,19 +73,18 @@ static bool GLLogCall(const char* function, const char* file, int line)
 	}
 	return true;
 }
-
+#include <vector>
 int main(void)
 {
+	
+
+	
 	/* Initialize GLFW */
 	if (!glfwInit())
 	{
 		std::cout << "Failed to initialize GLFW" << std::endl;
 		return -1;
 	}
-
-	glfwWindowHint(GLFW_CONTEXT_VERSON_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// TODO: Add double buffering support for the window
 	// TODO: Use perspective view
@@ -111,50 +114,24 @@ int main(void)
 	/* Build and Compile Shader Program */
 	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader"); 
 
-	// TEMPORARY CODE: Will be removed once Cube class is finalized 
-	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	/*
+	Cube cb1(glm::vec3(-1.0f,-1.0f,0.0f));
+	cb1.translate_tst();
+	cb1.translate_fromOrigin();
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	Cube cb2(glm::vec3(0.0f, 0.0f, 0.0f));
+	cb2.translate_tst();
+	cb2.translate_fromOrigin();
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	float * result = new float[180+180];
+	std::copy(cb1.vertices, cb1.vertices + 180, result);
+	std::copy(cb2.vertices, cb2.vertices + 180, result + 180);
+	*/
 
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-	};
+	//for(int x=0; x<180*2; x++)
+	//	std::cout << result[x] << std::endl;
 
 	// TEMPORARY CODE: Will be removed once Cube class is finalized 
 	glm::vec3 cubePositions[] = {
@@ -168,8 +145,47 @@ int main(void)
 
 	GLCall(glBindVertexArray(VAO));
 
+
+	Cube cb1(glm::vec3(0.5f, 0.5f, -1.5f));
+	cb1.translate_fromOrigin();
+	
+
+	Cube cb2(glm::vec3(-0.5f, 0.5f, -1.0f));
+	cb2.translate_fromOrigin();
+
+	Cube cb3(glm::vec3(-0.5f, -0.5f, -0.5f));
+	cb3.translate_fromOrigin();
+
+	Cube cb4(glm::vec3(0.5f, -0.5f, -0.5f));
+	cb4.translate_fromOrigin();
+
+	Cube cb5(glm::vec3(-0.5f, 1.0f, -1.0f));
+	cb5.translate_fromOrigin();
+
+	Cube cb6(glm::vec3(-0.5f, 1.5f, -1.5f));
+	cb6.translate_fromOrigin();
+
+	Model m1; 
+	m1.addPolygon(&cb1);
+	m1.addPolygon(&cb2);
+	m1.addPolygon(&cb3);
+	m1.addPolygon(&cb4);
+	m1.addPolygon(&cb5);
+	m1.addPolygon(&cb6);
+
+	std::cout << "byte size " << m1.getVAByteSize() << std::endl;
+	std::cout << "byte size " << 180 * 3* sizeof(float) << std::endl;
+	std::cout << "Component Count " << m1.getVAComponentCount() << std::endl;
+
+
+	//float *arr = cb1.getVertexArray();
+
+	//for(int x = 0; x < cb1.getVAComponentCount(); x++)
+	//	std::cout<<arr[x]<<std::endl;
+
+
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, 3*m1.getVAByteSize(), m1.getVertexArray(), GL_STATIC_DRAW));
 
 	// Set Position
 	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
@@ -218,9 +234,19 @@ int main(void)
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 	shaderProgram.setMat4("projection", projection);
 
+
+	/*Setup basic translation*/
+
+	glm::mat4 translation(1.0f);
+	translation = glm::translate(translation, glm::vec3(0.0f, 0.0f, 0.0f));
+	shaderProgram.setMat4("translation", translation);
+
+	int count = 1;
+
 	/* Main Loop */
 	while (!glfwWindowShouldClose(window))
 	{
+
 		// Set frame for Camera (taken from LearnOpenGL)
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -245,6 +271,10 @@ int main(void)
 		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		shaderProgram.setMat4("view", view);
 
+		//throw in a little translation
+		//translation = glm::translate(translation, glm::vec3(0.0f, count * 0.1f, 0.0f));
+		//shaderProgram.setMat4("translation", translation);
+
 		// TEMPORARY CODE: Will be changed once Cube class is finalized 
 		GLCall(glBindVertexArray(VAO));
 
@@ -253,7 +283,7 @@ int main(void)
 			model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.3f, 0.5f));
 			shaderProgram.setMat4("model", model);
 
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+			GLCall(glDrawArrays(GL_TRIANGLES, 0, 216));
 
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
