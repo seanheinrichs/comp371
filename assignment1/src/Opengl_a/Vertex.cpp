@@ -7,16 +7,7 @@ Vertex::Vertex(glm::vec3 pos, glm::vec2 tex)
 	texture = tex;
 }
 
-float* Vertex::getVertex()
-{
-	float verts[5] = {
-		position.x,
-		position.y,
-		position.z,
-		texture.x,
-		texture.y };
-	return verts;
-}
+
 
 int Vertex::getByteSize()
 {
@@ -40,4 +31,17 @@ void Vertex::setPosition(glm::vec3 pos)
 void Vertex::setTexture(glm::vec2 tex)
 {
 	texture = tex;
+}
+
+float* Vertex::getVertex()
+{
+	float verts[5] = {
+		position.x,
+		position.y,
+		position.z,
+		texture.x,
+		texture.y };
+
+
+	return verts;
 }

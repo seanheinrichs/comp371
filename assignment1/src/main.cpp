@@ -143,7 +143,14 @@ int main(void)
 
 
 	Cube cb1(glm::vec3(0.0f, 0.0f, 0.0f));
-	std::cout << "byte size" << cb1.getVAByteSize() << std::endl;
+	std::cout << "byte size " << cb1.getVAByteSize() << std::endl;
+	std::cout << "byte size " << 180 * sizeof(float) << std::endl;
+	std::cout << "Component Count " << cb1.getVAComponentCount() << std::endl;
+
+	//float *arr = cb1.getVertexArray();
+
+	//for(int x = 0; x < cb1.getVAComponentCount(); x++)
+	//	std::cout<<arr[x]<<std::endl;
 
 
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
