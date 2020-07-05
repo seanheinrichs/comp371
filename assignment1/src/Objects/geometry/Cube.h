@@ -33,51 +33,50 @@ class Cube : public Polygon{
 		int vaByteSize;
 
 		Vertex vertices[36] = {
-			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f),glm::vec2(0.0f, 0.0f)),
-			Vertex(glm::vec3(0.5f, -0.5f, -0.5f),glm::vec2(1.0f, 0.0f)),
-			Vertex(glm::vec3(0.5f,  0.5f, -0.5f),glm::vec2(1.0f, 1.0f)),
-			Vertex(glm::vec3(0.5f,  0.5f, -0.5f),glm::vec2(1.0f, 1.0f)),
-			Vertex(glm::vec3(-0.5f,  0.5f, -0.5f),glm::vec2(0.0f, 1.0f)),
-			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f),glm::vec2(0.0f, 0.0f)),
+			                  // Position          // Texture
+			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)),
+			Vertex(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f)),
+			Vertex(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f)),
+			Vertex(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f)),
+			Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(0.0f, 1.0f)),
+			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)),
 
-			Vertex(glm::vec3(-0.5f, -0.5f, 0.5f),glm::vec2(0.0f, 0.0f)),
-			Vertex(glm::vec3(0.5f, -0.5f, 0.5f),glm::vec2(1.0f, 0.0f)),
-			Vertex(glm::vec3(0.5f,  0.5f, 0.5f),glm::vec2(1.0f, 1.0f)),
-			Vertex(glm::vec3(0.5f,  0.5f, 0.5f),glm::vec2(1.0f, 1.0f)),
-			Vertex(glm::vec3(-0.5f,  0.5f, 0.5f),glm::vec2(0.0f, 1.0f)),
-			Vertex(glm::vec3(-0.5f, -0.5f, 0.5f),glm::vec2(0.0f, 0.0f)),
+			Vertex(glm::vec3(-0.5f, -0.5f, 0.5f),  glm::vec2(0.0f, 0.0f)),
+			Vertex(glm::vec3( 0.5f, -0.5f, 0.5f),  glm::vec2(1.0f, 0.0f)),
+			Vertex(glm::vec3( 0.5f,  0.5f, 0.5f),  glm::vec2(1.0f, 1.0f)),
+			Vertex(glm::vec3( 0.5f,  0.5f, 0.5f),  glm::vec2(1.0f, 1.0f)),
+			Vertex(glm::vec3(-0.5f,  0.5f, 0.5f),  glm::vec2(0.0f, 1.0f)),
+			Vertex(glm::vec3(-0.5f, -0.5f, 0.5f),  glm::vec2(0.0f, 0.0f)),
 
-			Vertex(glm::vec3(-0.5f,  0.5f,  0.5f),glm::vec2(1.0f, 0.0f)),
-			Vertex(glm::vec3(-0.5f,  0.5f, -0.5f),glm::vec2(1.0f, 1.0f)),
-			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f),glm::vec2(0.0f, 1.0f)),
-			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f),glm::vec2(0.0f, 1.0f)),
-			Vertex(glm::vec3(-0.5f, -0.5f,  0.5f),glm::vec2(0.0f, 0.0f)),
-			Vertex(glm::vec3(-0.5f,  0.5f,  0.5f),glm::vec2(1.0f, 0.0f)),
+			Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f)),
+			Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f)),
+			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f)),
+			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f)),
+			Vertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f)),
+			Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f)),
 
-			Vertex(glm::vec3(0.5f,  0.5f,  0.5f),glm::vec2(1.0f, 0.0f)),
-			Vertex(glm::vec3(0.5f,  0.5f, -0.5f),glm::vec2(1.0f, 1.0f)),
-			Vertex(glm::vec3(0.5f, -0.5f, -0.5f),glm::vec2(0.0f, 1.0f)),
-			Vertex(glm::vec3(0.5f, -0.5f, -0.5f),glm::vec2(0.0f, 1.0f)),
-			Vertex(glm::vec3(0.5f, -0.5f,  0.5f),glm::vec2(0.0f, 0.0f)),
-			Vertex(glm::vec3(0.5f,  0.5f,  0.5f),glm::vec2(1.0f, 0.0f)),
+			Vertex(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f)),
+			Vertex(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f)),
+			Vertex(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f)),
+			Vertex(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f)),
+			Vertex(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f)),
+			Vertex(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f)),
 
-			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f),glm::vec2(0.0f, 1.0f)),
-			Vertex(glm::vec3(0.5f, -0.5f, -0.5f),glm::vec2(1.0f, 1.0f)),
-			Vertex(glm::vec3(0.5f, -0.5f,  0.5f),glm::vec2(1.0f, 0.0f)),
-			Vertex(glm::vec3(0.5f, -0.5f,  0.5f),glm::vec2(1.0f, 0.0f)),
-			Vertex(glm::vec3(-0.5f, -0.5f,  0.5f),glm::vec2(0.0f, 0.0f)),
-			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f),glm::vec2(0.0f, 1.0f)),
+			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f)),
+			Vertex(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 1.0f)),
+			Vertex(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 0.0f)),
+			Vertex(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 0.0f)),
+			Vertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f)),
+			Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f)),
 
-			Vertex(glm::vec3(-0.5f,  0.5f, -0.5f),glm::vec2(0.0f, 1.0f)),
-			Vertex(glm::vec3(0.5f,  0.5f, -0.5f),glm::vec2(1.0f, 1.0f)),
-			Vertex(glm::vec3(0.5f,  0.5f,  0.5f),glm::vec2(1.0f, 0.0f)),
-			Vertex(glm::vec3(0.5f,  0.5f,  0.5f),glm::vec2(1.0f, 0.0f)),
-			Vertex(glm::vec3(-0.5f,  0.5f,  0.5f),glm::vec2(0.0f, 0.0f)),
-			Vertex(glm::vec3(-0.5f,  0.5f, -0.5f),glm::vec2(0.0f, 1.0f))
+			Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(0.0f, 1.0f)),
+			Vertex(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f)),
+			Vertex(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f)),
+			Vertex(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 0.0f)),
+			Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(0.0f, 0.0f)),
+			Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(0.0f, 1.0f))
 		};
 		
-
-
 			/*
 		float vertices[180] = {
 			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -122,8 +121,5 @@ class Cube : public Polygon{
 			-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
 			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 		};
-
-	
 	*/
-
 };
