@@ -41,6 +41,7 @@
 
 /* Function Declarations */
 void processInput(GLFWwindow *window);
+static Model * createSeansModel();
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
@@ -112,53 +113,18 @@ int main(void)
 
 	/* Models */
 
-	// I'm also not sure if we should use individual VBOs, VAOs or make them an array (see Grid)
+	// For the next person to add their model, we may want to use a VBO and VAO array (see Grid example)
 	unsigned int VBO, VAO;
 	GLCall(glGenVertexArrays(1, &VAO));
 	GLCall(glGenBuffers(1, &VBO));
 
-		// Sean's Model ( I really think we should each make our own methods in the Model class to return a specialized Model. This will explode main -_-)
+		// Sean's Model
 		GLCall(glBindVertexArray(VAO));
-		
-		Cube cb1(glm::vec3( 0.0f, 0.5f, 0.0f));
-		Cube cb2(glm::vec3( 0.0f, 1.5f, 0.0f));
-		Cube cb3(glm::vec3( 0.0f, 2.5f, 0.0f));
-		Cube cb4(glm::vec3( 0.0f, 3.5f, 0.0f));
-		Cube cb5(glm::vec3( 1.0f, 1.5f, 0.0f));
-		Cube cb6(glm::vec3( 1.0f, 3.5f, 0.0f));
-		Cube cb7(glm::vec3( 2.0f, 0.5f, 0.0f));
-		Cube cb8(glm::vec3( 2.0f, 1.5f, 0.0f));
-		Cube cb9(glm::vec3( 2.0f, 2.5f, 0.0f));
-		Cube cb10(glm::vec3(2.0f, 3.5f, 0.0f));
-		Cube cb11(glm::vec3(4.0f, 2.5f, 0.0f));
-		Cube cb12(glm::vec3(4.0f, 3.5f, 0.0f));
-		Cube cb13(glm::vec3(5.0f, 3.5f, 0.0f));
-		Cube cb14(glm::vec3(6.0f, 3.5f, 0.0f));
-		Cube cb15(glm::vec3(6.0f, 2.5f, 0.0f));
-		Cube cb16(glm::vec3(6.0f, 1.5f, 0.0f));
-		Cube cb17(glm::vec3(6.0f, 0.5f, 0.0f));
 
-		Model m1; 
-		m1.addPolygon(&cb1);
-		m1.addPolygon(&cb2);
-		m1.addPolygon(&cb3);
-		m1.addPolygon(&cb4);
-		m1.addPolygon(&cb5);
-		m1.addPolygon(&cb6);
-		m1.addPolygon(&cb7);
-		m1.addPolygon(&cb8);
-		m1.addPolygon(&cb9);
-		m1.addPolygon(&cb10);
-		m1.addPolygon(&cb11);
-		m1.addPolygon(&cb12);
-		m1.addPolygon(&cb13);
-		m1.addPolygon(&cb14);
-		m1.addPolygon(&cb15);
-		m1.addPolygon(&cb16); 
-		m1.addPolygon(&cb17);
+		Model* m1 = createSeansModel();
 
 		GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-		GLCall(glBufferData(GL_ARRAY_BUFFER, m1.getVAByteSize(), m1.getVertexArray(), GL_STATIC_DRAW));
+		GLCall(glBufferData(GL_ARRAY_BUFFER, m1->getVAByteSize(), m1->getVertexArray(), GL_STATIC_DRAW));
 
 		// Set Position
 		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
@@ -276,9 +242,9 @@ int main(void)
 
 		// Draw Model 1 (Sean)
 		GLCall(glBindVertexArray(VAO));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
-			shaderProgram.setInt("fill", 2);									// Set Color or Textures with Uniform in Shader
-			model = glm::mat4(1.0f);											// Use Identity Matrix to get rid of previous transformations
-			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));				// Make the model smaller with a scale function	
+			shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
+			model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
+			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
 			model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
 			GLCall(glDrawArrays(GL_TRIANGLES, 0, 612));							// Draw Call
@@ -337,4 +303,47 @@ void processInput(GLFWwindow *window)
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+/* Static methods to create our Models */
+static Model * createSeansModel()
+{
+	Cube * cb1 = new Cube(glm::vec3(0.0f, 0.5f, 0.0f));
+	Cube * cb2 = new Cube(glm::vec3(0.0f, 1.5f, 0.0f));
+	Cube * cb3 = new Cube(glm::vec3(0.0f, 2.5f, 0.0f));
+	Cube * cb4 = new Cube(glm::vec3(0.0f, 3.5f, 0.0f));
+	Cube * cb5 = new Cube(glm::vec3(1.0f, 1.5f, 0.0f));
+	Cube * cb6 = new Cube(glm::vec3(1.0f, 3.5f, 0.0f));
+	Cube * cb7 = new Cube(glm::vec3(2.0f, 0.5f, 0.0f));
+	Cube * cb8 = new Cube(glm::vec3(2.0f, 1.5f, 0.0f));
+	Cube * cb9 = new Cube(glm::vec3(2.0f, 2.5f, 0.0f));
+	Cube * cb10 = new Cube(glm::vec3(2.0f, 3.5f, 0.0f));
+	Cube * cb11 = new Cube(glm::vec3(4.0f, 2.5f, 0.0f));
+	Cube * cb12 = new Cube(glm::vec3(4.0f, 3.5f, 0.0f));
+	Cube * cb13 = new Cube(glm::vec3(5.0f, 3.5f, 0.0f));
+	Cube * cb14 = new Cube(glm::vec3(6.0f, 3.5f, 0.0f));
+	Cube * cb15 = new Cube(glm::vec3(6.0f, 2.5f, 0.0f));
+	Cube * cb16 = new Cube(glm::vec3(6.0f, 1.5f, 0.0f));
+	Cube * cb17 = new Cube(glm::vec3(6.0f, 0.5f, 0.0f));
+
+	Model * seansModel = new Model();
+	seansModel->addPolygon(cb1);
+	seansModel->addPolygon(cb2);
+	seansModel->addPolygon(cb3);
+	seansModel->addPolygon(cb4);
+	seansModel->addPolygon(cb5);
+	seansModel->addPolygon(cb6);
+	seansModel->addPolygon(cb7);
+	seansModel->addPolygon(cb8);
+	seansModel->addPolygon(cb9);
+	seansModel->addPolygon(cb10);
+	seansModel->addPolygon(cb11);
+	seansModel->addPolygon(cb12);
+	seansModel->addPolygon(cb13);
+	seansModel->addPolygon(cb14);
+	seansModel->addPolygon(cb15);
+	seansModel->addPolygon(cb16);
+	seansModel->addPolygon(cb17);
+
+	return seansModel;
 }
