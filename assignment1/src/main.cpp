@@ -42,6 +42,7 @@
 /* Function Declarations */
 void processInput(GLFWwindow *window);
 static Model * createSeansModel();
+static Model * createBensModel();
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
@@ -114,16 +115,17 @@ int main(void)
 	/* Models */
 
 	// For the next person to add their model, we may want to use a VBO and VAO array (see Grid example)
-	unsigned int VBO, VAO;
-	GLCall(glGenVertexArrays(1, &VAO));
-	GLCall(glGenBuffers(1, &VBO));
+	unsigned int model_VBO[2], model_VAO[2];
+	GLCall(glGenVertexArrays(2, model_VBO));
+	GLCall(glGenBuffers(2, model_VAO));
 
 		// Sean's Model
-		GLCall(glBindVertexArray(VAO));
+		GLCall(glBindVertexArray(model_VAO[0]));
 
-		Model* m1 = createSeansModel();
+		Model* m1 = createBensModel();
+		Model* m2 = createSeansModel();
 
-		GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
+		GLCall(glBindBuffer(GL_ARRAY_BUFFER, model_VBO[0]));
 		GLCall(glBufferData(GL_ARRAY_BUFFER, m1->getVAByteSize(), m1->getVertexArray(), GL_STATIC_DRAW));
 
 		// Set Position
@@ -137,6 +139,27 @@ int main(void)
 	// Unbinding (safe)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+
+	GLCall(glBindVertexArray(model_VAO[1]));
+
+
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, model_VBO[1]));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, m2->getVAByteSize(), m2->getVertexArray(), GL_STATIC_DRAW));
+
+	// Set Position
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
+	GLCall(glEnableVertexAttribArray(0));
+
+	// Set Textures
+	GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(1));
+
+	// Unbinding (safe)
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+
 
 	/* Grid */
 
@@ -171,6 +194,8 @@ int main(void)
 
 	/* Textures */ 
 
+
+	
 	// TEMPORARY CODE: I think at this point we should remove all of our texture "legacy" code
 	unsigned int texture;
 	GLCall(glGenTextures(1, &texture));
@@ -188,6 +213,7 @@ int main(void)
 	int width, height, nrChannels;
 	stbi_set_flip_vertically_on_load(true); 
 	
+	
 	// Get image from resources folder
 	unsigned char *data = stbi_load("comp371/assignment1/src/Resources/container.jpg", &width, &height, &nrChannels, 0);
 	if (data)
@@ -203,6 +229,8 @@ int main(void)
 
 	shaderProgram.use();
 	shaderProgram.setInt("texture", 0);
+	
+	
 
 	// Uniform Declarations
 	unsigned int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
@@ -241,13 +269,22 @@ int main(void)
 		glm::mat4 model;
 
 		// Draw Model 1 (Sean)
-		GLCall(glBindVertexArray(VAO));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
+		GLCall(glBindVertexArray(model_VAO[0]));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
 			shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
 			model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
 			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
 			model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, 612));							// Draw Call
+			GLCall(glDrawArrays(GL_TRIANGLES, 0, m1->getVAVertexCount()));							// Draw Call
+
+		GLCall(glBindVertexArray(model_VAO[1]));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
+			shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
+			model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
+			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
+			model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
+			GLCall(glDrawArrays(GL_TRIANGLES, 0, m2->getVAVertexCount()));							// Draw Call
+
 
 		// Draw the Grid Mesh
 		GLCall(glBindVertexArray(grid_VAOs[0]));
@@ -274,10 +311,10 @@ int main(void)
 	}
 
 	/* De-allocate resources */
-	GLCall(glDeleteVertexArrays(1, &VAO));
-	GLCall(glDeleteBuffers(1, &VBO));
-	GLCall(glDeleteVertexArrays(1, grid_VAOs));
-	GLCall(glDeleteBuffers(1, grid_VBOs));
+	GLCall(glDeleteVertexArrays(2, model_VAO));
+	GLCall(glDeleteBuffers(2, model_VBO));
+	GLCall(glDeleteVertexArrays(2, grid_VAOs));
+	GLCall(glDeleteBuffers(2, grid_VBOs));
 	
 	/* Terminate Program */
 	glfwTerminate();
@@ -346,4 +383,65 @@ static Model * createSeansModel()
 	seansModel->addPolygon(cb17);
 
 	return seansModel;
+}
+
+
+/* Static methods to create our Models */
+static Model * createBensModel()
+{
+
+	Model * model = new Model;
+	
+	model->addPolygon(new Cube(glm::vec3(0.0f, 0.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(0.0f, 1.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(0.0f, 2.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(0.0f, 3.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(0.75f, 3.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(1.25f, 2.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(1.75f, 1.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(2.25f, 0.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(3.0f, 0.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(3.0f, 1.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(3.0f, 2.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(3.0f, 3.5f, 0.0f)));
+
+	
+
+	model->addPolygon(new Cube(glm::vec3(5.0f, 3.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(5.5f, 3.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(6.0f, 3.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(5.0f, 2.0f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(5.5f, 2.0f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(6.0f, 2.0f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(5.0f, 0.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(5.5f, 0.5f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(6.0f, 0.5f, 0.0f)));
+
+	model->addPolygon(new Cube(glm::vec3(6.5f, 1.0f, 0.0f)));
+	model->addPolygon(new Cube(glm::vec3(6.5f, 3.0f, 0.0f)));
+
+
+	/*
+	Cube *cb = new Cube(glm::vec3(8.5f, 3.0f, 0.0f));
+	glm::mat4 warp = glm::mat4(
+		1.0f, 0.0f, 5.0f, 0.0f, 
+		0.0f, 1.0f, 5.0f, 0.0f, 
+		0.0f, 0.0f, 1.0f, 0.0f, 
+		0.0f, 0.0f, 0.0f, 1.0f);
+
+	warp = glm::translate(warp, glm::vec3(0.0f, 0.0f, -40.0f));
+	warp = glm::rotate(warp, glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 1.0));
+
+	cb->transform(warp);
+	model->addPolygon(cb);
+	*/
+
+	
+
+	glm::mat4 mat(1.0f);
+	mat = glm::translate(mat, glm::vec3(35.0f, 0.0f, 0.0f));
+
+	model->transform(mat);
+
+	return model;
 }

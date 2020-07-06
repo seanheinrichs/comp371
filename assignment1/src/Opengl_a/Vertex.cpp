@@ -20,6 +20,17 @@ Vertex::Vertex(glm::vec3 pos, glm::vec2 tex)
 	texture = tex;
 }
 
+Vertex::Vertex() {}
+
+void Vertex::addVertexComponent(VertexComponent vc) 
+{
+	vertexComponents.push_back(vc);
+}
+
+
+
+
+
 int Vertex::getByteSize()
 {
 	//this method is hardcoded for the time being
