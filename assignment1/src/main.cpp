@@ -42,6 +42,7 @@
 /* Function Declarations */
 void processInput(GLFWwindow *window);
 static Model * createSeansModel();
+static Model * createIsabellesModel();
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
@@ -122,9 +123,11 @@ int main(void)
 		GLCall(glBindVertexArray(VAO));
 
 		Model* m1 = createSeansModel();
-
+		
 		GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
 		GLCall(glBufferData(GL_ARRAY_BUFFER, m1->getVAByteSize(), m1->getVertexArray(), GL_STATIC_DRAW));
+
+	
 
 		// Set Position
 		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
@@ -137,6 +140,28 @@ int main(void)
 	// Unbinding (safe)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+
+	unsigned int VBO_I, VAO_I;
+	GLCall(glGenVertexArrays(1, &VAO_I));
+	GLCall(glGenBuffers(1, &VBO_I));
+	GLCall(glBindVertexArray(VAO_I));
+	Model* m2 = createIsabellesModel();
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO_I));
+
+	GLCall(glBufferData(GL_ARRAY_BUFFER, m2->getVAByteSize(), m2->getVertexArray(), GL_STATIC_DRAW));
+
+	// Set Position
+	int positionVerticesIndex = 0;
+	int positionVerticeDimension = 3;
+	GLCall(glVertexAttribPointer(positionVerticesIndex, positionVerticeDimension, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0)); // (-->describing what you are looking for)
+	GLCall(glEnableVertexAttribArray(positionVerticesIndex)); //bind cube geometry, looking at position vertices (--> go get it) (GPU talk)
+
+	// Set Textures
+	int textureVerticesIndex = 1;
+	int texureVerticeDimension = 2;
+	GLCall(glVertexAttribPointer(textureVerticesIndex, texureVerticeDimension, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(textureVerticesIndex)); // bind cube texture, looking at texture vertices
 
 	/* Grid */
 
@@ -247,7 +272,19 @@ int main(void)
 			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
 			model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, 612));							// Draw Call
+			GLCall(glDrawArrays(GL_TRIANGLES, 0, 1152));							// Draw Call
+			
+		//Model Isabelle
+		// Define model
+		
+			GLCall(glBindVertexArray(VAO_I));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
+			shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
+			model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
+			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
+			model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
+			GLCall(glDrawArrays(GL_TRIANGLES, 0, 1152));							// Draw Call
+
 
 		// Draw the Grid Mesh
 		GLCall(glBindVertexArray(grid_VAOs[0]));
@@ -346,4 +383,92 @@ static Model * createSeansModel()
 	seansModel->addPolygon(cb17);
 
 	return seansModel;
+}
+
+static Model * createIsabellesModel()
+{
+	//A0
+	float originX = 20.0f;
+	float originY = 0.5f;
+	float originZ = 0.0f;
+	float cubeOffset = 1.0f;
+	float letterOffset = cubeOffset * 5;
+	//drawing A
+	//left 
+	Cube * cube1 = new Cube(glm::vec3(originX, originY, originZ));
+	Cube * cube2 = new Cube(glm::vec3(originX, originY + cubeOffset, originZ));
+	Cube * cube3 = new Cube(glm::vec3(originX, originY + cubeOffset * 2, originZ));
+	Cube * cube4 = new Cube(glm::vec3(originX, originY + cubeOffset * 3, originZ));
+	Cube * cube5 = new Cube(glm::vec3(originX, originY + cubeOffset * 4, originZ));
+	Cube * cube6 = new Cube(glm::vec3(originX, originY + cubeOffset * 5, originZ));
+	//right
+	Cube * cube7 = new Cube(glm::vec3(originX + cubeOffset * 3, originY, originZ));
+	Cube * cube8 = new Cube(glm::vec3(originX + cubeOffset * 3, originY + cubeOffset, originZ));
+	Cube * cube9 = new Cube(glm::vec3(originX + cubeOffset * 3, originY + cubeOffset * 2, originZ));
+	Cube * cube10 = new Cube(glm::vec3(originX + cubeOffset * 3, originY + cubeOffset * 3, originZ));
+	Cube * cube11 = new Cube(glm::vec3(originX + cubeOffset * 3, originY + cubeOffset * 4, originZ));
+	Cube * cube12 = new Cube(glm::vec3(originX + cubeOffset * 3, originY + cubeOffset * 5, originZ));
+	//middle top
+	Cube * cube13 = new Cube(glm::vec3(originX + cubeOffset, originY + cubeOffset * 5, originZ));
+	Cube * cube14 = new Cube(glm::vec3(originX + cubeOffset * 2, originY + cubeOffset * 5, originZ));
+	//middle bottom
+	Cube * cube15 = new Cube(glm::vec3(originX + cubeOffset, originY + cubeOffset * 3, originZ));
+	Cube * cube16 = new Cube(glm::vec3(originX + cubeOffset * 2, originY + cubeOffset * 3, originZ));
+
+	//drawing 0
+	//left
+	Cube * cube17 = new Cube(glm::vec3(originX + letterOffset, originY, originZ));
+	Cube * cube18 = new Cube(glm::vec3(originX + letterOffset, originY + cubeOffset, originZ));
+	Cube * cube19 = new Cube(glm::vec3(originX + letterOffset, originY + cubeOffset * 2, originZ));
+	Cube * cube20 = new Cube(glm::vec3(originX + letterOffset, originY + cubeOffset * 3, originZ));
+	Cube * cube21 = new Cube(glm::vec3(originX + letterOffset, originY + cubeOffset * 4, originZ));
+	Cube * cube22 = new Cube(glm::vec3(originX + letterOffset, originY + cubeOffset * 5, originZ));
+	//right
+	Cube * cube23 = new Cube(glm::vec3(originX + letterOffset + cubeOffset * 3, originY, originZ));
+	Cube * cube24 = new Cube(glm::vec3(originX + letterOffset + cubeOffset * 3, originY + cubeOffset, originZ));
+	Cube * cube25 = new Cube(glm::vec3(originX + letterOffset + cubeOffset * 3, originY + cubeOffset * 2, originZ));
+	Cube * cube26 = new Cube(glm::vec3(originX + letterOffset + cubeOffset * 3, originY + cubeOffset * 3, originZ));
+	Cube * cube27 = new Cube(glm::vec3(originX + letterOffset + cubeOffset * 3, originY + cubeOffset * 4, originZ));
+	Cube * cube28 = new Cube(glm::vec3(originX + letterOffset + cubeOffset * 3, originY + cubeOffset * 5, originZ));
+	//top
+	Cube * cube29 = new Cube(glm::vec3(originX + letterOffset + cubeOffset, originY + cubeOffset * 5, originZ));
+	Cube * cube30 = new Cube(glm::vec3(originX + letterOffset + cubeOffset * 2, originY + cubeOffset * 5, originZ));
+	//bottom
+	Cube * cube31 = new Cube(glm::vec3(originX + letterOffset + cubeOffset, originY, originZ));
+	Cube * cube32 = new Cube(glm::vec3(originX + letterOffset + cubeOffset * 2, originY, originZ));
+
+	Model * isabellesModel = new Model();
+	isabellesModel->addPolygon(cube1);
+	isabellesModel->addPolygon(cube2);
+	isabellesModel->addPolygon(cube3);
+	isabellesModel->addPolygon(cube4);
+	isabellesModel->addPolygon(cube5);
+	isabellesModel->addPolygon(cube6);
+	isabellesModel->addPolygon(cube7);
+	isabellesModel->addPolygon(cube8);
+	isabellesModel->addPolygon(cube9);
+	isabellesModel->addPolygon(cube10);
+	isabellesModel->addPolygon(cube11);
+	isabellesModel->addPolygon(cube12);
+	isabellesModel->addPolygon(cube13);
+	isabellesModel->addPolygon(cube14);
+	isabellesModel->addPolygon(cube15);
+	isabellesModel->addPolygon(cube16);
+	isabellesModel->addPolygon(cube17);
+	isabellesModel->addPolygon(cube18);
+	isabellesModel->addPolygon(cube19);
+	isabellesModel->addPolygon(cube20);
+	isabellesModel->addPolygon(cube21);
+	isabellesModel->addPolygon(cube22);
+	isabellesModel->addPolygon(cube23);
+	isabellesModel->addPolygon(cube24);
+	isabellesModel->addPolygon(cube25);
+	isabellesModel->addPolygon(cube26);
+	isabellesModel->addPolygon(cube27);
+	isabellesModel->addPolygon(cube28);
+	isabellesModel->addPolygon(cube29);
+	isabellesModel->addPolygon(cube30);
+	isabellesModel->addPolygon(cube31);
+	isabellesModel->addPolygon(cube32);
+	return isabellesModel;
 }
