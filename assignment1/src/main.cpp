@@ -5,7 +5,7 @@
 		Benjamin Therien (40034572)
 		Sean Heinrichs (40075789)
 		Wayne St Amand (Add your SN# when you make a commit)
-		Isabelle Gourchette (Add your SN# when you make a commit)
+		Isabelle Gourchette 40008121
 		Ziming Wang (Add your SN# when you make a commit)
 	Due:  July 9th, 2020
 */
@@ -41,6 +41,7 @@
 
 /* Function Declarations */
 void processInput(GLFWwindow *window);
+void setupVBOVAO(unsigned int *VBO, unsigned int *VAO, int index, Model * model);
 static Model * createSeansModel();
 static Model * createIsabellesModel();
 
@@ -55,7 +56,7 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-/* Error Handling 
+/* Error Handling
 
 The following functions are ripped from cherno's videos and we need to modify them
 
@@ -110,61 +111,22 @@ int main(void)
 	GLCall(glEnable(GL_DEPTH_TEST));
 
 	/* Build and Compile Shader Program */
-	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader"); 
+	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader");
 
 	/* Models */
+	unsigned int VBO[5], VAO[5];
+	GLCall(glGenVertexArrays(5, VAO));
+	GLCall(glGenBuffers(5, VBO));
 
-	// For the next person to add their model, we may want to use a VBO and VAO array (see Grid example)
-	unsigned int VBO, VAO;
-	GLCall(glGenVertexArrays(1, &VAO));
-	GLCall(glGenBuffers(1, &VBO));
-
-		// Sean's Model
-		GLCall(glBindVertexArray(VAO));
-
-		Model* m1 = createSeansModel();
-		
-		GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-		GLCall(glBufferData(GL_ARRAY_BUFFER, m1->getVAByteSize(), m1->getVertexArray(), GL_STATIC_DRAW));
-
-	
-
-		// Set Position
-		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
-		GLCall(glEnableVertexAttribArray(0));
-		
-		// Set Textures
-		GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
-		GLCall(glEnableVertexAttribArray(1));
-
-	// Unbinding (safe)
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-
-	unsigned int VBO_I, VAO_I;
-	GLCall(glGenVertexArrays(1, &VAO_I));
-	GLCall(glGenBuffers(1, &VBO_I));
-	GLCall(glBindVertexArray(VAO_I));
+	//Models
+	Model* m1 = createSeansModel();
 	Model* m2 = createIsabellesModel();
-	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO_I));
 
-	GLCall(glBufferData(GL_ARRAY_BUFFER, m2->getVAByteSize(), m2->getVertexArray(), GL_STATIC_DRAW));
-
-	// Set Position
-	int positionVerticesIndex = 0;
-	int positionVerticeDimension = 3;
-	GLCall(glVertexAttribPointer(positionVerticesIndex, positionVerticeDimension, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0)); // (-->describing what you are looking for)
-	GLCall(glEnableVertexAttribArray(positionVerticesIndex)); //bind cube geometry, looking at position vertices (--> go get it) (GPU talk)
-
-	// Set Textures
-	int textureVerticesIndex = 1;
-	int texureVerticeDimension = 2;
-	GLCall(glVertexAttribPointer(textureVerticesIndex, texureVerticeDimension, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
-	GLCall(glEnableVertexAttribArray(textureVerticesIndex)); // bind cube texture, looking at texture vertices
+	//void setupVBOVAO(unsigned int *VBO, unsigned int *VAO, int index, Model * model)
+	setupVBOVAO(VBO, VAO, 0, m1);
+	setupVBOVAO(VBO, VAO, 1, m2);
 
 	/* Grid */
-
 	Grid mainGrid = Grid();
 
 	unsigned int grid_VAOs[2], grid_VBOs[2], grid_EBO;
@@ -172,29 +134,29 @@ int main(void)
 	glGenBuffers(2, grid_VBOs);
 	glGenBuffers(1, &grid_EBO);
 
-		/* Grid Mesh */
-		glBindVertexArray(grid_VAOs[0]);
-		glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]);
-		glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
+	/* Grid Mesh */
+	glBindVertexArray(grid_VAOs[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]);
+	glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
-		/* Grid Floor */
-		glBindVertexArray(grid_VAOs[1]);
-		glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW);
+	/* Grid Floor */
+	glBindVertexArray(grid_VAOs[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grid_EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mainGrid.floorIndices), mainGrid.floorIndices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grid_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mainGrid.floorIndices), mainGrid.floorIndices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
 	// Unbinding (safe)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	/* Textures */ 
+	/* Textures */
 
 	// TEMPORARY CODE: I think at this point we should remove all of our texture "legacy" code
 	unsigned int texture;
@@ -211,8 +173,8 @@ int main(void)
 
 	// Load image, create texture and generate mipmaps
 	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true); 
-	
+	stbi_set_flip_vertically_on_load(true);
+
 	// Get image from resources folder
 	unsigned char *data = stbi_load("comp371/assignment1/src/Resources/container.jpg", &width, &height, &nrChannels, 0);
 	if (data)
@@ -230,7 +192,7 @@ int main(void)
 	shaderProgram.setInt("texture", 0);
 
 	// Uniform Declarations
-	unsigned int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
+	unsigned int modelLoc = glGetUniformLocation(shaderProgram.ID, "model"); //access variable to set the model matrix in the vertex shader
 	unsigned int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
 	unsigned int projectionLoc = glGetUniformLocation(shaderProgram.ID, "projection");
 
@@ -266,44 +228,38 @@ int main(void)
 		glm::mat4 model;
 
 		// Draw Model 1 (Sean)
-		GLCall(glBindVertexArray(VAO));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
-			shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-			model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-			model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, 1152));							// Draw Call
-			
-		//Model Isabelle
-		// Define model
-		
-			GLCall(glBindVertexArray(VAO_I));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
-			shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-			model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-			model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, 1152));							// Draw Call
+		GLCall(glBindVertexArray(VAO[0]));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
+		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
+		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
+		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
+		GLCall(glDrawArrays(GL_TRIANGLES, 0, 612));							// Draw Call
 
+		//Model Isabelle
+		GLCall(glBindVertexArray(VAO[1]));
+		model = glm::translate(model, glm::vec3(22.0f, 0.0f, -22.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	//***sending the model transofmration matrices to the shader
+		GLCall(glDrawArrays(GL_TRIANGLES, 0, 1152));
 
 		// Draw the Grid Mesh
 		GLCall(glBindVertexArray(grid_VAOs[0]));
-			shaderProgram.setInt("fill", 0);
-			model = glm::mat4(1.0f);
-			model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			glDrawArrays(GL_LINES, 0, mainGrid.meshVertices.size());
+		shaderProgram.setInt("fill", 0);
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glDrawArrays(GL_LINES, 0, mainGrid.meshVertices.size());
 
 		// Draw the Grid Floor
 		GLCall(glBindVertexArray(grid_VAOs[1]));
-			shaderProgram.setInt("fill", 1);
-			model = glm::mat4(1.0f);
-			model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		shaderProgram.setInt("fill", 1);
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
@@ -311,11 +267,11 @@ int main(void)
 	}
 
 	/* De-allocate resources */
-	GLCall(glDeleteVertexArrays(1, &VAO));
-	GLCall(glDeleteBuffers(1, &VBO));
+	GLCall(glDeleteVertexArrays(1, VAO));
+	GLCall(glDeleteBuffers(1, VBO));
 	GLCall(glDeleteVertexArrays(1, grid_VAOs));
 	GLCall(glDeleteBuffers(1, grid_VBOs));
-	
+
 	/* Terminate Program */
 	glfwTerminate();
 	return 0;
@@ -340,6 +296,27 @@ void processInput(GLFWwindow *window)
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+void setupVBOVAO(unsigned int *VBO, unsigned int *VAO, int index, Model * model)
+{
+	int positionVerticesIndex = 0;
+	int positionVerticeDimension = 3;
+	int textureVerticesIndex = 1;
+	int texureVerticeDimension = 2;
+
+	GLCall(glBindVertexArray(VAO[index]));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO[index]));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, model->getVAByteSize(), model->getVertexArray(), GL_STATIC_DRAW));
+	// Set Position
+	GLCall(glVertexAttribPointer(positionVerticesIndex, positionVerticeDimension, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
+	GLCall(glEnableVertexAttribArray(positionVerticesIndex));
+	// Set Textures
+	GLCall(glVertexAttribPointer(textureVerticesIndex, texureVerticeDimension, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(textureVerticesIndex));
+	// Unbinding (safe)
+	glBindBuffer(GL_ARRAY_BUFFER, index);
+	glBindVertexArray(index);
 }
 
 /* Static methods to create our Models */
