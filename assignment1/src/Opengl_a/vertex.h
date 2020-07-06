@@ -16,7 +16,8 @@ texture: a 2 component vextor that holds the texture of the vertex
 
 
 #include "../Shaders/Shader.h"
-
+#include <vector>
+#include "vertexComponent.h"
 
 class Vertex 
 {
@@ -24,7 +25,11 @@ class Vertex
 public:
 	glm::vec3 position;
 	glm::vec2 texture;
-	
+	std::vector<VertexComponent> vertexComponents;
+	Vertex();
+
+
+	void addVertexComponent(VertexComponent vc);
 
 
 	Vertex(glm::vec3 pos, glm::vec2 tex);

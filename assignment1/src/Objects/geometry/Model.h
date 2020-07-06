@@ -19,17 +19,18 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include <glm/glm.hpp>
 #include "Polygon.h"
 
-class Model
+class Model : Polygon
 {
 public:
-	void transform(glm::mat4 transmat);
+	virtual void transform(glm::mat4 transmat);
 	std::vector<Polygon*> polygons;
 	void addPolygon(Polygon* poly);
 	Model();
 
-	float* getVertexArray();
-	int getVAComponentCount();
-	int getVAByteSize();
+	virtual float* getVertexArray();
+	virtual int getVAFloatCount();
+	virtual int getVAByteSize();
+	virtual int getVAVertexCount();
 
 
 	glm::vec3 origin;

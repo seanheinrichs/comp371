@@ -17,8 +17,9 @@ class Polygon
 {
 	public:
 		virtual void transform(glm::mat4 transMat) {}
-		virtual int getVAComponentCount() { return 5; }
-		virtual int getVAByteSize() { return 0; }
+		virtual int getVAVertexCount() { return 5; }
+		virtual int getVAByteSize() { return 5; }
+		virtual int getVAFloatCount() { return 5; }
 		virtual float* getVertexArray() {
 			float* a = new float[3];
 			a[0] = 5.0;
