@@ -4,7 +4,7 @@
 	Written By:
 		Benjamin Therien (40034572)
 		Sean Heinrichs (40075789)
-		Wayne St Amand (Add your SN# when you make a commit)
+		Wayne St Amand (40074423)
 		Isabelle Gourchette (Add your SN# when you make a commit)
 		Ziming Wang (Add your SN# when you make a commit)
 	Due:  July 9th, 2020
@@ -346,4 +346,47 @@ static Model * createSeansModel()
 	seansModel->addPolygon(cb17);
 
 	return seansModel;
+}
+
+static Model * createWaynesModel()
+{
+	Cube * cb1 = new Cube(glm::vec3(0.0f, 3.0f, 0.0f));
+	Cube * cb2 = new Cube(glm::vec3(0.0f, 4.0f, 0.0f));
+	Cube * cb3 = new Cube(glm::vec3(1.0f, 0.0f, 0.0f));
+	Cube * cb4 = new Cube(glm::vec3(1.0f, 1.0f, 0.0f));
+	Cube * cb5 = new Cube(glm::vec3(1.0f, 2.0f, 0.0f));
+	Cube * cb6 = new Cube(glm::vec3(1.0f, 3.0f, 0.0f));
+	Cube * cb7 = new Cube(glm::vec3(2.0f, 3.0f, 0.0f));
+	Cube * cb8 = new Cube(glm::vec3(2.0f, 4.0f, 0.0f));
+
+	Cube * cb9 = new Cube(glm::vec3(4.0f, 3.0f, 0.0f));
+	Cube * cb10 = new Cube(glm::vec3(4.0f, 4.0f, 0.0f));
+	Cube * cb11 = new Cube(glm::vec3(5.0f, 4.0f, 0.0f));
+	Cube * cb12 = new Cube(glm::vec3(6.0f, 0.0f, 0.0f));
+	Cube * cb13 = new Cube(glm::vec3(6.0f, 1.0f, 0.0f));
+	Cube * cb14 = new Cube(glm::vec3(6.0f, 2.0f, 0.0f));
+	Cube * cb15 = new Cube(glm::vec3(6.0f, 3.0f, 0.0f));
+	Cube * cb16 = new Cube(glm::vec3(6.0f, 4.0f, 0.0f));
+
+
+	Model * waynesModel = new Model();
+	waynesModel->addPolygon(cb1);
+	waynesModel->addPolygon(cb2);
+	waynesModel->addPolygon(cb3);
+	waynesModel->addPolygon(cb4);
+	waynesModel->addPolygon(cb5);
+	waynesModel->addPolygon(cb6);
+	waynesModel->addPolygon(cb7);
+	waynesModel->addPolygon(cb8);
+
+	waynesModel->addPolygon(cb9);
+	waynesModel->addPolygon(cb10);
+	waynesModel->addPolygon(cb11);
+	waynesModel->addPolygon(cb12);
+	waynesModel->addPolygon(cb13);
+	waynesModel->addPolygon(cb14);
+	waynesModel->addPolygon(cb15);
+	waynesModel->addPolygon(cb16);
+
+	return waynesModel;
 }
