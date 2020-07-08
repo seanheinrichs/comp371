@@ -6,11 +6,11 @@
 #include "vertexComponent.h"
 #include "vertex.h"
 
-VertexController::VertexController(bool position, bool texture)
+VertexController::VertexController(bool position, bool texture, bool color)
 {
 	VertexController::position = position;
 	VertexController::texture = texture;
-
+	VertexController::color = color;
 }
 
 
@@ -31,13 +31,21 @@ int VertexController::getVertexByteSize(Vertex vert)
 	int size = 0;
 	for (std::vector<VertexComponent>::iterator it = vert.vertexComponents.begin(); it < vert.vertexComponents.end(); it++)
 	{
-		if (position && it->type == 1)
+		if (position && it->type == POSITION)
 		{
 			size += it->getByteSize();
 		}
-		else if (texture && it->type == 2)
+		else if (texture && it->type == TEXTURE)
 		{
 			size += it->getByteSize();
+		}
+		else if (color && it->type == COLOR)
+		{
+			size += it->getByteSize();
+		}
+		else 
+		{
+			//pass
 		}
 	}
 
@@ -49,13 +57,21 @@ int VertexController::getVertexFloatCount(Vertex vert)
 	int size = 0;
 	for (std::vector<VertexComponent>::iterator it = vert.vertexComponents.begin(); it < vert.vertexComponents.end(); it++)
 	{
-		if (position && it->type == 1)
+		if (position && it->type == POSITION)
 		{
 			size += it->getFloatCount();
 		}
-		else if (texture && it->type == 2)
+		else if (texture && it->type == TEXTURE)
 		{
 			size += it->getFloatCount();
+		}
+		else if (color && it->type == COLOR)
+		{
+			size += it->getFloatCount();
+		}
+		else
+		{
+			//pass
 		}
 	}
 
@@ -69,19 +85,20 @@ float* VertexController::getVertex(Vertex vert)
 	int currentCount = 0;
 	for(std::vector<VertexComponent>::iterator it = vert.vertexComponents.begin(); it < vert.vertexComponents.end(); it++)
 	{
-		if (position && it->type == 1) 
+		if (position && it->type == POSITION)
 		{
 			std::copy(it->data, it->data + it->getFloatCount(), a+ currentCount);
 			currentCount += it->getFloatCount();
 		}
-		else if (texture && it->type == 2)
+		else if (texture && it->type == TEXTURE)
 		{
 			std::copy(it->data, it->data + it->getFloatCount(), a + currentCount);
 			currentCount += it->getFloatCount();
 		}
-		else 
+		else if (color && it->type == COLOR)
 		{
-		
+			std::copy(it->data, it->data + it->getFloatCount(), a + currentCount);
+			currentCount += it->getFloatCount();
 		}
 	}
 
@@ -154,7 +171,7 @@ void VertexController::transform(glm::mat4 transmat)
 	{
 		for (std::vector<VertexComponent>::iterator it2 = (*it).vertexComponents.begin(); it2 < (*it).vertexComponents.end(); it2++)
 		{
-			if (position && it2->type == 1)
+			if (position && it2->type == POSITION)
 			{
 				transformOne(transmat, *it2);
 				break;

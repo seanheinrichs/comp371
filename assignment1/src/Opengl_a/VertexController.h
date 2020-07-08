@@ -10,7 +10,7 @@ class VertexController{
 public: 
 	std::vector<Vertex> vertices;
 
-	VertexController(bool position = true, bool texture = false);
+	VertexController(bool position = true, bool texture = false, bool color = false);
 	VertexController(std::vector<Vertex> verts, bool position = true, bool texture = false);
 
 	void appendVertex(Vertex& ver);
@@ -28,6 +28,7 @@ public:
 
 	bool position;
 	bool texture;
+	bool color;
 
 	
 

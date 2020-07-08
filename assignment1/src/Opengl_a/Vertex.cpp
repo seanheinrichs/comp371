@@ -29,8 +29,6 @@ void Vertex::addVertexComponent(VertexComponent vc)
 
 
 
-
-
 int Vertex::getByteSize()
 {
 	//this method is hardcoded for the time being

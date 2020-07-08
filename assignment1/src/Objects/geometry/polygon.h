@@ -20,6 +20,9 @@ class Polygon
 		virtual int getVAVertexCount() { return 5; }
 		virtual int getVAByteSize() { return 5; }
 		virtual int getVAFloatCount() { return 5; }
+		virtual int getVertexByteSize() { return 5; }
+		virtual void setVertexController(bool position, bool texture, bool color) {}
+		virtual Vertex getSampleVertex() { return Vertex(); }
 		virtual float* getVertexArray() {
 			float* a = new float[3];
 			a[0] = 5.0;
