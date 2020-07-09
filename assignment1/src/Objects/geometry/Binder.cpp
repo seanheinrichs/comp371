@@ -87,8 +87,8 @@ void Binder::bind()
 
 void Binder::unbind()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+	GLCall(glBindVertexArray(0));
 }
 
 void Binder::deallocate() 

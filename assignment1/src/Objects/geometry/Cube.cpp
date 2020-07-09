@@ -10,7 +10,7 @@
 void Cube::setupVC() 
 {
 
-	vc = new VertexController(true, false);
+	vc = new VertexController(true, false, false);
 
 	Vertex a1;
 	a1.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, -0.5f)));
