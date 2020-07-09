@@ -15,26 +15,41 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 */
 
 #pragma once
+#include "binder.h"
 #include <vector>
 #include <glm/glm.hpp>
-#include "Polygon.h"
+#include "polygon.h"
 
-class Model : Polygon
+
+class Model : public Polygon, public Binder
 {
 public:
+	virtual void setVertexController(bool position, bool texture, bool color);
 	virtual void transform(glm::mat4 transmat);
 	std::vector<Polygon*> polygons;
 	void addPolygon(Polygon* poly);
-	Model();
+	Model(bool position, bool texture, bool color);
 
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();
 	virtual int getVAByteSize();
 	virtual int getVAVertexCount();
+	virtual int getVertexByteSize();
+	virtual Vertex getSampleVertex();
+
+	//binding
+	//void bindArrayBuffer(bool unbind);
+	//void bind();
+	//void unbind();
 
 
 	glm::vec3 origin;
 	int vaComponentCount;
 	int vaByteSize;
+
+	//Binder* binder;
+
+	//vertex components
+	bool position, color, texture;
 
 };

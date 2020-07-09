@@ -16,19 +16,54 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 
 #pragma once
 
+
 #include "Model.h"
 #include <iostream>
 
 
-Model::Model()
+Model::Model(bool position, bool texture, bool color)
 {
+	Model::position = position;
+	Model::texture = texture;
+	Model::color = color;
 	origin = glm::vec3(0.f);
+	//Model::binder = new Binder(position, texture, color);
 }
 
+/*
+void Model::bindArrayBuffer(bool unbind)
+{
+	(*this->binder).bindArrayBuffer(unbind, this);
+}
+
+void Model::bind()
+{
+	binder->bind();
+}
+void Model::unbind()
+{
+	binder->unbind();
+}
+*/
 void Model::addPolygon(Polygon* poly) 
 {
+	poly->setVertexController(position, texture, color);
 	polygons.push_back(poly);
 }
+
+void Model::setVertexController(bool position, bool texture, bool color) 
+{
+	Model::position = position;
+	Model::texture = texture;
+	Model::color = color;
+}
+
+Vertex Model::getSampleVertex() 
+{
+	return polygons.front()->getSampleVertex();
+}
+
+
 
 int Model::getVAFloatCount()
 {
@@ -81,4 +116,9 @@ float* Model::getVertexArray()
 	}
 	return va;
 
+}
+
+int Model::getVertexByteSize() 
+{
+	return polygons.front()->getVertexByteSize();
 }

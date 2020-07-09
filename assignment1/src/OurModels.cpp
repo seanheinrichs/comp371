@@ -25,7 +25,7 @@ static Model * createSeansModel()
 	Cube * cb16 = new Cube(glm::vec3(6.0f, 1.5f, 0.0f));
 	Cube * cb17 = new Cube(glm::vec3(6.0f, 0.5f, 0.0f));
 
-	Model * seansModel = new Model();
+	Model * seansModel = new Model(true, false, false);
 	seansModel->addPolygon(cb1);
 	seansModel->addPolygon(cb2);
 	seansModel->addPolygon(cb3);
@@ -69,7 +69,7 @@ static Model * createWaynesModel()
 	Cube * cb16 = new Cube(glm::vec3(6.0f, 4.0f, 0.0f));
 
 
-	Model * waynesModel = new Model();
+	Model * waynesModel = new Model(true, false, false);
 	waynesModel->addPolygon(cb1);
 	waynesModel->addPolygon(cb2);
 	waynesModel->addPolygon(cb3);
@@ -88,16 +88,19 @@ static Model * createWaynesModel()
 	waynesModel->addPolygon(cb15);
 	waynesModel->addPolygon(cb16);
 
+	glm::mat4 mat(1.0f);
+	mat = glm::translate(mat, glm::vec3(10.0f, 0.0f, 10.0f));
+
+	waynesModel->transform(mat);
+
 	return waynesModel;
 
 }
 
 
 /* Static methods to create our Models */
-static Model * createBensModel()
+static void createBensModel(Model* model)
 {
-
-	Model * model = new Model;
 
 	model->addPolygon(new Cube(glm::vec3(0.0f, 0.5f, 0.0f)));
 	model->addPolygon(new Cube(glm::vec3(0.0f, 1.5f, 0.0f)));
@@ -146,11 +149,9 @@ static Model * createBensModel()
 
 
 	glm::mat4 mat(1.0f);
-	mat = glm::translate(mat, glm::vec3(35.0f, 0.0f, 0.0f));
+	mat = glm::translate(mat, glm::vec3(20.0f, 0.0f, 0.0f));
 
 	model->transform(mat);
-
-	return model;
 
 }
 
@@ -207,7 +208,7 @@ static Model * createIsabellesModel()
 	Cube * cube31 = new Cube(glm::vec3(originX + letterOffset + cubeOffset, originY, originZ));
 	Cube * cube32 = new Cube(glm::vec3(originX + letterOffset + cubeOffset * 2, originY, originZ));
 
-	Model * isabellesModel = new Model();
+	Model * isabellesModel = new Model(true, false, false);
 	isabellesModel->addPolygon(cube1);
 	isabellesModel->addPolygon(cube2);
 	isabellesModel->addPolygon(cube3);
@@ -240,5 +241,11 @@ static Model * createIsabellesModel()
 	isabellesModel->addPolygon(cube30);
 	isabellesModel->addPolygon(cube31);
 	isabellesModel->addPolygon(cube32);
+
+	glm::mat4 mat(1.0f);
+	mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 15.0f));
+
+	isabellesModel->transform(mat);
+
 	return isabellesModel;
 }

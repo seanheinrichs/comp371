@@ -10,7 +10,7 @@
 void Cube::setupVC() 
 {
 
-	vc = new VertexController(true, true);
+	vc = new VertexController(true, false);
 
 	Vertex a1;
 	a1.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, -0.5f)));
@@ -214,7 +214,17 @@ Cube::Cube(glm::vec3 origin_a)
 	translate_fromOrigin();
 }
 
+void Cube::setVertexController(bool position, bool texture, bool color) 
+{
+	vc->position = position;
+	vc->texture = texture;
+	vc->color = color;
+}
 
+Vertex Cube::getSampleVertex()
+{
+	return vc->vertices.front();
+}
 
 void Cube::transform(glm::mat4 transmat)
 {
@@ -240,6 +250,12 @@ int Cube::getVAFloatCount()
 int Cube::getVAByteSize()
 {
 	return vc->getVAByteSize();
+}
+
+int Cube::getVertexByteSize()
+{
+
+	return vc->getVertexByteSize(vc->vertices.front());
 }
 
 

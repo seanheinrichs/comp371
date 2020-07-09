@@ -2,11 +2,21 @@
 #include <glm/glm.hpp>
 
 
+//#define POSITION 0
+//#define TEXTURE 1 
+//#define COLOR 2 
+
 enum Components
 {
-	POSITION = 1,
-	TEXTURE = 2
+	POSITION = 0,
+	TEXTURE ,
+	COLOR 
 };
+
+static bool operator==(Components& a, Components& b)  
+{
+	return (int)a == (int)b;
+}
 
 class VertexComponent 
 {
