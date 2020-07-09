@@ -5,9 +5,10 @@
 #include "../../Opengl_a/vertex.h"
 #include "model.h"
 
-/* Error Handling
+/* USED FOR DEBUGGING - Every OpenGL function call we use should be wrapped in a GLCall()
 
-The following functions are ripped from cherno's videos and we need to modify them
+The following 20 lines of code were taken from this video:
+https://www.youtube.com/watch?v=FBbPWSOQ0-w&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=10
 
 */
 #define ASSERT(x) if (!(x)) __debugbreak();
@@ -68,12 +69,6 @@ void Binder::bindArrayBuffer(bool unbind, Model* model)
 	{
 		if (arr[(int)it->type]) 
 		{
-			std::cout << "BINDER: "  << std::endl;
-			std::cout << "model->getVertexByteSize(): " << model->getVertexByteSize() << std::endl;
-			std::cout << "it->getFloatCount() : " << it->getFloatCount() << std::endl;
-			std::cout << "(void*)vertexByteOffset: " << (void*)0 << std::endl;
-			std::cout << "getVertexByteSize: " << 3 * sizeof(float) << std::endl;
-
 			GLCall(glVertexAttribPointer(vertexAttribCount, it->getFloatCount(), GL_FLOAT, GL_FALSE, model->getVertexByteSize(), (void*)0));
 			GLCall(glEnableVertexAttribArray(0));
 			vertexAttribCount += 1;

@@ -89,7 +89,7 @@ static Model * createWaynesModel()
 	waynesModel->addPolygon(cb16);
 
 	glm::mat4 mat(1.0f);
-	mat = glm::translate(mat, glm::vec3(10.0f, 0.0f, 0.0f));
+	mat = glm::translate(mat, glm::vec3(10.0f, 0.0f, 10.0f));
 
 	waynesModel->transform(mat);
 

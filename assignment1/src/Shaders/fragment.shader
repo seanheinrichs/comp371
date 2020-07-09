@@ -20,11 +20,14 @@ void main()
 	{
 		FragColor = vec4(0.2f, 0.3f, 0.3f, 1.0f);
 	}
+	else if (fill == 2)
+	{
+		FragColor = vec4(0.75f, 0.75f, 0.75f, 1.0f);
+	}
 	// Textures
 	else 
 	{
 		FragColor = texture(texture1, TexCoord);
 	}
 
-	FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);
 }

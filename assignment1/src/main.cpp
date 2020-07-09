@@ -29,36 +29,21 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-//#define GLFW_REFRESH_RATE 60
-//#define	GLFW_DOUBLEBUFFER GLFW_TRUE
+#define GLFW_REFRESH_RATE 60
+#define	GLFW_DOUBLEBUFFER GLFW_TRUE
 
-/* USED FOR DEBUGGING - Every OpenGL function call we use should be wrapped in a GLCall() */
+/* USED FOR DEBUGGING - Every OpenGL function call we use should be wrapped in a GLCall() 
+
+The following 20 lines of code were taken from this video: 
+https://www.youtube.com/watch?v=FBbPWSOQ0-w&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=10
+
+*/
 #define ASSERT(x) if (!(x)) __debugbreak();
 #define GLCall(x) GLClearError();\
 	x;\
 	ASSERT(GLLogCall(#x, __FILE__, __LINE__))
 
-/* Function Declarations */
-void processInput(GLFWwindow *window);
-static Model * createSeansModel();
-static Model * createBensModel();
 
-/* Global Constants */
-const unsigned int WINDOW_WIDTH = 1024;
-const unsigned int WINDOW_HEIGHT = 768;
-
-/* Camera Setup */
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.2f, 2.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -2.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
-
-/* Error Handling 
-
-The following functions are ripped from cherno's videos and we need to modify them
-
-*/
 static void GLClearError() {
 	while (glGetError() != GL_NO_ERROR);
 }
@@ -73,6 +58,22 @@ static bool GLLogCall(const char* function, const char* file, int line)
 	}
 	return true;
 }
+
+/* Function Declarations */
+void processInput(GLFWwindow *window);
+
+/* Global Constants */
+const unsigned int WINDOW_WIDTH = 1024;
+const unsigned int WINDOW_HEIGHT = 768;
+
+/* Camera Setup */
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.2f, 2.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -2.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+
 #include <vector>
 int main(void)
 {
@@ -135,50 +136,7 @@ int main(void)
 	Model* isa = createIsabellesModel();
 	isa->bindArrayBuffer(true, isa);
 
-
-
 	
-	// Set Textures
-	//GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
-	//GLCall(glEnableVertexAttribArray(1));
-	
-	// Unbinding (safe)
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindVertexArray(0);
-
-	/*
-	// TEMPORARY CODE: I think at this point we should remove all of our texture "legacy" code
-	unsigned int texture;
-	GLCall(glGenTextures(1, &texture));
-	GLCall(glBindTexture(GL_TEXTURE_2D, texture));
-
-	// Set texture wrapping parameters
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-
-	// Set texture filtering parameters
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-
-	// Load image, create texture and generate mipmaps
-	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true);
-
-	// Get image from resources folder
-	unsigned char *data = stbi_load("comp371/assignment1/src/Resources/container.jpg", &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data));
-		GLCall(glGenerateMipmap(GL_TEXTURE_2D));
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
-
-	*/
-
 	// [Grid]
 
 	Grid mainGrid = Grid();
@@ -258,8 +216,6 @@ int main(void)
 		// Define model
 		glm::mat4 model;
 
-		// Draw Model 1 (Sean)
-		//GLCall(glBindVertexArray(vao));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
 		ben->bind();
 		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
 		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
@@ -315,11 +271,6 @@ int main(void)
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
-		
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
 	}
 
 	// De-allocate resources 
@@ -332,219 +283,6 @@ int main(void)
 	glfwTerminate();
 	return 0;
 }
-
-	/*
-
-	//	[Models]
-
-	// For the next person to add their model, we may want to use a VBO and VAO array (see Grid example)
-	unsigned int model_VBO[2], model_VAO[2];
-	GLCall(glGenVertexArrays(2, model_VAO));
-	GLCall(glGenBuffers(2, model_VBO));
-
-		// Sean's Model
-		GLCall(glBindVertexArray(model_VAO[0]));
-
-		Model* m1 = createBensModel();
-		Model* m2 = createSeansModel();
-
-		GLCall(glBindBuffer(GL_ARRAY_BUFFER, model_VBO[0]));
-		GLCall(glBufferData(GL_ARRAY_BUFFER, m1->getVAByteSize(), m1->getVertexArray(), GL_STATIC_DRAW));
-
-		// Set Position
-		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
-		GLCall(glEnableVertexAttribArray(0));
-		
-		// Set Textures
-		GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
-		GLCall(glEnableVertexAttribArray(1));
-
-	// Unbinding (safe)
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-
-	GLCall(glBindVertexArray(model_VAO[1]));
-
-
-	GLCall(glBindBuffer(GL_ARRAY_BUFFER, model_VBO[1]));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, m2->getVAByteSize(), m2->getVertexArray(), GL_STATIC_DRAW));
-
-	// Set Position
-	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0));
-	GLCall(glEnableVertexAttribArray(0));
-
-	// Set Textures
-	GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
-	GLCall(glEnableVertexAttribArray(1));
-
-	// Unbinding (safe)
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-
-
-	// [Grid]
-
-	Grid mainGrid = Grid();
-
-	unsigned int grid_VAOs[2], grid_VBOs[2], grid_EBO;
-	glGenVertexArrays(2, grid_VAOs);
-	glGenBuffers(2, grid_VBOs);
-	glGenBuffers(1, &grid_EBO);
-
-		// Grid Mesh 
-		glBindVertexArray(grid_VAOs[0]);
-		glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]);
-		glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		// Grid Floor 
-		glBindVertexArray(grid_VAOs[1]);
-		glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grid_EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mainGrid.floorIndices), mainGrid.floorIndices, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-	// Unbinding (safe)
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	// [Textures] 
-
-
-	
-	// TEMPORARY CODE: I think at this point we should remove all of our texture "legacy" code
-	unsigned int texture;
-	GLCall(glGenTextures(1, &texture));
-	GLCall(glBindTexture(GL_TEXTURE_2D, texture));
-
-	// Set texture wrapping parameters
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-
-	// Set texture filtering parameters
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-
-	// Load image, create texture and generate mipmaps
-	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true); 
-	
-	
-	// Get image from resources folder
-	unsigned char *data = stbi_load("comp371/assignment1/src/Resources/container.jpg", &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data));
-		GLCall(glGenerateMipmap(GL_TEXTURE_2D));
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
-
-	shaderProgram.use();
-	shaderProgram.setInt("texture", 0);
-	
-	
-
-	// Uniform Declarations
-	unsigned int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
-	unsigned int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
-	unsigned int projectionLoc = glGetUniformLocation(shaderProgram.ID, "projection");
-
-	// Setup Camera Projection 
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-	shaderProgram.setMat4("projection", projection);
-
-	// Main Loop 
-	while (!glfwWindowShouldClose(window))
-	{
-		// Set frame for Camera (taken from LearnOpenGL)
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
-		// Event Handling
-		processInput(window);
-
-		// Render
-		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
-		// Tectures
-		// TEMPORARY CODE: Either to be removed or moved to grid class (depending on whether we are using textures)
-		GLCall(glActiveTexture(GL_TEXTURE0));
-		GLCall(glBindTexture(GL_TEXTURE_2D, texture));
-
-		// Handles camera views and transformations
-		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-		shaderProgram.setMat4("view", view);
-
-		// Define model
-		glm::mat4 model;
-
-		// Draw Model 1 (Sean)
-		GLCall(glBindVertexArray(model_VAO[0]));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
-			shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-			model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-			model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, m1->getVAVertexCount()));							// Draw Call
-
-		GLCall(glBindVertexArray(model_VAO[1]));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
-			shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-			model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-			model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, m2->getVAVertexCount()));							// Draw Call
-
-
-		// Draw the Grid Mesh
-		GLCall(glBindVertexArray(grid_VAOs[0]));
-			shaderProgram.setInt("fill", 0);
-			model = glm::mat4(1.0f);
-			model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			glDrawArrays(GL_LINES, 0, mainGrid.meshVertices.size());
-
-		// Draw the Grid Floor
-		GLCall(glBindVertexArray(grid_VAOs[1]));
-			shaderProgram.setInt("fill", 1);
-			model = glm::mat4(1.0f);
-			model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-		// Swap Buffers and Poll for Events
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-
-	// De-allocate resources 
-	GLCall(glDeleteVertexArrays(2, model_VAO));
-	GLCall(glDeleteBuffers(2, model_VBO));
-	GLCall(glDeleteVertexArrays(2, grid_VAOs));
-	GLCall(glDeleteBuffers(2, grid_VBOs));
-	
-	// Terminate Program 
-	glfwTerminate();
-	return 0;
-
-	*/
-//}
 
 // Import all event handling functions here 
 void processInput(GLFWwindow *window)
