@@ -6,7 +6,7 @@
 		Sean Heinrichs (40075789)
 		Wayne St Amand (40074423)
 		Isabelle Gourchette (Add your SN# when you make a commit)
-		Ziming Wang (Add your SN# when you make a commit)
+		Ziming Wang (40041601)
 	Due:  July 9th, 2020
 */
 
@@ -136,6 +136,9 @@ int main(void)
 	Model* isa = createIsabellesModel();
 	isa->bindArrayBuffer(true, isa);
 
+	Model* ziming = createZimingsModel();
+	ziming->bindArrayBuffer(true, ziming);
+
 	
 	// [Grid]
 
@@ -248,6 +251,14 @@ int main(void)
 		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
 		GLCall(glDrawArrays(GL_TRIANGLES, 0, isa->getVAVertexCount()));
+
+		ziming->bind();
+		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
+		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
+		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
+		GLCall(glDrawArrays(GL_TRIANGLES, 0, ziming->getVAVertexCount()));
 		
 		// Draw the Grid Mesh
 		GLCall(glBindVertexArray(grid_VAOs[0]));
@@ -278,6 +289,7 @@ int main(void)
 	sean->deallocate();
 	wayne->deallocate();
 	isa->deallocate();
+	ziming->deallocate();
 
 	// Terminate Program 
 	glfwTerminate();
