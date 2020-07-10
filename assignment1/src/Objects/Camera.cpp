@@ -38,11 +38,11 @@ void Camera::tiltCamera(float pitch)
 	updateCamera();
 }
 
-void Camera::zoomCamera(float yOffset)
+void Camera::zoomCamera(float zoom)
 {
 	if (fieldOfViewAngle >= MIN_ZOOM && fieldOfViewAngle <= MAX_ZOOM)
 	{
-		fieldOfViewAngle -= yOffset * 0.1;
+		fieldOfViewAngle -= zoom * 0.1;
 	}
 
 	// Limit zoom values to prevent irregular behavior
