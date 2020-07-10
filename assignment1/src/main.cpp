@@ -239,9 +239,7 @@ int main(void)
 		// Use Identity Matrix to get rid of previous transformations
 
 		glm::mat4 scaleFromKeyboard = glm::translate(model, glm::vec3(0.0f, 0.0f, -22.0f)) * glm::scale(model, glm::vec3(scaleVal, scaleVal, scaleVal));
-		m1->transform(scaleFromKeyboard);
-		//model = glm::translate(model, glm::vec3(0.0f, 0.0f, -22.0f)) * glm::scale(model, glm::vec3(scaleVal, scaleVal, scaleVal));
-			
+		//m1->transform(scaleFromKeyboard); //I'm guessing the the method to call for modularity, but needs to be implemented with the following line
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(scaleFromKeyboard));
 		GLCall(glDrawArrays(GL_TRIANGLES, 0, 612));							
 		//Model Isabelle
