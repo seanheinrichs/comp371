@@ -249,3 +249,62 @@ static Model * createIsabellesModel()
 
 	return isabellesModel;
 }
+
+static Model * createZimingsModel()
+{
+	Cube * cb1 = new Cube(glm::vec3(0.0f, 0.5f, 0.0f));
+	Cube * cb2 = new Cube(glm::vec3(0.0f, 1.5f, 0.0f));
+	Cube * cb3 = new Cube(glm::vec3(0.0f, 2.5f, 0.0f));
+	Cube * cb4 = new Cube(glm::vec3(0.0f, 3.5f, 0.0f));
+	Cube * cb5 = new Cube(glm::vec3(1.0f, 3.5f, 0.0f));
+	Cube * cb6 = new Cube(glm::vec3(2.0f, 0.5f, 0.0f));
+	Cube * cb7 = new Cube(glm::vec3(2.0f, 1.5f, 0.0f));
+	Cube * cb8 = new Cube(glm::vec3(2.0f, 2.5f, 0.0f));
+	Cube * cb9 = new Cube(glm::vec3(2.0f, 3.5f, 0.0f));
+	Cube * cb10 = new Cube(glm::vec3(3.0f, 3.5f, 0.0f));
+	Cube * cb11 = new Cube(glm::vec3(4.0f, 0.5f, 0.0f));
+	Cube * cb12 = new Cube(glm::vec3(4.0f, 1.5f, 0.0f));
+	Cube * cb13 = new Cube(glm::vec3(4.0f, 2.5f, 0.0f));
+	Cube * cb14 = new Cube(glm::vec3(4.0f, 3.5f, 0.0f));
+	Cube * cb15 = new Cube(glm::vec3(6.0f, 1.5f, 0.0f));
+	Cube * cb16 = new Cube(glm::vec3(6.0f, 2.5f, 0.0f));
+	Cube * cb17 = new Cube(glm::vec3(6.0f, 3.5f, 0.0f));
+	Cube * cb18 = new Cube(glm::vec3(7.0f, 1.5f, 0.0f));
+	Cube * cb19 = new Cube(glm::vec3(8.0f, 0.5f, 0.0f));
+	Cube * cb20 = new Cube(glm::vec3(8.0f, 1.5f, 0.0f));
+	Cube * cb21 = new Cube(glm::vec3(8.0f, 2.5f, 0.0f));
+	Cube * cb22 = new Cube(glm::vec3(8.0f, 3.5f, 0.0f));
+	Cube * cb23 = new Cube(glm::vec3(9.0f, 1.5f, 0.0f));
+
+	Model * ZimingsModel = new Model(true, false, false);
+	ZimingsModel->addPolygon(cb1);
+	ZimingsModel->addPolygon(cb2);
+	ZimingsModel->addPolygon(cb3);
+	ZimingsModel->addPolygon(cb4);
+	ZimingsModel->addPolygon(cb5);
+	ZimingsModel->addPolygon(cb6);
+	ZimingsModel->addPolygon(cb7);
+	ZimingsModel->addPolygon(cb8);
+	ZimingsModel->addPolygon(cb9);
+	ZimingsModel->addPolygon(cb10);
+	ZimingsModel->addPolygon(cb11);
+	ZimingsModel->addPolygon(cb12);
+	ZimingsModel->addPolygon(cb13);
+	ZimingsModel->addPolygon(cb14);
+	ZimingsModel->addPolygon(cb15);
+	ZimingsModel->addPolygon(cb16);
+	ZimingsModel->addPolygon(cb17);
+	ZimingsModel->addPolygon(cb18);
+	ZimingsModel->addPolygon(cb19);
+	ZimingsModel->addPolygon(cb20);
+	ZimingsModel->addPolygon(cb21);
+	ZimingsModel->addPolygon(cb22);
+	ZimingsModel->addPolygon(cb23);
+
+	glm::mat4 mat(1.0f);
+	mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 15.0f));
+
+	ZimingsModel->transform(mat);
+
+	return ZimingsModel;
+}
