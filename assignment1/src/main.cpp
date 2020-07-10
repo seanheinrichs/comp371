@@ -19,9 +19,9 @@
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "stb_image.h"	// For texture mapping (can remove once blocks don't have textures)
 #include "Objects/geometry/Polygon.h"
 #include "Objects/Grid.hpp"
+#include "Objects/Camera.h"
 #include "OurModels.cpp"
 
 #include <GL/glew.h>    
@@ -61,20 +61,25 @@ static bool GLLogCall(const char* function, const char* file, int line)
 
 /* Function Declarations */
 void processInput(GLFWwindow *window);
+void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
 const unsigned int WINDOW_HEIGHT = 768;
 
 /* Camera Setup */
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.2f, 2.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -2.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+Camera camera = Camera(glm::vec3(0.0f, 0.2f, 2.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+// Initialize variables used for rotations
+float previousXPos = WINDOW_WIDTH / 2.0f;
+float previousYPos = WINDOW_HEIGHT / 2.0f;
+float xOffset = 0.0f;
+float yOffset = 0.0f;
+float rX = 0.0f;
+float rY = 0.0f;
 
-#include <vector>
 int main(void)
 {
 	/* Initialize GLFW */
@@ -84,19 +89,21 @@ int main(void)
 		return -1;
 	}
 
-	// TODO: Add double buffering support for the window
-	// TODO: Use perspective view
 	GLFWwindow* window;
 
 	// Create a window and its OpenGL context 
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "COMP 371 - Assignment 1", NULL, NULL);
 	if (!window)
 	{
+		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
 
 	glfwMakeContextCurrent(window);
+	glfwSetCursorPosCallback(window, cursorPositionCallback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
 	// Initialize GLEW 
 	if (glewInit() != GLEW_OK)
@@ -117,7 +124,6 @@ int main(void)
 	std::cout << "getVAByteSize: " << m1->getVAByteSize() << std::endl;
 	std::cout << "getVertexByteSize: " << m1->getVertexByteSize() << std::endl;
 	std::cout << "getVertexByteSize: " << 3*sizeof(float) << std::endl;
-
 	*/
 
 	Model * ben = new Model(true, false, false);
@@ -171,20 +177,14 @@ int main(void)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-
-
-
 	shaderProgram.use();
 	shaderProgram.setInt("texture", 0);
-
 
 	// Uniform Declarations
 	unsigned int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
 	unsigned int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
 	unsigned int projectionLoc = glGetUniformLocation(shaderProgram.ID, "projection");
 	
-	
-
 	// Setup Camera Projection 
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 	shaderProgram.setMat4("projection", projection);
@@ -202,54 +202,52 @@ int main(void)
 		// Event Handling
 		processInput(window);
 
-
 		// Render
 		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-		// Tectures
-		// TEMPORARY CODE: Either to be removed or moved to grid class (depending on whether we are using textures)
-		//GLCall(glActiveTexture(GL_TEXTURE0));
-		//GLCall(glBindTexture(GL_TEXTURE_2D, texture));
+		// Recompute Camera Pipeline
+		glm::mat4 model;
+		shaderProgram.setMat4("model", model);
 
-		// Handles camera views and transformations
-		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+		shaderProgram.setMat4("projection", projection);
+
+		glm::mat4 view = camera.calculateViewMatrix();
+		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
+		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		shaderProgram.setMat4("view", view);
 
-		// Define model
-		glm::mat4 model;
-
 		ben->bind();
-		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
+		shaderProgram.setInt("fill", 2);                                    
+		model = glm::mat4(1.0f);                                            
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
+		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(GL_TRIANGLES, 0, ben->getVAVertexCount()));
 		
-		
 		sean->bind();
-		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
+		shaderProgram.setInt("fill", 2);                                    
+		model = glm::mat4(1.0f);                                            
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
+		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(GL_TRIANGLES, 0, sean->getVAVertexCount()));
 
 		wayne->bind();
-		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
+		shaderProgram.setInt("fill", 2);                                    
+		model = glm::mat4(1.0f);                                            
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
+		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(GL_TRIANGLES, 0, wayne->getVAVertexCount()));
 
 		isa->bind();
-		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
+		shaderProgram.setInt("fill", 2);                                    
+		model = glm::mat4(1.0f);                                            
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
+		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(GL_TRIANGLES, 0, isa->getVAVertexCount()));
 
 		ziming->bind();
@@ -296,25 +294,73 @@ int main(void)
 	return 0;
 }
 
-// Import all event handling functions here 
+// Event handling functions
 void processInput(GLFWwindow *window)
 {
-	// Example call
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	// Anti-clockwise rotation about the positive x-axis
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 	{
-		glfwSetWindowShouldClose(window, true);
+		rX += 0.5f;
 	}
 
-	// TODO: Change Camera to be dependent on Mouse Movements (as specified in the assignment)
-	float cameraSpeed = 1.0 * deltaTime;
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraFront;
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= cameraSpeed * cameraFront;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	// Anti-clockwise rotation about the negative x-axis 
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		rX -= 0.5f;
+	}
+
+	// Anti-clockwise rotation about the positive y-axis
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		rY -= 0.5f;
+	}
+
+	// Anti-clockwise rotation about the negative y-axis
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		rY += 0.5f;
+	}
+
+	// Reset to initial world position
+	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
+	{
+		rY = 0;
+		rX = 0;
+	}
 }
+
+void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
+{
+	const float SENSITIVITY = 0.05f;
+
+	xOffset = xPos - previousXPos;
+	yOffset = previousYPos - yPos;
+
+	previousXPos = xPos;
+	previousYPos = yPos;
+
+	// Limit speed of camera movement
+	xOffset *= SENSITIVITY;
+	yOffset *= SENSITIVITY;
+
+	// Pan camera when holding the right mouse button
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+	{
+		camera.panCamera(xOffset);
+	}
+
+	// Tilt camera when holding the middle mouse button
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
+	{
+		camera.tiltCamera(yOffset);
+	}
+
+	// Zoom camera when holding the left mouse button
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	{
+		camera.zoomCamera(yOffset);
+	}
+}
+
 
 
