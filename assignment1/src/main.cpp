@@ -40,7 +40,7 @@
 	ASSERT(GLLogCall(#x, __FILE__, __LINE__))
 
 /* Function Declarations */
-void processInput(GLFWwindow *window);
+void  processInput(GLFWwindow *window, Model & mCubes, float & scaleVal);
 void setupVBOVAO(unsigned int *VBO, unsigned int *VAO, int index, Model * model);
 static Model * createSeansModel();
 static Model * createIsabellesModel();
@@ -200,6 +200,7 @@ int main(void)
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 	shaderProgram.setMat4("projection", projection);
 
+	float scaleVal = 0.2f;
 	/* Main Loop */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -208,8 +209,12 @@ int main(void)
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		// Define model
+		glm::mat4 model;
+		model = glm::scale(model, glm::vec3(scaleVal, scaleVal, scaleVal));
+
 		// Event Handling
-		processInput(window);
+		processInput(window, *m1, scaleVal);
 
 		// Render
 		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
@@ -224,23 +229,26 @@ int main(void)
 		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		shaderProgram.setMat4("view", view);
 
-		// Define model
-		glm::mat4 model;
+		
 
 		// Draw Model 1 (Sean)
 		GLCall(glBindVertexArray(VAO[0]));			// Not sure how we are going to handle rendering, don't know if this is sustainable but here is how it currently works
 		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, 612));							// Draw Call
+		model = glm::mat4(1.0f);  
 
+		// Use Identity Matrix to get rid of previous transformations
+
+		glm::mat4 scaleFromKeyboard = glm::translate(model, glm::vec3(0.0f, 0.0f, -22.0f)) * glm::scale(model, glm::vec3(scaleVal, scaleVal, scaleVal));
+		m1->transform(scaleFromKeyboard);
+		//model = glm::translate(model, glm::vec3(0.0f, 0.0f, -22.0f)) * glm::scale(model, glm::vec3(scaleVal, scaleVal, scaleVal));
+			
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(scaleFromKeyboard));
+		GLCall(glDrawArrays(GL_TRIANGLES, 0, 612));							
 		//Model Isabelle
-		GLCall(glBindVertexArray(VAO[1]));
-		model = glm::translate(model, glm::vec3(22.0f, 0.0f, -22.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	//***sending the model transofmration matrices to the shader
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, 1152));
+		//GLCall(glBindVertexArray(VAO[1]));
+		//model = glm::translate(model, glm::vec3(22.0f, 0.0f, -22.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	//***sending the model transofmration matrices to the shader
+		//GLCall(glDrawArrays(GL_TRIANGLES, 0, 1152));
 
 		// Draw the Grid Mesh
 		GLCall(glBindVertexArray(grid_VAOs[0]));
@@ -278,7 +286,7 @@ int main(void)
 }
 
 /* Import all event handling functions here */
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow *window, Model & mCubes, float & scaleVal)
 {
 	/* Example call */
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -296,6 +304,28 @@ void processInput(GLFWwindow *window)
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
+		std::cout << "Scale up" << std::endl;
+		scaleVal = scaleVal + 0.01f;
+		//glm::mat4 translation = glm::scale(glm::mat4(2.0f), glm::vec3(scaleVal, scaleVal, scaleVal));
+		//mCubes.transform(translation);
+	}
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+		std::cout << "Scale down" << std::endl;
+		if (scaleVal > 0) {
+			scaleVal = scaleVal - 0.01f;
+		}
+		
+		//glm::mat4 translation = glm::scale(glm::mat4(1.0f), glm::vec3(scaleVal, scaleVal, scaleVal));
+		//mCubes.transform(translation);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		
+		std::cout << "Scale down" << std::endl;
+		scaleVal = 0.2f;
+	}
+		
 }
 
 void setupVBOVAO(unsigned int *VBO, unsigned int *VAO, int index, Model * model)
