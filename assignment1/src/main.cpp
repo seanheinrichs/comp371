@@ -80,6 +80,9 @@ float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
 
+//globals used for selecting render mode
+GLenum MODE = GL_LINES;
+
 int main(void)
 {
 	/* Initialize GLFW */
@@ -114,6 +117,9 @@ int main(void)
 
 	// Enable depth test for 3D rendering 
 	GLCall(glEnable(GL_DEPTH_TEST));
+
+	//Enable Culling
+	GLCall(glEnable(GL_CULL_FACE));
 
 	// Build and Compile Shader Program 
 	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader");
@@ -191,6 +197,8 @@ int main(void)
 
 	shaderProgram.setInt("fill", 0);
 
+	
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -218,13 +226,15 @@ int main(void)
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		shaderProgram.setMat4("view", view);
 
+		
+
 		ben->bind();
 		shaderProgram.setInt("fill", 2);                                    
 		model = glm::mat4(1.0f);                                            
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -22.0f));		
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, ben->getVAVertexCount()));
+		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 		
 		sean->bind();
 		shaderProgram.setInt("fill", 2);                                    
@@ -232,7 +242,7 @@ int main(void)
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
 		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, sean->getVAVertexCount()));
+		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
 
 		wayne->bind();
 		shaderProgram.setInt("fill", 2);                                    
@@ -240,7 +250,7 @@ int main(void)
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
 		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, wayne->getVAVertexCount()));
+		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
 
 		isa->bind();
 		shaderProgram.setInt("fill", 2);                                    
@@ -248,7 +258,7 @@ int main(void)
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
 		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, isa->getVAVertexCount()));
+		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
 
 		ziming->bind();
 		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
@@ -256,7 +266,7 @@ int main(void)
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
 		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, ziming->getVAVertexCount()));
+		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
 		
 		// Draw the Grid Mesh
 		GLCall(glBindVertexArray(grid_VAOs[0]));
@@ -326,6 +336,24 @@ void processInput(GLFWwindow *window)
 	{
 		rY = 0;
 		rX = 0;
+	}
+
+	// Change rendering to points
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		MODE = GL_POINTS;
+	}
+
+	// Change rendering to lines
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		MODE = GL_LINES;
+	}
+
+	// Change rendering to triangles
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		MODE = GL_TRIANGLES;
 	}
 }
 
