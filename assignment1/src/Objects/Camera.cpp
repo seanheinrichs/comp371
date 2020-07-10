@@ -1,7 +1,6 @@
 #include "Camera.h";
 
 #include <glm/glm.hpp>
-#include <iostream>
 
 const float MAX_ZOOM = 45.0f;
 const float MIN_ZOOM = 1.0f;
