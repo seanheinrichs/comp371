@@ -1,5 +1,6 @@
 #include "Camera.h";
 
+#include <glm/glm.hpp>
 #include <iostream>
 
 const float MAX_ZOOM = 45.0f;
@@ -22,6 +23,8 @@ Camera::~Camera() {}
 void Camera::panCamera(float yaw)
 {
 	yawAngle += yaw;
+
+	updateCamera();
 }	
 
 void Camera::tiltCamera(float pitch)
@@ -31,6 +34,8 @@ void Camera::tiltCamera(float pitch)
 	// Ensure pitch is inbounds for both + and - values to prevent irregular behavior
 	pitchAngle >  89.0f ? pitchAngle =  89.0f : NULL;
 	pitchAngle < -89.0f ? pitchAngle = -89.0f : NULL;
+
+	updateCamera();
 }
 
 void Camera::zoomCamera(float yOffset)
@@ -43,4 +48,17 @@ void Camera::zoomCamera(float yOffset)
 	// Limit zoom values to prevent irregular behavior
 	fieldOfViewAngle <= MIN_ZOOM ? fieldOfViewAngle = MIN_ZOOM : NULL;
 	fieldOfViewAngle >= MAX_ZOOM ? fieldOfViewAngle = MAX_ZOOM : NULL;
+}
+
+glm::mat4 Camera::calculateViewMatrix()
+{
+	return glm::lookAt(position, position + front, up);
+}
+
+void Camera::updateCamera()
+{
+	front.x = cos(glm::radians(yawAngle)) * cos(glm::radians(pitchAngle));
+	front.y = sin(glm::radians(pitchAngle));
+	front.z = sin(glm::radians(yawAngle)) * cos(glm::radians(pitchAngle));
+	front = glm::normalize(front);
 }

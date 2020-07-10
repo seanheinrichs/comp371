@@ -210,7 +210,7 @@ int main(void)
 		glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 		shaderProgram.setMat4("projection", projection);
 
-		glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
+		glm::mat4 view = camera.calculateViewMatrix();
 		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		shaderProgram.setMat4("view", view);
@@ -348,13 +348,6 @@ void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 	{
 		camera.zoomCamera(yOffset);
 	}
-
-	// Update the camera
-	glm::vec3 front;
-	front.x = cos(glm::radians(camera.yawAngle)) * cos(glm::radians(camera.pitchAngle));
-	front.y = sin(glm::radians(camera.pitchAngle));
-	front.z = sin(glm::radians(camera.yawAngle)) * cos(glm::radians(camera.pitchAngle));
-	camera.front = glm::normalize(front);
 }
 
 
