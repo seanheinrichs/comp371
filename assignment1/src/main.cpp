@@ -60,7 +60,7 @@ static bool GLLogCall(const char* function, const char* file, int line)
 }
 
 /* Function Declarations */
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow *window, Model** models);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 
 /* Global Constants */
@@ -80,8 +80,9 @@ float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
 
-//globals used for selecting render mode
+//globals used for selecting render mode and models
 GLenum MODE = GL_LINES;
+int SELECTED;
 
 int main(void)
 {
@@ -197,7 +198,19 @@ int main(void)
 
 	shaderProgram.setInt("fill", 0);
 
-	
+	Model** models = new Model*[5];
+	models[0] = ben;
+	models[1] = sean;
+	models[2] = isa;
+	models[3] = wayne;
+	models[4] = ziming;
+
+	SELECTED = -1;
+	ben->addTranslation(glm::vec3(1.0f, 0.0f, -1.0f));
+	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+
+
+
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -208,7 +221,7 @@ int main(void)
 		lastFrame = currentFrame;
 
 		// Event Handling
-		processInput(window);
+		processInput(window, models);
 
 		// Render
 		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
@@ -229,12 +242,21 @@ int main(void)
 		
 
 		ben->bind();
-		shaderProgram.setInt("fill", 2);                                    
-		model = glm::mat4(1.0f);                                            
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -22.0f));		
+		shaderProgram.setInt("fill", 2);
+		//glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, -1.0f));
+		//glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f));
+		//glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0));
+		//glm::mat4 transform = translate * rotate * scale;
+		//model = glm::mat4(1.0f);                                            
+		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
+		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));	
+
+		model = ben->getModelMatrix();
+		std::cout << "in while:" << std::endl;
+		ben->printTranslate();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
+		
 		
 		sean->bind();
 		shaderProgram.setInt("fill", 2);                                    
@@ -252,6 +274,7 @@ int main(void)
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
 
+		
 		isa->bind();
 		shaderProgram.setInt("fill", 2);                                    
 		model = glm::mat4(1.0f);                                            
@@ -259,6 +282,7 @@ int main(void)
 		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
+		
 
 		ziming->bind();
 		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
@@ -267,6 +291,8 @@ int main(void)
 		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
+
+		
 		
 		// Draw the Grid Mesh
 		GLCall(glBindVertexArray(grid_VAOs[0]));
@@ -305,8 +331,9 @@ int main(void)
 }
 
 // Event handling functions
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow *window, Model** models)
 {
+	bool modified = false;
 	// Anti-clockwise rotation about the positive x-axis
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 	{
@@ -355,6 +382,129 @@ void processInput(GLFWwindow *window)
 	{
 		MODE = GL_TRIANGLES;
 	}
+
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
+		std::cout << "inside key 1" << std::endl;
+
+		if(SELECTED == 0)
+			SELECTED = -1;
+		else
+			SELECTED = 0;
+	}
+	
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	{
+		if (SELECTED == 1)
+			SELECTED = -1;
+		else
+			SELECTED = 1;
+	}
+	
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	{
+		if (SELECTED == 2)
+			SELECTED = -1;
+		else
+			SELECTED = 2;
+	}
+	
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		if (SELECTED == 3)
+			SELECTED = -1;
+		else
+			SELECTED = 3;
+	}
+	
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	{
+		if (SELECTED == 4)
+			SELECTED = -1;
+		else
+			SELECTED = 4;
+	}
+
+	//left
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{	
+		modified = true;
+		if (SELECTED == -1) 
+		{
+			for (int a = 0; a < 5; a++) 
+			{
+				models[a]->addTranslation(glm::vec3(0.1f, 0.0f, 0.0f));
+				models[a]->printTranslate();
+			}
+		}
+		else 
+		{
+			std::cout << "in specific:" << std::endl;
+			models[SELECTED]->addTranslation(glm::vec3(0.1f,0.0f,0.0f));
+		}
+	}
+
+	//right
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		modified = true;
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addTranslation(glm::vec3(0.1f, 0.0f, 0.0f));
+		}
+	}
+
+	//up
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		modified = true;
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addTranslation(glm::vec3(0.0f, 0.1f, 0.0f));
+		}
+	}
+
+	//down
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		modified = true;
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addTranslation(glm::vec3(0.0f, 0.1f, 0.0f));
+		}
+	}
+
+	//rotate left 5 degrees about y axis
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		modified = true;
+	}
+
+	if (modified) 
+	{
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			
+		}
+	}
+
+
 }
 
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)

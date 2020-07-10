@@ -101,20 +101,6 @@ static Model * createWaynesModel()
 /* Static methods to create our Models */
 static void createBensModel(Model* model)
 {
-	/*
-	model->addPolygon(new Cube(glm::vec3(0.0f, 0.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(0.0f, 1.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(0.0f, 2.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(0.0f, 3.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(0.75f, 3.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(1.25f, 2.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(1.75f, 1.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(2.25f, 0.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(3.0f, 0.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(3.0f, 1.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(3.0f, 2.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(3.0f, 3.5f, 0.0f)));
-	*/
 
 	Model* three = new Model(true, false, false);
 
@@ -130,7 +116,7 @@ static void createBensModel(Model* model)
 
 	three->addPolygon(new Cube(glm::vec3(6.5f, 1.0f, 0.0f)));
 	three->addPolygon(new Cube(glm::vec3(6.5f, 3.0f, 0.0f)));
-	three->transform(glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 0.0f, 0.0f)));
+	three->transform(glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.0f, 0.0f)));
 
 	
 
@@ -140,24 +126,29 @@ static void createBensModel(Model* model)
 	
 	glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(7.0f, 2.0f, 0.0f));
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 4.0f, 1.0f));
-	glm::mat4 sr = glm::rotate(glm::mat4(1.0f), glm::radians(35.0f), glm::vec3(0.0f, 0.0f, 1.0));
-	sr = translate * sr * scale;
+	glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), glm::radians(35.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	glm::mat4 transform = translate * rotate * scale;
 
 	cb->transform(scale);
 	cb1->transform(scale);
-	cb2->transform(sr);
-	model->addPolygon(cb);
-	model->addPolygon(cb1);
-	model->addPolygon(cb2);
+	cb2->transform(transform);
+	Model* N = new Model(true, false, false);
+	N->addPolygon(cb);
+	N->addPolygon(cb1);
+	N->addPolygon(cb2);
+	N->transform(glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 0.0f, 0.0f)));
+
+
+	model->addPolygon(N);
 	model->addPolygon(three);
 
 
 
 
-	glm::mat4 mat(1.0f);
-	mat = glm::translate(mat, glm::vec3(20.0f, 0.0f, 0.0f));
+	//glm::mat4 mat(1.0f);
+	//mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	model->transform(mat);
+	//model->transform(mat);
 
 }
 

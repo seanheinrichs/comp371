@@ -19,6 +19,7 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 
 #include "Model.h"
 #include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
 
 
 Model::Model(bool position, bool texture, bool color)
@@ -28,23 +29,77 @@ Model::Model(bool position, bool texture, bool color)
 	Model::color = color;
 	origin = glm::vec3(0.f);
 	//Model::binder = new Binder(position, texture, color);
+	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
+	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	rotate_angle = 0.0;
 }
 
-/*
-void Model::bindArrayBuffer(bool unbind)
+Model::Model() 
 {
-	(*this->binder).bindArrayBuffer(unbind, this);
+	Model::position = true;
+	Model::texture = false;
+	Model::color = false;
+	origin = glm::vec3(0.f);
+	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
+	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	rotate_angle = 0.0;
 }
 
-void Model::bind()
+void Model::addRotation(float radians, glm::vec3 axis) 
 {
-	binder->bind();
+	rotate_vec.x += axis.x;
+	rotate_vec.y += axis.y;
+	rotate_vec.z += axis.z;
+	rotate_angle += radians;
 }
-void Model::unbind()
+
+void Model::addScale(glm::vec3 scale)
 {
-	binder->unbind();
+	scale_vec.x += scale.x;
+	scale_vec.y += scale.y;
+	scale_vec.z += scale.z;
 }
-*/
+
+void Model::addTranslation(glm::vec3 translate)
+{
+	std::cout << "translation updated" << std::endl;
+	Model::translate_vec.x += translate.x;
+	Model::translate_vec.y += translate.y;
+	Model::translate_vec.z += translate.z;
+}
+
+void Model::printTranslate()
+{
+	std::cout << "translation updated" << std::endl;
+	std::cout << "x:"<< Model::translate_vec.x << std::endl;
+	std::cout << "y:"<< Model::translate_vec.y << std::endl;
+	std::cout << "z:"<< Model::translate_vec.z << std::endl;
+}
+
+glm::mat4 Model::getRotation() 
+{
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec);
+}
+
+
+glm::mat4 Model::getTranslation() 
+{
+	return glm::translate(glm::mat4(1.0f), translate_vec);
+}
+
+glm::mat4 Model::getScale() 
+{
+	return glm::scale(glm::mat4(1.0f), scale_vec);
+}
+
+glm::mat4 Model::getModelMatrix()
+{
+	return getTranslation() * getRotation() * getScale();
+}
+
+
 void Model::addPolygon(Polygon* poly) 
 {
 	poly->setVertexController(position, texture, color);
