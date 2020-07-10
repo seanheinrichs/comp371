@@ -101,7 +101,7 @@ static Model * createWaynesModel()
 /* Static methods to create our Models */
 static void createBensModel(Model* model)
 {
-
+	/*
 	model->addPolygon(new Cube(glm::vec3(0.0f, 0.5f, 0.0f)));
 	model->addPolygon(new Cube(glm::vec3(0.0f, 1.5f, 0.0f)));
 	model->addPolygon(new Cube(glm::vec3(0.0f, 2.5f, 0.0f)));
@@ -114,37 +114,43 @@ static void createBensModel(Model* model)
 	model->addPolygon(new Cube(glm::vec3(3.0f, 1.5f, 0.0f)));
 	model->addPolygon(new Cube(glm::vec3(3.0f, 2.5f, 0.0f)));
 	model->addPolygon(new Cube(glm::vec3(3.0f, 3.5f, 0.0f)));
-
-
-
-	model->addPolygon(new Cube(glm::vec3(5.0f, 3.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(5.5f, 3.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(6.0f, 3.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(5.0f, 2.0f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(5.5f, 2.0f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(6.0f, 2.0f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(5.0f, 0.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(5.5f, 0.5f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(6.0f, 0.5f, 0.0f)));
-
-	model->addPolygon(new Cube(glm::vec3(6.5f, 1.0f, 0.0f)));
-	model->addPolygon(new Cube(glm::vec3(6.5f, 3.0f, 0.0f)));
-
-
-	/*
-	Cube *cb = new Cube(glm::vec3(8.5f, 3.0f, 0.0f));
-	glm::mat4 warp = glm::mat4(
-		1.0f, 0.0f, 5.0f, 0.0f,
-		0.0f, 1.0f, 5.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f);
-
-	warp = glm::translate(warp, glm::vec3(0.0f, 0.0f, -40.0f));
-	warp = glm::rotate(warp, glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 1.0));
-
-	cb->transform(warp);
-	model->addPolygon(cb);
 	*/
+
+	Model* three = new Model(true, false, false);
+
+	three->addPolygon(new Cube(glm::vec3(5.0f, 3.5f, 0.0f)));
+	three->addPolygon(new Cube(glm::vec3(5.5f, 3.5f, 0.0f)));
+	three->addPolygon(new Cube(glm::vec3(6.0f, 3.5f, 0.0f)));
+	three->addPolygon(new Cube(glm::vec3(5.0f, 2.0f, 0.0f)));
+	three->addPolygon(new Cube(glm::vec3(5.5f, 2.0f, 0.0f)));
+	three->addPolygon(new Cube(glm::vec3(6.0f, 2.0f, 0.0f)));
+	three->addPolygon(new Cube(glm::vec3(5.0f, 0.5f, 0.0f)));
+	three->addPolygon(new Cube(glm::vec3(5.5f, 0.5f, 0.0f)));
+	three->addPolygon(new Cube(glm::vec3(6.0f, 0.5f, 0.0f)));
+
+	three->addPolygon(new Cube(glm::vec3(6.5f, 1.0f, 0.0f)));
+	three->addPolygon(new Cube(glm::vec3(6.5f, 3.0f, 0.0f)));
+	three->transform(glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 0.0f, 0.0f)));
+
+	
+
+	Cube *cb = new Cube(glm::vec3(8.125f, 0.5f, 0.0f));
+	Cube *cb1 = new Cube(glm::vec3(5.825f, 0.5f, 0.0f));
+	Cube *cb2 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	
+	glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(7.0f, 2.0f, 0.0f));
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 4.0f, 1.0f));
+	glm::mat4 sr = glm::rotate(glm::mat4(1.0f), glm::radians(35.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	sr = translate * sr * scale;
+
+	cb->transform(scale);
+	cb1->transform(scale);
+	cb2->transform(sr);
+	model->addPolygon(cb);
+	model->addPolygon(cb1);
+	model->addPolygon(cb2);
+	model->addPolygon(three);
+
 
 
 
