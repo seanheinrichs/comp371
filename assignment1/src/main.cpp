@@ -252,12 +252,12 @@ int main(void)
 		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));	
 
 		model = ben->getModelMatrix();
-		std::cout << "in while:" << std::endl;
-		ben->printTranslate();
+		//std::cout << "in while:" << std::endl;
+		//ben->printTranslate();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 		
-		
+		/*
 		sean->bind();
 		shaderProgram.setInt("fill", 2);                                    
 		model = glm::mat4(1.0f);                                            
@@ -265,7 +265,7 @@ int main(void)
 		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
-
+		
 		wayne->bind();
 		shaderProgram.setInt("fill", 2);                                    
 		model = glm::mat4(1.0f);                                            
@@ -291,7 +291,7 @@ int main(void)
 		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
-
+		*/
 		
 		
 		// Draw the Grid Mesh
@@ -431,16 +431,12 @@ void processInput(GLFWwindow *window, Model** models)
 		modified = true;
 		if (SELECTED == -1) 
 		{
-			for (int a = 0; a < 5; a++) 
-			{
-				models[a]->addTranslation(glm::vec3(0.1f, 0.0f, 0.0f));
-				models[a]->printTranslate();
-			}
+
 		}
 		else 
 		{
 			std::cout << "in specific:" << std::endl;
-			models[SELECTED]->addTranslation(glm::vec3(0.1f,0.0f,0.0f));
+			models[SELECTED]->addTranslation(glm::vec3(-0.1f,0.0f,0.0f));
 		}
 	}
 
@@ -482,7 +478,7 @@ void processInput(GLFWwindow *window, Model** models)
 		}
 		else
 		{
-			models[SELECTED]->addTranslation(glm::vec3(0.0f, 0.1f, 0.0f));
+			models[SELECTED]->addTranslation(glm::vec3(0.0f, -0.1f, 0.0f));
 		}
 	}
 
@@ -500,7 +496,26 @@ void processInput(GLFWwindow *window, Model** models)
 		}
 		else
 		{
-			
+			models[SELECTED]->addRotation(0.5,glm::vec3(0.0f, -0.1f, 0.0f));
+		}
+	}
+
+
+	//rotate right 5 degrees about y axis
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		modified = true;
+	}
+
+	if (modified)
+	{
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addRotation(-0.5, glm::vec3(0.0f, -0.1f, 0.0f));
 		}
 	}
 
