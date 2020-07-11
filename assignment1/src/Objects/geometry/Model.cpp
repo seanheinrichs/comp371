@@ -47,12 +47,21 @@ Model::Model()
 	rotate_angle = 0.0;
 }
 
+void Model::addTranslationOrigin(glm::vec3 translate)
+{
+	Model::translate_vec_origin.x = translate.x;
+	Model::translate_vec_origin.y = translate.y;
+	Model::translate_vec_origin.z = translate.z;
+}
+
 void Model::addRotation(float radians, glm::vec3 axis) 
 {
 	rotate_vec.x += axis.x;
 	rotate_vec.y += axis.y;
 	rotate_vec.z += axis.z;
 	rotate_angle += radians;
+
+
 }
 
 void Model::addScale(glm::vec3 scale)
@@ -96,7 +105,8 @@ glm::mat4 Model::getScale()
 
 glm::mat4 Model::getModelMatrix()
 {
-	return getTranslation() * getRotation() * getScale();
+	return getTranslation()  * getScale() * getRotation();
+	//translate X scale X rotate
 }
 
 

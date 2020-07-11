@@ -35,10 +35,11 @@ public:
 	void addRotation(float radians, glm::vec3 axis);
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
-			
+	void addTranslationOrigin(glm::vec3 translate);
 	glm::mat4 getRotation();
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
+	glm::mat4 getOrigin();
 	glm::mat4 getModelMatrix();
 
 	virtual float* getVertexArray();
@@ -67,6 +68,7 @@ public:
 	glm::vec3 rotate_vec;
 	glm::vec3 translate_vec;
 	glm::vec3 scale_vec;
+	glm::vec3 translate_vec_origin;
 	float rotate_angle;
 
 };

@@ -206,11 +206,22 @@ int main(void)
 	models[4] = ziming;
 
 	SELECTED = -1;
-	ben->addTranslation(glm::vec3(1.0f, 0.0f, -1.0f));
+	/*
+	ben->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 
+	sean->addTranslation(glm::vec3(-2.0f, 2.0f, -20.0f));
+	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 
+	wayne->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 
+	isa->addTranslation(glm::vec3(0.0f, -0.0f, -20.0f));
+	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	*/
+	ziming->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	ziming->addTranslationOrigin(glm::vec3(0.0f, 0.0f, -20.0f));
+	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -257,20 +268,22 @@ int main(void)
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 		
-		/*
+		
 		sean->bind();
 		shaderProgram.setInt("fill", 2);                                    
 		model = glm::mat4(1.0f);                                            
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
+		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));	
+		model = sean->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
 		
 		wayne->bind();
 		shaderProgram.setInt("fill", 2);                                    
 		model = glm::mat4(1.0f);                                            
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
+		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		model = wayne->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
 
@@ -278,8 +291,9 @@ int main(void)
 		isa->bind();
 		shaderProgram.setInt("fill", 2);                                    
 		model = glm::mat4(1.0f);                                            
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
+		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));
+		model = isa->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
 		
@@ -287,11 +301,12 @@ int main(void)
 		ziming->bind();
 		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
 		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
+		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
+		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
+		model = ziming->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
-		*/
+		
 		
 		
 		// Draw the Grid Mesh
@@ -387,41 +402,30 @@ void processInput(GLFWwindow *window, Model** models)
 	{
 		std::cout << "inside key 1" << std::endl;
 
-		if(SELECTED == 0)
-			SELECTED = -1;
-		else
 			SELECTED = 0;
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 	{
-		if (SELECTED == 1)
-			SELECTED = -1;
-		else
+
 			SELECTED = 1;
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 	{
-		if (SELECTED == 2)
-			SELECTED = -1;
-		else
+
 			SELECTED = 2;
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 	{
-		if (SELECTED == 3)
-			SELECTED = -1;
-		else
+	
 			SELECTED = 3;
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
 	{
-		if (SELECTED == 4)
-			SELECTED = -1;
-		else
+	
 			SELECTED = 4;
 	}
 
