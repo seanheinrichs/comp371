@@ -328,7 +328,6 @@ int main(void)
 // Event handling functions
 void processInput(GLFWwindow *window, Model** models)
 {
-	bool modified = false;
 	float cameraSpeed = 1.0 * deltaTime;
 
 	// [Camera FPS Movement]
