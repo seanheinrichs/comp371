@@ -54,12 +54,12 @@ void Model::addTranslationOrigin(glm::vec3 translate)
 	Model::translate_vec_origin.z = translate.z;
 }
 
-void Model::addRotation(float radians, glm::vec3 axis) 
+void Model::addRotation(float degrees, glm::vec3 axis) 
 {
 	rotate_vec.x += axis.x;
 	rotate_vec.y += axis.y;
 	rotate_vec.z += axis.z;
-	rotate_angle += radians;
+	rotate_angle += glm::radians(degrees);
 }
 
 void Model::addScale(glm::vec3 scale)

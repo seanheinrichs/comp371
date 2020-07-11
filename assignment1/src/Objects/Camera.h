@@ -15,6 +15,12 @@ public:
 	void panCamera(float yaw);
 	void tiltCamera(float pitch);
 	void zoomCamera(float zoom);
+
+	void moveForward(float speed);
+	void moveBackward(float speed);
+	void moveLeft(float speed);
+	void moveRight(float speed);
+
 	glm::mat4 calculateViewMatrix();
 
 	float fieldOfViewAngle;
