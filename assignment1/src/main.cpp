@@ -5,7 +5,7 @@
 		Benjamin Therien (40034572)
 		Sean Heinrichs (40075789)
 		Wayne St Amand (40074423)
-		Isabelle Gourchette (Add your SN# when you make a commit)
+		Isabelle Gourchette (40008121)
 		Ziming Wang (40041601)
 	Due:  July 9th, 2020
 */
@@ -60,7 +60,7 @@ static bool GLLogCall(const char* function, const char* file, int line)
 }
 
 /* Function Declarations */
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow *window, Model** models);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 
 /* Global Constants */
@@ -79,6 +79,10 @@ float xOffset = 0.0f;
 float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
+
+//globals used for selecting render mode and models
+GLenum MODE = GL_LINES;
+int SELECTED;
 
 int main(void)
 {
@@ -114,6 +118,9 @@ int main(void)
 
 	// Enable depth test for 3D rendering 
 	GLCall(glEnable(GL_DEPTH_TEST));
+
+	//Enable Culling
+	GLCall(glEnable(GL_CULL_FACE));
 
 	// Build and Compile Shader Program 
 	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader");
@@ -191,6 +198,38 @@ int main(void)
 
 	shaderProgram.setInt("fill", 0);
 
+	Model** models = new Model*[5];
+	models[0] = ben;
+	models[1] = sean;
+	models[2] = isa;
+	models[3] = wayne;
+	models[4] = ziming;
+
+	SELECTED = -1;
+
+	ben->translateToOrigin();
+	sean->translateToOrigin();
+	isa->translateToOrigin();
+	wayne->translateToOrigin();
+	ziming->translateToOrigin();
+
+	
+	ben->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	
+	sean->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+
+	wayne->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+
+	isa->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	
+	ziming->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -200,7 +239,7 @@ int main(void)
 		lastFrame = currentFrame;
 
 		// Event Handling
-		processInput(window);
+		processInput(window, models);
 
 		// Render
 		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
@@ -219,44 +258,38 @@ int main(void)
 		shaderProgram.setMat4("view", view);
 
 		ben->bind();
-		shaderProgram.setInt("fill", 2);                                    
-		model = glm::mat4(1.0f);                                            
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		shaderProgram.setInt("fill", 2);
+		model = ben->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, ben->getVAVertexCount()));
+		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 		
 		sean->bind();
-		shaderProgram.setInt("fill", 2);                                    
-		model = glm::mat4(1.0f);                                            
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		shaderProgram.setInt("fill", 2);                               
+		model = sean->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, sean->getVAVertexCount()));
-
+		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
+		
 		wayne->bind();
-		shaderProgram.setInt("fill", 2);                                    
-		model = glm::mat4(1.0f);                                            
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		shaderProgram.setInt("fill", 2);                                   	
+		model = wayne->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, wayne->getVAVertexCount()));
+		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
 
+		
 		isa->bind();
 		shaderProgram.setInt("fill", 2);                                    
-		model = glm::mat4(1.0f);                                            
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		model = isa->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, isa->getVAVertexCount()));
+		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
+		
 
 		ziming->bind();
-		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-		model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
+		shaderProgram.setInt("fill", 2);                               
+		model = ziming->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, ziming->getVAVertexCount()));
+		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
+		
+		
 		
 		// Draw the Grid Mesh
 		GLCall(glBindVertexArray(grid_VAOs[0]));
@@ -295,8 +328,10 @@ int main(void)
 }
 
 // Event handling functions
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow *window, Model** models)
 {
+	bool modified = false; //needed?
+
 	// Anti-clockwise rotation about the positive x-axis
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 	{
@@ -326,6 +361,176 @@ void processInput(GLFWwindow *window)
 	{
 		rY = 0;
 		rX = 0;
+	}
+
+	// Change rendering to points
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		MODE = GL_POINTS;
+	}
+
+	// Change rendering to lines
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		MODE = GL_LINES;
+	}
+
+	// Change rendering to triangles
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		MODE = GL_TRIANGLES;
+	}
+
+
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && (SELECTED != 0 ))
+	{
+		std::cout << "inside key 1" << std::endl;
+
+			SELECTED = 0; //I removed the SELECTED = -1 because each time you press on a key it toggled between SELECTED = -1 and SELECTED = anyothernumber
+						//for as long as the key was pressed down. Causing the model to not be selected sometimes 
+			//depending on how long the key was pressed.
+
+	}
+	
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && (SELECTED != 1))
+	{
+			SELECTED = 1;
+	}
+	
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && (SELECTED != 2))
+	{
+			SELECTED = 2;
+	}
+	
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && (SELECTED != 3))
+	{
+			SELECTED = 3;
+	}
+	
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && (SELECTED != 4))
+	{
+			SELECTED = 4;
+	}
+
+	//TRANSLATION
+	//left
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{	
+		modified = true;
+		if (SELECTED == -1) 
+		{
+
+		}
+		else 
+		{
+			std::cout << "in specific:" << std::endl;
+			models[SELECTED]->addTranslation(glm::vec3(-0.1f,0.0f,0.0f));
+		}
+	}
+
+	//right
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		modified = true;
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addTranslation(glm::vec3(0.1f, 0.0f, 0.0f));
+		}
+	}
+
+	//up
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		modified = true;
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addTranslation(glm::vec3(0.0f, 0.1f, 0.0f));
+		}
+	}
+
+	//down
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		modified = true;
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addTranslation(glm::vec3(0.0f, -0.1f, 0.0f));
+		}
+	}
+
+	//ROTATION
+	//rotate left 5 degrees about y axis
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		modified = true;
+	
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addRotation(5,glm::vec3(0.0f, -0.1f, 0.0f));
+		}
+	}
+
+
+	//rotate right 5 degrees about y axis
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		modified = true;
+
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addRotation(-0.5, glm::vec3(0.0f, -0.1f, 0.0f));
+		}
+	}
+
+	//SCALE
+	//up
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+	{
+		modified = true;
+	
+
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+		}
+	}
+
+	//down
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	{
+	
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
+		}
 	}
 }
 

@@ -32,6 +32,7 @@ class Cube : public Polygon{
 		virtual int getVertexByteSize();
 		virtual void setVertexController(bool position, bool texture, bool color);
 		virtual Vertex getSampleVertex();
+		virtual std::map<std::string, glm::vec3> getMinMax();
 		
 
 		glm::vec3 origin;

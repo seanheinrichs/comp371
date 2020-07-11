@@ -12,6 +12,8 @@ Note: The virtual methods below must be overriden to for correct polymorphic beh
 #pragma once
 
 #include "../../Opengl_a/vertex.h"
+#include <map>
+#include <string>
 
 class Polygon 
 {
@@ -23,6 +25,13 @@ class Polygon
 		virtual int getVertexByteSize() { return 5; }
 		virtual void setVertexController(bool position, bool texture, bool color) {}
 		virtual Vertex getSampleVertex() { return Vertex(); }
+		virtual std::map<std::string, glm::vec3> getMinMax()
+		{
+			std::map<std::string, glm::vec3> map;
+			map["min"] = glm::vec3(0.0f);
+			map["max"] = glm::vec3(0.0f);
+			return map;
+		};
 		virtual float* getVertexArray() {
 			float* a = new float[3];
 			a[0] = 5.0;

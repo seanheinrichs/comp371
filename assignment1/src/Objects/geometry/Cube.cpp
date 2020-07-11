@@ -263,3 +263,9 @@ float* Cube::getVertexArray()
 {
 	return vc->getVertexArray();
 }
+
+
+std::map<std::string, glm::vec3> Cube::getMinMax()
+{
+	return vc->getMinMax();
+}

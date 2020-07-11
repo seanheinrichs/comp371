@@ -19,6 +19,7 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include <vector>
 #include <glm/glm.hpp>
 #include "polygon.h"
+#include <glm/gtc/type_ptr.hpp>
 
 
 class Model : public Polygon, public Binder
@@ -29,6 +30,17 @@ public:
 	std::vector<Polygon*> polygons;
 	void addPolygon(Polygon* poly);
 	Model(bool position, bool texture, bool color);
+	Model();
+
+	void addRotation(float radians, glm::vec3 axis);
+	void addScale(glm::vec3 scale);
+	void addTranslation(glm::vec3 translate);
+	void addTranslationOrigin(glm::vec3 translate);
+	glm::mat4 getRotation();
+	glm::mat4 getTranslation();
+	glm::mat4 getScale();
+	glm::mat4 getTranslationOrigin();
+	glm::mat4 getModelMatrix();
 
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();
@@ -36,6 +48,10 @@ public:
 	virtual int getVAVertexCount();
 	virtual int getVertexByteSize();
 	virtual Vertex getSampleVertex();
+	virtual std::map<std::string, glm::vec3> getMinMax();
+
+
+	void translateToOrigin();
 
 	//binding
 	//void bindArrayBuffer(bool unbind);
@@ -51,5 +67,12 @@ public:
 
 	//vertex components
 	bool position, color, texture;
+
+	void printTranslate();
+	glm::vec3 rotate_vec;
+	glm::vec3 translate_vec;
+	glm::vec3 scale_vec;
+	glm::vec3 translate_vec_origin;
+	float rotate_angle;
 
 };
