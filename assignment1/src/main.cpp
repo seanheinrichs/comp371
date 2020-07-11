@@ -425,6 +425,7 @@ void processInput(GLFWwindow *window, Model** models)
 			SELECTED = 4;
 	}
 
+	//TRANSLATION
 	//left
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{	
@@ -482,14 +483,12 @@ void processInput(GLFWwindow *window, Model** models)
 		}
 	}
 
+	//ROTATION
 	//rotate left 5 degrees about y axis
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		modified = true;
-	}
-
-	if (modified) 
-	{
+	
 		if (SELECTED == -1)
 		{
 
@@ -505,10 +504,7 @@ void processInput(GLFWwindow *window, Model** models)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		modified = true;
-	}
 
-	if (modified)
-	{
 		if (SELECTED == -1)
 		{
 
@@ -519,6 +515,36 @@ void processInput(GLFWwindow *window, Model** models)
 		}
 	}
 
+	//SCALE
+	//up
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+	{
+		modified = true;
+	
+
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+		}
+	}
+
+	//down
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	{
+	
+		if (SELECTED == -1)
+		{
+
+		}
+		else
+		{
+			models[SELECTED]->addScale(glm::vec3(-0.02f, -0.02f, -0.02f));
+		}
+	}
 
 }
 
