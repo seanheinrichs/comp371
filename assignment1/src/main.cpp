@@ -500,7 +500,7 @@ void processInput(GLFWwindow *window, Model** models)
 		}
 		else
 		{
-			models[SELECTED]->addRotation(20.0f,glm::vec3(0.0f, -0.1f, 0.0f));
+			models[SELECTED]->addRotation(5.0f,glm::vec3(0.0f, -0.1f, 0.0f));
 		}
 	}
 
@@ -516,7 +516,7 @@ void processInput(GLFWwindow *window, Model** models)
 		}
 		else
 		{
-			models[SELECTED]->addRotation(-20.0f, glm::vec3(0.0f, -0.1f, 0.0f));
+			models[SELECTED]->addRotation(-5.0f, glm::vec3(0.0f, -0.1f, 0.0f));
 		}
 	}
 
