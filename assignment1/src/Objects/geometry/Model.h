@@ -39,7 +39,7 @@ public:
 	glm::mat4 getRotation();
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
-	glm::mat4 getOrigin();
+	glm::mat4 getTranslationOrigin();
 	glm::mat4 getModelMatrix();
 
 	virtual float* getVertexArray();

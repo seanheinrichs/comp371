@@ -42,7 +42,7 @@ Model::Model()
 	Model::color = false;
 	origin = glm::vec3(0.f);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
-	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	translate_vec_origin = translate_vec = glm::vec3(0.0f, 0.0f, 0.0f); //not sure if this is the best way to set up the translate_vec_origin
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
 }
@@ -89,13 +89,28 @@ void Model::printTranslate()
 
 glm::mat4 Model::getRotation() 
 {
-	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec);
+	//return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec);
+
+	//an attempt, maybe not placed in the right method
+	//missing the point translation step from the model to rotate around itself
+	//1. translate to center of model
+	//2. rotate
+	//3. translate back to origin 
+	return
+	getTranslation() *
+		glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec) *
+			glm::translate(glm::mat4(1.0f), glm::vec3(-translate_vec_origin.x, -translate_vec_origin.y, translate_vec_origin.z));
 }
 
 
 glm::mat4 Model::getTranslation() 
 {
 	return glm::translate(glm::mat4(1.0f), translate_vec);
+}
+
+glm::mat4 Model::getTranslationOrigin()
+{
+	return glm::translate(glm::mat4(1.0f), translate_vec_origin);
 }
 
 glm::mat4 Model::getScale() 
@@ -105,8 +120,8 @@ glm::mat4 Model::getScale()
 
 glm::mat4 Model::getModelMatrix()
 {
-	return getTranslation()  * getScale() * getRotation();
-	//translate X scale X rotate
+	return getTranslation() * getRotation() * getScale();
+
 }
 
 
@@ -127,7 +142,6 @@ Vertex Model::getSampleVertex()
 {
 	return polygons.front()->getSampleVertex();
 }
-
 
 
 int Model::getVAFloatCount()

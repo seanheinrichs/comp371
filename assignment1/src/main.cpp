@@ -5,7 +5,7 @@
 		Benjamin Therien (40034572)
 		Sean Heinrichs (40075789)
 		Wayne St Amand (40074423)
-		Isabelle Gourchette (Add your SN# when you make a commit)
+		Isabelle Gourchette (40008121)
 		Ziming Wang (40041601)
 	Due:  July 9th, 2020
 */
@@ -206,22 +206,23 @@ int main(void)
 	models[4] = ziming;
 
 	SELECTED = -1;
+
 	/*
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-
-	sean->addTranslation(glm::vec3(-2.0f, 2.0f, -20.0f));
+	
+	sean->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 
 	wayne->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
 	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 
-	isa->addTranslation(glm::vec3(0.0f, -0.0f, -20.0f));
+	isa->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	*/
 	ziming->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
-	ziming->addTranslationOrigin(glm::vec3(0.0f, 0.0f, -20.0f));
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -249,8 +250,6 @@ int main(void)
 		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		shaderProgram.setMat4("view", view);
-
-		
 
 		ben->bind();
 		shaderProgram.setInt("fill", 2);
@@ -348,7 +347,8 @@ int main(void)
 // Event handling functions
 void processInput(GLFWwindow *window, Model** models)
 {
-	bool modified = false;
+	bool modified = false; //needed?
+
 	// Anti-clockwise rotation about the positive x-axis
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 	{
@@ -402,30 +402,28 @@ void processInput(GLFWwindow *window, Model** models)
 	{
 		std::cout << "inside key 1" << std::endl;
 
-			SELECTED = 0;
+			SELECTED = 0; //I removed the SELECTED = -1 because each time you press on a key it toggled between SELECTED = -1 and SELECTED = anyothernumber
+						//for as long as the key was pressed down. Causing the model to not be selected sometimes 
+			//depending on how long the key was pressed.
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 	{
-
 			SELECTED = 1;
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 	{
-
 			SELECTED = 2;
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 	{
-	
 			SELECTED = 3;
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
 	{
-	
 			SELECTED = 4;
 	}
 
@@ -546,10 +544,9 @@ void processInput(GLFWwindow *window, Model** models)
 		}
 		else
 		{
-			models[SELECTED]->addScale(glm::vec3(-0.02f, -0.02f, -0.02f));
+			models[SELECTED]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
 		}
 	}
-
 }
 
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
