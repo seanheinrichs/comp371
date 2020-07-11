@@ -61,3 +61,23 @@ void Camera::updateCamera()
 	front.z = sin(glm::radians(yawAngle)) * cos(glm::radians(pitchAngle));
 	front = glm::normalize(front);
 }
+
+void Camera::moveForward(float speed)
+{
+	position += speed * front;
+}
+
+void Camera::moveBackward(float speed)
+{
+	position -= speed * front;
+}
+
+void Camera::moveLeft(float speed)
+{
+	position -= glm::normalize(glm::cross(front, up)) * speed;
+}
+
+void Camera::moveRight(float speed)
+{
+	position += glm::normalize(glm::cross(front, up)) * speed;
+}

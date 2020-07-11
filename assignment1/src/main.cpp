@@ -68,7 +68,7 @@ const unsigned int WINDOW_WIDTH = 1024;
 const unsigned int WINDOW_HEIGHT = 768;
 
 /* Camera Setup */
-Camera camera = Camera(glm::vec3(0.0f, 0.2f, 2.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+Camera camera = Camera(glm::vec3(0.0f, 0.3f, 2.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
@@ -81,7 +81,7 @@ float rX = 0.0f;
 float rY = 0.0f;
 
 //globals used for selecting render mode and models
-GLenum MODE = GL_LINES;
+GLenum MODE = GL_TRIANGLES;
 int SELECTED;
 
 int main(void)
@@ -120,83 +120,72 @@ int main(void)
 	GLCall(glEnable(GL_DEPTH_TEST));
 
 	//Enable Culling
-	GLCall(glEnable(GL_CULL_FACE));
+	//GLCall(glEnable(GL_CULL_FACE));
 
 	// Build and Compile Shader Program 
 	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader");
 
-	/*
-	std::cout << "getVAFloatCount: " << m1->getVAFloatCount() << std::endl;
-	std::cout << "getVAVertexCount: " << m1->getVAVertexCount() << std::endl;
-	std::cout << "getVAByteSize: " << m1->getVAByteSize() << std::endl;
-	std::cout << "getVertexByteSize: " << m1->getVertexByteSize() << std::endl;
-	std::cout << "getVertexByteSize: " << 3*sizeof(float) << std::endl;
-	*/
+	// [Models]
 
 	Model * ben = new Model(true, false, false);
 	createBensModel(ben);
 	ben->bindArrayBuffer(true, ben);
 
-
-	Model* sean = createSeansModel();
+	Model * sean = new Model(true, false, false);
+	createSeansModel(sean);
 	sean->bindArrayBuffer(true, sean);
 
-
-	Model* wayne = createWaynesModel();
+	Model* wayne = new Model(true, false, false);
+	createWaynesModel(wayne);
 	wayne->bindArrayBuffer(true, wayne);
 
-
-	Model* isa = createIsabellesModel();
+	Model* isa = new Model(true, false, false);
+	createIsabellesModel(isa);
 	isa->bindArrayBuffer(true, isa);
 
-	Model* ziming = createZimingsModel();
+	Model* ziming = new Model(true, false, false);
+	createZimingsModel(ziming);
 	ziming->bindArrayBuffer(true, ziming);
 
-	
 	// [Grid]
 
 	Grid mainGrid = Grid();
 
-	unsigned int grid_VAOs[2], grid_VBOs[2], grid_EBO;
-	glGenVertexArrays(2, grid_VAOs);
-	glGenBuffers(2, grid_VBOs);
-	glGenBuffers(1, &grid_EBO);
+	unsigned int grid_VAOs[3], grid_VBOs[3], grid_EBO;
+	GLCall(glGenVertexArrays(3, grid_VAOs));
+	GLCall(glGenBuffers(3, grid_VBOs));
+	GLCall(glGenBuffers(1, &grid_EBO));
 
-	// Grid Mesh 
-	glBindVertexArray(grid_VAOs[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]);
-	glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	// [Grid Mesh] 
+	GLCall(glBindVertexArray(grid_VAOs[0]));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW));
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
+	GLCall(glEnableVertexAttribArray(0));
 
-	// Grid Floor 
-	glBindVertexArray(grid_VAOs[1]);
-	glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW);
+	// [Grid Floor] 
+	GLCall(glBindVertexArray(grid_VAOs[1]));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[1]));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grid_EBO));
+	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mainGrid.floorIndices), mainGrid.floorIndices, GL_STATIC_DRAW));
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
+	GLCall(glEnableVertexAttribArray(0));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grid_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mainGrid.floorIndices), mainGrid.floorIndices, GL_STATIC_DRAW);
+	// [Coordinate Axis]
+	GLCall(glBindVertexArray(grid_VAOs[2]));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[2]));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.axisVertices), mainGrid.axisVertices, GL_STATIC_DRAW));
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0));
+	GLCall(glEnableVertexAttribArray(0));
+	GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(1));
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	// Unbinding (safe)
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	shaderProgram.use();
-	shaderProgram.setInt("texture", 0);
 
 	// Uniform Declarations
 	unsigned int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
 	unsigned int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
 	unsigned int projectionLoc = glGetUniformLocation(shaderProgram.ID, "projection");
-	
-	// Setup Camera Projection 
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-	shaderProgram.setMat4("projection", projection);
-
-	shaderProgram.setInt("fill", 0);
 
 	Model** models = new Model*[5];
 	models[0] = ben;
@@ -212,23 +201,23 @@ int main(void)
 	isa->translateToOrigin();
 	wayne->translateToOrigin();
 	ziming->translateToOrigin();
-
 	
-	ben->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	ben->addTranslation(glm::vec3(0.0f, 0.0f, -1.0f));
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	
-	sean->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 
-	wayne->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	wayne->addTranslation(glm::vec3(-4.5f, 0.0f, -4.0f));
 	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 
-	isa->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.5f));
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	
-	ziming->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
+	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.5f));
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	
+	shaderProgram.use();
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -257,6 +246,8 @@ int main(void)
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		shaderProgram.setMat4("view", view);
 
+		// [Models]
+
 		ben->bind();
 		shaderProgram.setInt("fill", 2);
 		model = ben->getModelMatrix();
@@ -275,23 +266,20 @@ int main(void)
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
 
-		
 		isa->bind();
 		shaderProgram.setInt("fill", 2);                                    
 		model = isa->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
 		
-
 		ziming->bind();
 		shaderProgram.setInt("fill", 2);                               
 		model = ziming->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
 		
-		
-		
-		// Draw the Grid Mesh
+		// [Grid Mesh]
+
 		GLCall(glBindVertexArray(grid_VAOs[0]));
 		shaderProgram.setInt("fill", 0);
 		model = glm::mat4(1.0f);
@@ -300,7 +288,8 @@ int main(void)
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glDrawArrays(GL_LINES, 0, mainGrid.meshVertices.size());
 
-		// Draw the Grid Floor
+		// [Grid Floor]
+
 		GLCall(glBindVertexArray(grid_VAOs[1]));
 		shaderProgram.setInt("fill", 1);
 		model = glm::mat4(1.0f);
@@ -309,6 +298,16 @@ int main(void)
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		// [Coordinate Axis]
+		glLineWidth(5.0f);
+		GLCall(glBindVertexArray(grid_VAOs[2]));
+		shaderProgram.setInt("fill", 3);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.01f, 0.0f));
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		glDrawArrays(GL_LINES, 0, 6);
+		glLineWidth(1.0f);
 
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
@@ -331,6 +330,25 @@ int main(void)
 void processInput(GLFWwindow *window, Model** models)
 {
 	bool modified = false; //needed?
+	float cameraSpeed = 1.0 * deltaTime;
+
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+	{
+		camera.moveForward(cameraSpeed);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+	{
+		camera.moveBackward(cameraSpeed);
+	}
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+	{
+		camera.moveLeft(cameraSpeed);
+	}
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+	{
+		camera.moveRight(cameraSpeed);
+	}
 
 	// Anti-clockwise rotation about the positive x-axis
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -482,7 +500,7 @@ void processInput(GLFWwindow *window, Model** models)
 		}
 		else
 		{
-			models[SELECTED]->addRotation(5,glm::vec3(0.0f, -0.1f, 0.0f));
+			models[SELECTED]->addRotation(5.0f,glm::vec3(0.0f, -0.1f, 0.0f));
 		}
 	}
 
@@ -498,7 +516,7 @@ void processInput(GLFWwindow *window, Model** models)
 		}
 		else
 		{
-			models[SELECTED]->addRotation(-0.5, glm::vec3(0.0f, -0.1f, 0.0f));
+			models[SELECTED]->addRotation(-5.0f, glm::vec3(0.0f, -0.1f, 0.0f));
 		}
 	}
 

@@ -5,96 +5,76 @@
 
 
 /* Static methods to create our Models */
-static Model * createSeansModel()
+static void createSeansModel(Model * model)
 {
 	Cube * cb1 = new Cube(glm::vec3(0.0f, 0.5f, 0.0f));
-	Cube * cb2 = new Cube(glm::vec3(0.0f, 1.5f, 0.0f));
-	Cube * cb3 = new Cube(glm::vec3(0.0f, 2.5f, 0.0f));
-	Cube * cb4 = new Cube(glm::vec3(0.0f, 3.5f, 0.0f));
-	Cube * cb5 = new Cube(glm::vec3(1.0f, 1.5f, 0.0f));
-	Cube * cb6 = new Cube(glm::vec3(1.0f, 3.5f, 0.0f));
-	Cube * cb7 = new Cube(glm::vec3(2.0f, 0.5f, 0.0f));
-	Cube * cb8 = new Cube(glm::vec3(2.0f, 1.5f, 0.0f));
-	Cube * cb9 = new Cube(glm::vec3(2.0f, 2.5f, 0.0f));
-	Cube * cb10 = new Cube(glm::vec3(2.0f, 3.5f, 0.0f));
-	Cube * cb11 = new Cube(glm::vec3(4.0f, 2.5f, 0.0f));
-	Cube * cb12 = new Cube(glm::vec3(4.0f, 3.5f, 0.0f));
-	Cube * cb13 = new Cube(glm::vec3(5.0f, 3.5f, 0.0f));
-	Cube * cb14 = new Cube(glm::vec3(6.0f, 3.5f, 0.0f));
-	Cube * cb15 = new Cube(glm::vec3(6.0f, 2.5f, 0.0f));
-	Cube * cb16 = new Cube(glm::vec3(6.0f, 1.5f, 0.0f));
-	Cube * cb17 = new Cube(glm::vec3(6.0f, 0.5f, 0.0f));
+	Cube * cb2 = new Cube(glm::vec3(2.0f, 0.5f, 0.0f));
+	Cube * cb3 = new Cube(glm::vec3(6.0f, 0.5f, 0.0f));
+	Cube * cb4 = new Cube(glm::vec3(4.0f, 2.0f, 0.0f));
+	Cube * cb5 = new Cube(glm::vec3(1.0f, 2.5f, 0.0f));
+	Cube * cb6 = new Cube(glm::vec3(1.0f, 4.5f, 0.0f));
+	Cube * cb7 = new Cube(glm::vec3(5.0f, 4.5f, 0.0f));
 
-	Model * seansModel = new Model(true, false, false);
-	seansModel->addPolygon(cb1);
-	seansModel->addPolygon(cb2);
-	seansModel->addPolygon(cb3);
-	seansModel->addPolygon(cb4);
-	seansModel->addPolygon(cb5);
-	seansModel->addPolygon(cb6);
-	seansModel->addPolygon(cb7);
-	seansModel->addPolygon(cb8);
-	seansModel->addPolygon(cb9);
-	seansModel->addPolygon(cb10);
-	seansModel->addPolygon(cb11);
-	seansModel->addPolygon(cb12);
-	seansModel->addPolygon(cb13);
-	seansModel->addPolygon(cb14);
-	seansModel->addPolygon(cb15);
-	seansModel->addPolygon(cb16);
-	seansModel->addPolygon(cb17);
+	// Create 1x4 columns
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 5.0f, 1.0f));
 
-	return seansModel;
+	cb1->transform(scale);
+	cb2->transform(scale);
+	cb3->transform(scale);
+
+	// Create 1x2 column
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 2.0f, 1.0f));
+
+	cb4->transform(scale);
+
+	model->addPolygon(cb1);
+	model->addPolygon(cb2);
+	model->addPolygon(cb3);
+	model->addPolygon(cb4);
+	model->addPolygon(cb5);
+	model->addPolygon(cb6);
+	model->addPolygon(cb7);
 }
 
 
-static Model * createWaynesModel()
+static void createWaynesModel(Model * model)
 {
-	Cube * cb1 = new Cube(glm::vec3(0.0f, 3.0f, 0.0f));
-	Cube * cb2 = new Cube(glm::vec3(0.0f, 4.0f, 0.0f));
-	Cube * cb3 = new Cube(glm::vec3(1.0f, 0.0f, 0.0f));
-	Cube * cb4 = new Cube(glm::vec3(1.0f, 1.0f, 0.0f));
-	Cube * cb5 = new Cube(glm::vec3(1.0f, 2.0f, 0.0f));
-	Cube * cb6 = new Cube(glm::vec3(1.0f, 3.0f, 0.0f));
-	Cube * cb7 = new Cube(glm::vec3(2.0f, 3.0f, 0.0f));
-	Cube * cb8 = new Cube(glm::vec3(2.0f, 4.0f, 0.0f));
+	Cube * cb1 = new Cube(glm::vec3(0.0f, 3.5f, 0.0f));
+	Cube * cb2 = new Cube(glm::vec3(0.0f, 4.5f, 0.0f));
+	Cube * cb3 = new Cube(glm::vec3(1.0f, 0.5f, 0.0f));
+	Cube * cb4 = new Cube(glm::vec3(1.0f, 1.5f, 0.0f));
+	Cube * cb5 = new Cube(glm::vec3(1.0f, 2.5f, 0.0f));
+	Cube * cb6 = new Cube(glm::vec3(1.0f, 3.5f, 0.0f));
+	Cube * cb7 = new Cube(glm::vec3(2.0f, 3.5f, 0.0f));
+	Cube * cb8 = new Cube(glm::vec3(2.0f, 4.5f, 0.0f));
 
-	Cube * cb9 = new Cube(glm::vec3(4.0f, 3.0f, 0.0f));
-	Cube * cb10 = new Cube(glm::vec3(4.0f, 4.0f, 0.0f));
-	Cube * cb11 = new Cube(glm::vec3(5.0f, 4.0f, 0.0f));
-	Cube * cb12 = new Cube(glm::vec3(6.0f, 0.0f, 0.0f));
-	Cube * cb13 = new Cube(glm::vec3(6.0f, 1.0f, 0.0f));
-	Cube * cb14 = new Cube(glm::vec3(6.0f, 2.0f, 0.0f));
-	Cube * cb15 = new Cube(glm::vec3(6.0f, 3.0f, 0.0f));
-	Cube * cb16 = new Cube(glm::vec3(6.0f, 4.0f, 0.0f));
-
+	Cube * cb9 = new Cube(glm::vec3(4.0f, 3.5f, 0.0f));
+	Cube * cb10 = new Cube(glm::vec3(4.0f, 4.5f, 0.0f));
+	Cube * cb11 = new Cube(glm::vec3(5.0f, 4.5f, 0.0f));
+	Cube * cb12 = new Cube(glm::vec3(6.0f, 0.5f, 0.0f));
+	Cube * cb13 = new Cube(glm::vec3(6.0f, 1.5f, 0.0f));
+	Cube * cb14 = new Cube(glm::vec3(6.0f, 2.5f, 0.0f));
+	Cube * cb15 = new Cube(glm::vec3(6.0f, 3.5f, 0.0f));
+	Cube * cb16 = new Cube(glm::vec3(6.0f, 4.5f, 0.0f));
 
 	Model * waynesModel = new Model(true, false, false);
-	waynesModel->addPolygon(cb1);
-	waynesModel->addPolygon(cb2);
-	waynesModel->addPolygon(cb3);
-	waynesModel->addPolygon(cb4);
-	waynesModel->addPolygon(cb5);
-	waynesModel->addPolygon(cb6);
-	waynesModel->addPolygon(cb7);
-	waynesModel->addPolygon(cb8);
+	model->addPolygon(cb1);
+	model->addPolygon(cb2);
+	model->addPolygon(cb3);
+	model->addPolygon(cb4);
+	model->addPolygon(cb5);
+	model->addPolygon(cb6);
+	model->addPolygon(cb7);
+	model->addPolygon(cb8);
 
-	waynesModel->addPolygon(cb9);
-	waynesModel->addPolygon(cb10);
-	waynesModel->addPolygon(cb11);
-	waynesModel->addPolygon(cb12);
-	waynesModel->addPolygon(cb13);
-	waynesModel->addPolygon(cb14);
-	waynesModel->addPolygon(cb15);
-	waynesModel->addPolygon(cb16);
-
-	glm::mat4 mat(1.0f);
-	mat = glm::translate(mat, glm::vec3(10.0f, 0.0f, 10.0f));
-
-	waynesModel->transform(mat);
-
-	return waynesModel;
-
+	model->addPolygon(cb9);
+	model->addPolygon(cb10);
+	model->addPolygon(cb11);
+	model->addPolygon(cb12);
+	model->addPolygon(cb13);
+	model->addPolygon(cb14);
+	model->addPolygon(cb15);
+	model->addPolygon(cb16);
 }
 
 
@@ -141,22 +121,13 @@ static void createBensModel(Model* model)
 
 	model->addPolygon(N);
 	model->addPolygon(three);
-
-
-
-
-	//glm::mat4 mat(1.0f);
-	//mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
-
-	//model->transform(mat);
-
 }
 
 
-static Model * createIsabellesModel()
+static void createIsabellesModel(Model * model)
 {
 	//A0
-	float originX = 20.0f;
+	float originX = 0.0f;
 	float originY = 0.5f;
 	float originZ = 0.0f;
 	float cubeOffset = 1.0f;
@@ -205,49 +176,41 @@ static Model * createIsabellesModel()
 	Cube * cube31 = new Cube(glm::vec3(originX + letterOffset + cubeOffset, originY, originZ));
 	Cube * cube32 = new Cube(glm::vec3(originX + letterOffset + cubeOffset * 2, originY, originZ));
 
-	Model * isabellesModel = new Model(true, false, false);
-	isabellesModel->addPolygon(cube1);
-	isabellesModel->addPolygon(cube2);
-	isabellesModel->addPolygon(cube3);
-	isabellesModel->addPolygon(cube4);
-	isabellesModel->addPolygon(cube5);
-	isabellesModel->addPolygon(cube6);
-	isabellesModel->addPolygon(cube7);
-	isabellesModel->addPolygon(cube8);
-	isabellesModel->addPolygon(cube9);
-	isabellesModel->addPolygon(cube10);
-	isabellesModel->addPolygon(cube11);
-	isabellesModel->addPolygon(cube12);
-	isabellesModel->addPolygon(cube13);
-	isabellesModel->addPolygon(cube14);
-	isabellesModel->addPolygon(cube15);
-	isabellesModel->addPolygon(cube16);
-	isabellesModel->addPolygon(cube17);
-	isabellesModel->addPolygon(cube18);
-	isabellesModel->addPolygon(cube19);
-	isabellesModel->addPolygon(cube20);
-	isabellesModel->addPolygon(cube21);
-	isabellesModel->addPolygon(cube22);
-	isabellesModel->addPolygon(cube23);
-	isabellesModel->addPolygon(cube24);
-	isabellesModel->addPolygon(cube25);
-	isabellesModel->addPolygon(cube26);
-	isabellesModel->addPolygon(cube27);
-	isabellesModel->addPolygon(cube28);
-	isabellesModel->addPolygon(cube29);
-	isabellesModel->addPolygon(cube30);
-	isabellesModel->addPolygon(cube31);
-	isabellesModel->addPolygon(cube32);
-
-	glm::mat4 mat(1.0f);
-	mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 15.0f));
-
-	isabellesModel->transform(mat);
-
-	return isabellesModel;
+	model->addPolygon(cube1);
+	model->addPolygon(cube2);
+	model->addPolygon(cube3);
+	model->addPolygon(cube4);
+	model->addPolygon(cube5);
+	model->addPolygon(cube6);
+	model->addPolygon(cube7);
+	model->addPolygon(cube8);
+	model->addPolygon(cube9);
+	model->addPolygon(cube10);
+	model->addPolygon(cube11);
+	model->addPolygon(cube12);
+	model->addPolygon(cube13);
+	model->addPolygon(cube14);
+	model->addPolygon(cube15);
+	model->addPolygon(cube16);
+	model->addPolygon(cube17);
+	model->addPolygon(cube18);
+	model->addPolygon(cube19);
+	model->addPolygon(cube20);
+	model->addPolygon(cube21);
+	model->addPolygon(cube22);
+	model->addPolygon(cube23);
+	model->addPolygon(cube24);
+	model->addPolygon(cube25);
+	model->addPolygon(cube26);
+	model->addPolygon(cube27);
+	model->addPolygon(cube28);
+	model->addPolygon(cube29);
+	model->addPolygon(cube30);
+	model->addPolygon(cube31);
+	model->addPolygon(cube32);
 }
 
-static Model * createZimingsModel()
+static void createZimingsModel(Model * model)
 {
 	Cube * cb1 = new Cube(glm::vec3(0.0f, 0.5f, 0.0f));
 	Cube * cb2 = new Cube(glm::vec3(0.0f, 1.5f, 0.0f));
@@ -273,35 +236,27 @@ static Model * createZimingsModel()
 	Cube * cb22 = new Cube(glm::vec3(8.0f, 3.5f, 0.0f));
 	Cube * cb23 = new Cube(glm::vec3(9.0f, 1.5f, 0.0f));
 
-	Model * ZimingsModel = new Model(true, false, false);
-	ZimingsModel->addPolygon(cb1);
-	ZimingsModel->addPolygon(cb2);
-	ZimingsModel->addPolygon(cb3);
-	ZimingsModel->addPolygon(cb4);
-	ZimingsModel->addPolygon(cb5);
-	ZimingsModel->addPolygon(cb6);
-	ZimingsModel->addPolygon(cb7);
-	ZimingsModel->addPolygon(cb8);
-	ZimingsModel->addPolygon(cb9);
-	ZimingsModel->addPolygon(cb10);
-	ZimingsModel->addPolygon(cb11);
-	ZimingsModel->addPolygon(cb12);
-	ZimingsModel->addPolygon(cb13);
-	ZimingsModel->addPolygon(cb14);
-	ZimingsModel->addPolygon(cb15);
-	ZimingsModel->addPolygon(cb16);
-	ZimingsModel->addPolygon(cb17);
-	ZimingsModel->addPolygon(cb18);
-	ZimingsModel->addPolygon(cb19);
-	ZimingsModel->addPolygon(cb20);
-	ZimingsModel->addPolygon(cb21);
-	ZimingsModel->addPolygon(cb22);
-	ZimingsModel->addPolygon(cb23);
-
-	glm::mat4 mat(1.0f);
-	mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 15.0f));
-
-	ZimingsModel->transform(mat);
-
-	return ZimingsModel;
+	model->addPolygon(cb1);
+	model->addPolygon(cb2);
+	model->addPolygon(cb3);
+	model->addPolygon(cb4);
+	model->addPolygon(cb5);
+	model->addPolygon(cb6);
+	model->addPolygon(cb7);
+	model->addPolygon(cb8);
+	model->addPolygon(cb9);
+	model->addPolygon(cb10);
+	model->addPolygon(cb11);
+	model->addPolygon(cb12);
+	model->addPolygon(cb13);
+	model->addPolygon(cb14);
+	model->addPolygon(cb15);
+	model->addPolygon(cb16);
+	model->addPolygon(cb17);
+	model->addPolygon(cb18);
+	model->addPolygon(cb19);
+	model->addPolygon(cb20);
+	model->addPolygon(cb21);
+	model->addPolygon(cb22);
+	model->addPolygon(cb23);
 }

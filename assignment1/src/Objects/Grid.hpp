@@ -22,6 +22,16 @@ public:
 		1, 2, 3
 	};
 
+	float axisVertices[36] = {
+		// Positions       // Colors
+		0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+		0.5f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+		0.0f, 0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.5f,  0.0f, 0.0f, 1.0f,
+	};
+
 	/* Constructor */
 	Grid()
 	{
@@ -39,6 +49,8 @@ public:
 			meshVertices.push_back(glm::vec3(1.0f, float(i) / 100, 0.0f));
 		}
 	}
+
+	~Grid() {};
 };
 
 #endif
