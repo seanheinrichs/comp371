@@ -41,7 +41,7 @@ Model::Model()
 	Model::texture = false;
 	Model::color = false;
 	origin = glm::vec3(0.f);
-	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
+	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	translate_vec_origin = translate_vec = glm::vec3(0.0f, 0.0f, 0.0f); //not sure if this is the best way to set up the translate_vec_origin
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
@@ -60,8 +60,6 @@ void Model::addRotation(float radians, glm::vec3 axis)
 	rotate_vec.y += axis.y;
 	rotate_vec.z += axis.z;
 	rotate_angle += radians;
-
-
 }
 
 void Model::addScale(glm::vec3 scale)
@@ -73,7 +71,7 @@ void Model::addScale(glm::vec3 scale)
 
 void Model::addTranslation(glm::vec3 translate)
 {
-	std::cout << "translation updated" << std::endl;
+	//std::cout << "translation updated" << std::endl;
 	Model::translate_vec.x += translate.x;
 	Model::translate_vec.y += translate.y;
 	Model::translate_vec.z += translate.z;
@@ -81,7 +79,7 @@ void Model::addTranslation(glm::vec3 translate)
 
 void Model::printTranslate()
 {
-	std::cout << "translation updated" << std::endl;
+	//std::cout << "translation updated" << std::endl;
 	std::cout << "x:"<< Model::translate_vec.x << std::endl;
 	std::cout << "y:"<< Model::translate_vec.y << std::endl;
 	std::cout << "z:"<< Model::translate_vec.z << std::endl;
@@ -89,7 +87,7 @@ void Model::printTranslate()
 
 glm::mat4 Model::getRotation() 
 {
-	//return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec);
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec);
 
 	//an attempt, maybe not placed in the right method
 	//missing the point translation step from the model to rotate around itself
@@ -120,8 +118,10 @@ glm::mat4 Model::getScale()
 
 glm::mat4 Model::getModelMatrix()
 {
-	return getTranslation() * getRotation() * getScale();
-
+	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
+		return getTranslation() *  getScale();
+	else
+		return getTranslation() * getRotation() * getScale();
 }
 
 
@@ -197,7 +197,54 @@ float* Model::getVertexArray()
 
 }
 
+
+std::map<std::string, glm::vec3> Model::getMinMax()
+{
+	std::map<std::string, glm::vec3> map;
+	map["min"] = glm::vec3(0.0f);
+	map["max"] = glm::vec3(0.0f);
+	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		std::map<std::string, glm::vec3> temp = (**it).getMinMax();
+		if (map["max"].x < temp["max"].x)
+			map["max"].x = temp["max"].x;
+
+		if (map["max"].y < temp["max"].y)
+			map["max"].y = temp["max"].y;
+
+		if (map["max"].z < temp["max"].z)
+			map["max"].z = temp["max"].z;
+
+		if (map["min"].x > temp["min"].x)
+			map["min"].x = temp["min"].x;
+
+		if (map["min"].y > temp["min"].y)
+			map["min"].y = temp["min"].y;
+
+		if (map["min"].z > temp["min"].z)
+			map["min"].z = temp["min"].z;
+
+	}
+
+	return map;
+
+}
+
 int Model::getVertexByteSize() 
 {
 	return polygons.front()->getVertexByteSize();
+}
+
+void Model::translateToOrigin()
+{
+	std::map<std::string, glm::vec3> map;
+	map = getMinMax();
+
+	glm::vec3 temp;
+	temp.x = -(map["min"].x + map["max"].x) / 2;
+	temp.y = -(map["min"].y + map["max"].y) / 2;
+	temp.z = -(map["min"].z + map["max"].z) / 2;
+
+	transform(glm::translate(glm::mat4(1.0f), temp));
+
 }

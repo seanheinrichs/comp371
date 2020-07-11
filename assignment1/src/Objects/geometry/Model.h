@@ -48,6 +48,10 @@ public:
 	virtual int getVAVertexCount();
 	virtual int getVertexByteSize();
 	virtual Vertex getSampleVertex();
+	virtual std::map<std::string, glm::vec3> getMinMax();
+
+
+	void translateToOrigin();
 
 	//binding
 	//void bindArrayBuffer(bool unbind);

@@ -207,7 +207,13 @@ int main(void)
 
 	SELECTED = -1;
 
-	/*
+	ben->translateToOrigin();
+	sean->translateToOrigin();
+	isa->translateToOrigin();
+	wayne->translateToOrigin();
+	ziming->translateToOrigin();
+
+	
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	
@@ -219,7 +225,7 @@ int main(void)
 
 	isa->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	*/
+	
 	ziming->addTranslation(glm::vec3(0.0f, 0.0f, -20.0f));
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	
@@ -253,35 +259,18 @@ int main(void)
 
 		ben->bind();
 		shaderProgram.setInt("fill", 2);
-		//glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, -1.0f));
-		//glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f));
-		//glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0));
-		//glm::mat4 transform = translate * rotate * scale;
-		//model = glm::mat4(1.0f);                                            
-		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));	
-
 		model = ben->getModelMatrix();
-		//std::cout << "in while:" << std::endl;
-		//ben->printTranslate();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 		
-		
 		sean->bind();
-		shaderProgram.setInt("fill", 2);                                    
-		model = glm::mat4(1.0f);                                            
-		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));	
+		shaderProgram.setInt("fill", 2);                               
 		model = sean->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
 		
 		wayne->bind();
-		shaderProgram.setInt("fill", 2);                                    
-		model = glm::mat4(1.0f);                                            
-		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		
+		shaderProgram.setInt("fill", 2);                                   	
 		model = wayne->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
@@ -289,19 +278,13 @@ int main(void)
 		
 		isa->bind();
 		shaderProgram.setInt("fill", 2);                                    
-		model = glm::mat4(1.0f);                                            
-		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             
-		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));
 		model = isa->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	
 		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
 		
 
 		ziming->bind();
-		shaderProgram.setInt("fill", 2);                                    // Set Color or Textures with Uniform in Shader
-		model = glm::mat4(1.0f);                                            // Use Identity Matrix to get rid of previous transformations
-		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));             // Make the model smaller with a scale function	
-		//model = glm::translate(model, glm::vec3(-22.0f, 0.0f, -22.0f));		// Move it to a corner
+		shaderProgram.setInt("fill", 2);                               
 		model = ziming->getModelMatrix();
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));	// ??? All I know is that I need to call this or nothing works... Still trying to figure this out
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
@@ -398,31 +381,33 @@ void processInput(GLFWwindow *window, Model** models)
 		MODE = GL_TRIANGLES;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && (SELECTED != 0 ))
 	{
 		std::cout << "inside key 1" << std::endl;
 
 			SELECTED = 0; //I removed the SELECTED = -1 because each time you press on a key it toggled between SELECTED = -1 and SELECTED = anyothernumber
 						//for as long as the key was pressed down. Causing the model to not be selected sometimes 
 			//depending on how long the key was pressed.
+
 	}
 	
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && (SELECTED != 1))
 	{
 			SELECTED = 1;
 	}
 	
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && (SELECTED != 2))
 	{
 			SELECTED = 2;
 	}
 	
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && (SELECTED != 3))
 	{
 			SELECTED = 3;
 	}
 	
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && (SELECTED != 4))
 	{
 			SELECTED = 4;
 	}
@@ -497,7 +482,7 @@ void processInput(GLFWwindow *window, Model** models)
 		}
 		else
 		{
-			models[SELECTED]->addRotation(0.5,glm::vec3(0.0f, -0.1f, 0.0f));
+			models[SELECTED]->addRotation(5,glm::vec3(0.0f, -0.1f, 0.0f));
 		}
 	}
 

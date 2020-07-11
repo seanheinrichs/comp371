@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 
 #include "vertex.h"
+#include <map>
+#include <string>
 
 class VertexController{
 
@@ -25,6 +27,8 @@ public:
 	float* getVertexArray();
 	void transform(glm::mat4 transmat);
 	void transformOne(glm::mat4 transmat, VertexComponent& vc);
+
+	std::map<std::string, glm::vec3> getMinMax();
 
 	bool position;
 	bool texture;

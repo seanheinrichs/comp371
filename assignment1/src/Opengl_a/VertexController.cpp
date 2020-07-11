@@ -5,6 +5,8 @@
 #include "VertexController.h"
 #include "vertexComponent.h"
 #include "vertex.h"
+#include <string>
+#include <map>
 
 VertexController::VertexController(bool position, bool texture, bool color)
 {
@@ -197,5 +199,87 @@ float* VertexController::getVertexArray()
 		currentCount += floatCount;
 	}
 	return va;
+
+}
+
+
+
+std::map<std::string, glm::vec3> VertexController::getMinMax()
+{
+	std::map<std::string, glm::vec3> map;
+	int count = 0;
+	for (std::vector<Vertex>::iterator it = vertices.begin(); it < vertices.end(); it++)
+	{
+		for (std::vector<VertexComponent>::iterator it2 = (*it).vertexComponents.begin(); it2 < (*it).vertexComponents.end(); it2++)
+		{
+			if (position && it2->type == POSITION)
+			{
+				if (count == 0)
+				{
+					glm::vec3* temp1 = new glm::vec3();
+					glm::vec3* temp2 = new glm::vec3();
+					temp1->x = (*it2).data[0];
+					temp1->y = (*it2).data[1];
+					temp1->z = (*it2).data[2];
+					temp2->x = (*it2).data[0];
+					temp2->y = (*it2).data[1];
+					temp2->z = (*it2).data[2];
+
+
+					map["min"] = *temp1;
+					map["max"] = *temp2;
+
+					delete temp2;
+					delete temp1;
+				}
+				else 
+				{
+					glm::vec3* temp1 = new glm::vec3();
+					glm::vec3* temp2 = new glm::vec3();
+					temp1->x = (*it2).data[0];
+					temp1->y = (*it2).data[1];
+					temp1->z = (*it2).data[2];
+					temp2->x = (*it2).data[0];
+					temp2->y = (*it2).data[1];
+					temp2->z = (*it2).data[2];
+					std::map<std::string, glm::vec3> temp;
+
+					temp["min"] = *temp1;
+					temp["max"] = *temp2;
+
+
+					
+					if (map["max"].x < temp["max"].x)
+						map["max"].x = temp["max"].x;
+
+					if (map["max"].y < temp["max"].y)
+						map["max"].y = temp["max"].y;
+
+					if (map["max"].z < temp["max"].z)
+						map["max"].z = temp["max"].z;
+
+					if (map["min"].x > temp["min"].x)
+						map["min"].x = temp["min"].x;
+
+					if (map["min"].y > temp["min"].y)
+						map["min"].y = temp["min"].y;
+
+					if (map["min"].z > temp["min"].z)
+						map["min"].z = temp["min"].z;
+
+					delete temp2;
+					delete temp1;
+				}
+
+				count += 1;
+				break;
+			}
+			else
+			{
+				//pass
+			}
+		}
+	}
+	return map;
 
 }
