@@ -59,7 +59,7 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 	rotate_vec.x += axis.x;
 	rotate_vec.y += axis.y;
 	rotate_vec.z += axis.z;
-	rotate_angle += glm::radians(degrees);
+	rotate_angle += degrees;
 }
 
 void Model::addScale(glm::vec3 scale)
