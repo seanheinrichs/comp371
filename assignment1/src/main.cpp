@@ -252,8 +252,6 @@ int main(void)
 		model = ben->getModelMatrix();
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));	
 		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
-		
-		std::cout << selected << std::endl;
 
 		sean->bind();
 		selected == 1 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);                            
