@@ -64,9 +64,17 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 
 void Model::addScale(glm::vec3 scale)
 {
-	scale_vec.x += scale.x;
-	scale_vec.y += scale.y;
-	scale_vec.z += scale.z;
+	if (scale_vec.x >= 0.0 && scale_vec.y >= 0.0 && scale_vec.z >= 0.0) {
+		scale_vec.x += scale.x;
+		scale_vec.y += scale.y;
+		scale_vec.z += scale.z;
+	}
+	else {
+		scale_vec.x = 0.2f;
+		scale_vec.y = 0.2f;
+		scale_vec.z = 0.2f;
+	}
+
 }
 
 void Model::addTranslation(glm::vec3 translate)
