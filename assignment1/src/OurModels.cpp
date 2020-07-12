@@ -215,10 +215,10 @@ static void createBensModel(Model* model)
 static void createIsabellesModel(Model * model)
 {
 	//A
-	Cube * cube1 = new Cube(glm::vec3(-1.0f, 0.5f, 1.0f));
-	Cube * cube2 = new Cube(glm::vec3(-2.0f, 2.5f, 1.0f));
-	Cube * cube3 = new Cube(glm::vec3(-3.0f, 0.5f, 1.0f));
-	Cube * cube4 = new Cube(glm::vec3(-2.0f, 4.5f, 1.0f));
+	Cube * cube1 = new Cube(glm::vec3(-1.0f, 0.5f, 0.0f));
+	Cube * cube2 = new Cube(glm::vec3(-2.0f, 2.5f, 0.0f));
+	Cube * cube3 = new Cube(glm::vec3(-3.0f, 0.5f, 0.0f));
+	Cube * cube4 = new Cube(glm::vec3(-2.0f, 4.5f, 0.0f));
 
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 5.0f, 1.0f));
 	cube1->transform(scale);
@@ -229,10 +229,10 @@ static void createIsabellesModel(Model * model)
 	model->addPolygon(cube4);
 
 	//0
-	Cube * cube5 = new Cube(glm::vec3(1.0f , 0.5f, 1.0f));
-	Cube * cube6 = new Cube(glm::vec3(2.0f, 0.5f, 1.0f));
-	Cube * cube7 = new Cube(glm::vec3(3.0f, 0.5f, 1.0f));
-	Cube * cube8 = new Cube(glm::vec3(2.0f, 4.5f, 1.0f));
+	Cube * cube5 = new Cube(glm::vec3(1.0f , 0.5f, 0.0f));
+	Cube * cube6 = new Cube(glm::vec3(2.0f, 0.5f, 0.0f));
+	Cube * cube7 = new Cube(glm::vec3(3.0f, 0.5f, 0.0f));
+	Cube * cube8 = new Cube(glm::vec3(2.0f, 4.5f, 0.0f));
 
 	cube5->transform(scale);
 	cube7->transform(scale);
@@ -240,9 +240,10 @@ static void createIsabellesModel(Model * model)
 	model->addPolygon(cube6);
 	model->addPolygon(cube7);
 	model->addPolygon(cube8);
+
 	// Set initial position
 	glm::mat4 mat(1.0f);
-	mat = glm::rotate(mat, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::rotate(mat, glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	model->transform(mat);
 }
 
