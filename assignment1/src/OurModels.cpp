@@ -42,7 +42,6 @@ static void createSeansModel(Model * model)
 
 static void createWaynesModel(Model * model)
 {
-<<<<<<< HEAD
 	// Y model
 	Cube *cb1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
 	glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.5f, 0.5f, 0.0f));
@@ -114,25 +113,6 @@ static void createWaynesModel(Model * model)
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
 	transform = translate * rotate * scale;
 	cb9->transform(transform);
-=======
-	Cube * cb1 = new Cube(glm::vec3(-3.0f, 3.5f, 0.0f));
-	Cube * cb2 = new Cube(glm::vec3(-3.0f, 4.5f, 0.0f));
-	Cube * cb3 = new Cube(glm::vec3(-2.0f, 0.5f, 0.0f));
-	Cube * cb4 = new Cube(glm::vec3(-2.0f, 1.5f, 0.0f));
-	Cube * cb5 = new Cube(glm::vec3(-2.0f, 2.5f, 0.0f));
-	Cube * cb6 = new Cube(glm::vec3(-2.0f, 3.5f, 0.0f));
-	Cube * cb7 = new Cube(glm::vec3(-1.0f, 3.5f, 0.0f));
-	Cube * cb8 = new Cube(glm::vec3(-1.0f, 4.5f, 0.0f));
-
-	Cube * cb9 =  new Cube(glm::vec3(1.0f, 3.5f, 0.0f));
-	Cube * cb10 = new Cube(glm::vec3(1.0f, 4.5f, 0.0f));
-	Cube * cb11 = new Cube(glm::vec3(2.0f, 4.5f, 0.0f));
-	Cube * cb12 = new Cube(glm::vec3(3.0f, 0.5f, 0.0f));
-	Cube * cb13 = new Cube(glm::vec3(3.0f, 1.5f, 0.0f));
-	Cube * cb14 = new Cube(glm::vec3(3.0f, 2.5f, 0.0f));
-	Cube * cb15 = new Cube(glm::vec3(3.0f, 3.5f, 0.0f));
-	Cube * cb16 = new Cube(glm::vec3(3.0f, 4.5f, 0.0f));
->>>>>>> 4c0a21d... fix rotation and misc cleanup
 
 	Model * waynesModel = new Model(true, false, false);
 
@@ -148,16 +128,6 @@ static void createWaynesModel(Model * model)
 	model->addPolygon(cb7);
 	model->addPolygon(cb8);
 	model->addPolygon(cb9);
-<<<<<<< HEAD
-=======
-	model->addPolygon(cb10);
-	model->addPolygon(cb11);
-	model->addPolygon(cb12);
-	model->addPolygon(cb13);
-	model->addPolygon(cb14);
-	model->addPolygon(cb15);
-	model->addPolygon(cb16);
->>>>>>> 4c0a21d... fix rotation and misc cleanup
 
 	// Set initial position
 	glm::mat4 mat(1.0f);
