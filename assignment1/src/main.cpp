@@ -120,7 +120,9 @@ int main(void)
 	GLCall(glEnable(GL_DEPTH_TEST));
 
 	//Enable Culling
-	//GLCall(glEnable(GL_CULL_FACE));
+	GLCall(glEnable(GL_CULL_FACE));
+	GLCall(glCullFace(GL_FRONT));
+	GLCall(glFrontFace(GL_CW));
 
 	// Build and Compile Shader Program 
 	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader");
