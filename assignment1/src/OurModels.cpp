@@ -42,6 +42,7 @@ static void createSeansModel(Model * model)
 
 static void createWaynesModel(Model * model)
 {
+<<<<<<< HEAD
 	// Y model
 	Cube *cb1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
 	glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.5f, 0.5f, 0.0f));
@@ -113,6 +114,25 @@ static void createWaynesModel(Model * model)
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
 	transform = translate * rotate * scale;
 	cb9->transform(transform);
+=======
+	Cube * cb1 = new Cube(glm::vec3(-3.0f, 3.5f, 0.0f));
+	Cube * cb2 = new Cube(glm::vec3(-3.0f, 4.5f, 0.0f));
+	Cube * cb3 = new Cube(glm::vec3(-2.0f, 0.5f, 0.0f));
+	Cube * cb4 = new Cube(glm::vec3(-2.0f, 1.5f, 0.0f));
+	Cube * cb5 = new Cube(glm::vec3(-2.0f, 2.5f, 0.0f));
+	Cube * cb6 = new Cube(glm::vec3(-2.0f, 3.5f, 0.0f));
+	Cube * cb7 = new Cube(glm::vec3(-1.0f, 3.5f, 0.0f));
+	Cube * cb8 = new Cube(glm::vec3(-1.0f, 4.5f, 0.0f));
+
+	Cube * cb9 =  new Cube(glm::vec3(1.0f, 3.5f, 0.0f));
+	Cube * cb10 = new Cube(glm::vec3(1.0f, 4.5f, 0.0f));
+	Cube * cb11 = new Cube(glm::vec3(2.0f, 4.5f, 0.0f));
+	Cube * cb12 = new Cube(glm::vec3(3.0f, 0.5f, 0.0f));
+	Cube * cb13 = new Cube(glm::vec3(3.0f, 1.5f, 0.0f));
+	Cube * cb14 = new Cube(glm::vec3(3.0f, 2.5f, 0.0f));
+	Cube * cb15 = new Cube(glm::vec3(3.0f, 3.5f, 0.0f));
+	Cube * cb16 = new Cube(glm::vec3(3.0f, 4.5f, 0.0f));
+>>>>>>> 4c0a21d... fix rotation and misc cleanup
 
 	Model * waynesModel = new Model(true, false, false);
 
@@ -128,6 +148,16 @@ static void createWaynesModel(Model * model)
 	model->addPolygon(cb7);
 	model->addPolygon(cb8);
 	model->addPolygon(cb9);
+<<<<<<< HEAD
+=======
+	model->addPolygon(cb10);
+	model->addPolygon(cb11);
+	model->addPolygon(cb12);
+	model->addPolygon(cb13);
+	model->addPolygon(cb14);
+	model->addPolygon(cb15);
+	model->addPolygon(cb16);
+>>>>>>> 4c0a21d... fix rotation and misc cleanup
 
 	// Set initial position
 	glm::mat4 mat(1.0f);
@@ -184,88 +214,32 @@ static void createBensModel(Model* model)
 
 static void createIsabellesModel(Model * model)
 {
-	//A0
-	float originX = 0.0f;
-	float originY = 0.5f;
-	float originZ = 0.0f;
-	float cubeOffset = 1.0f;
+	//A
+	Cube * cube1 = new Cube(glm::vec3(-1.0f, 0.5f, 0.0f));
+	Cube * cube2 = new Cube(glm::vec3(-2.0f, 2.5f, 0.0f));
+	Cube * cube3 = new Cube(glm::vec3(-3.0f, 0.5f, 0.0f));
+	Cube * cube4 = new Cube(glm::vec3(-2.0f, 4.5f, 0.0f));
 
-	//drawing A
-	//left 
-	Cube * cube1 = new Cube(glm::vec3(originX - 1.0f, originY, originZ));
-	Cube * cube2 = new Cube(glm::vec3(originX - 1.0f, originY + cubeOffset, originZ));
-	Cube * cube3 = new Cube(glm::vec3(originX - 1.0f, originY + cubeOffset * 2, originZ));
-	Cube * cube4 = new Cube(glm::vec3(originX - 1.0f, originY + cubeOffset * 3, originZ));
-	Cube * cube5 = new Cube(glm::vec3(originX - 1.0f, originY + cubeOffset * 4, originZ));
-	Cube * cube6 = new Cube(glm::vec3(originX - 1.0f, originY + cubeOffset * 5, originZ));
-	//right
-	Cube * cube7 = new Cube(glm::vec3(originX + cubeOffset * -4, originY, originZ));
-	Cube * cube8 = new Cube(glm::vec3(originX + cubeOffset * -4, originY + cubeOffset, originZ));
-	Cube * cube9 = new Cube(glm::vec3(originX + cubeOffset * -4, originY + cubeOffset * 2, originZ));
-	Cube * cube10 = new Cube(glm::vec3(originX + cubeOffset * -4, originY + cubeOffset * 3, originZ));
-	Cube * cube11 = new Cube(glm::vec3(originX + cubeOffset * -4, originY + cubeOffset * 4, originZ));
-	Cube * cube12 = new Cube(glm::vec3(originX + cubeOffset * -4, originY + cubeOffset * 5, originZ));
-	//middle top
-	Cube * cube13 = new Cube(glm::vec3(originX + cubeOffset * -2, originY + cubeOffset * 5, originZ));
-	Cube * cube14 = new Cube(glm::vec3(originX + cubeOffset * -3, originY + cubeOffset * 5, originZ));
-	//middle bottom
-	Cube * cube15 = new Cube(glm::vec3(originX + cubeOffset * -2, originY + cubeOffset * 3, originZ));
-	Cube * cube16 = new Cube(glm::vec3(originX + cubeOffset * -3, originY + cubeOffset * 3, originZ));
-
-	//drawing 0
-	//left
-	Cube * cube17 = new Cube(glm::vec3(originX + 1.0f, originY, originZ));
-	Cube * cube18 = new Cube(glm::vec3(originX + 1.0f, originY + cubeOffset, originZ));
-	Cube * cube19 = new Cube(glm::vec3(originX + 1.0f, originY + cubeOffset * 2, originZ));
-	Cube * cube20 = new Cube(glm::vec3(originX + 1.0f, originY + cubeOffset * 3, originZ));
-	Cube * cube21 = new Cube(glm::vec3(originX + 1.0f, originY + cubeOffset * 4, originZ));
-	Cube * cube22 = new Cube(glm::vec3(originX + 1.0f, originY + cubeOffset * 5, originZ));
-	//right
-	Cube * cube23 = new Cube(glm::vec3(originX + cubeOffset * 4, originY, originZ));
-	Cube * cube24 = new Cube(glm::vec3(originX + cubeOffset * 4, originY + cubeOffset, originZ));
-	Cube * cube25 = new Cube(glm::vec3(originX + cubeOffset * 4, originY + cubeOffset * 2, originZ));
-	Cube * cube26 = new Cube(glm::vec3(originX + cubeOffset * 4, originY + cubeOffset * 3, originZ));
-	Cube * cube27 = new Cube(glm::vec3(originX + cubeOffset * 4, originY + cubeOffset * 4, originZ));
-	Cube * cube28 = new Cube(glm::vec3(originX + cubeOffset * 4, originY + cubeOffset * 5, originZ));
-	//top
-	Cube * cube29 = new Cube(glm::vec3(originX + cubeOffset * 2, originY + cubeOffset * 5, originZ));
-	Cube * cube30 = new Cube(glm::vec3(originX + cubeOffset * 3, originY + cubeOffset * 5, originZ));
-	//bottom
-	Cube * cube31 = new Cube(glm::vec3(originX + cubeOffset * 2, originY, originZ));
-	Cube * cube32 = new Cube(glm::vec3(originX + cubeOffset * 3, originY, originZ));
-
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 5.0f, 1.0f));
+	cube1->transform(scale);
+	cube3->transform(scale);
 	model->addPolygon(cube1);
 	model->addPolygon(cube2);
 	model->addPolygon(cube3);
 	model->addPolygon(cube4);
+
+	//0
+	Cube * cube5 = new Cube(glm::vec3(1.0f , 0.5f, 0.0f));
+	Cube * cube6 = new Cube(glm::vec3(2.0f, 0.5f, 0.0f));
+	Cube * cube7 = new Cube(glm::vec3(3.0f, 0.5f, 0.0f));
+	Cube * cube8 = new Cube(glm::vec3(2.0f, 4.5f, 0.0f));
+
+	cube5->transform(scale);
+	cube7->transform(scale);
 	model->addPolygon(cube5);
 	model->addPolygon(cube6);
 	model->addPolygon(cube7);
 	model->addPolygon(cube8);
-	model->addPolygon(cube9);
-	model->addPolygon(cube10);
-	model->addPolygon(cube11);
-	model->addPolygon(cube12);
-	model->addPolygon(cube13);
-	model->addPolygon(cube14);
-	model->addPolygon(cube15);
-	model->addPolygon(cube16);
-	model->addPolygon(cube17);
-	model->addPolygon(cube18);
-	model->addPolygon(cube19);
-	model->addPolygon(cube20);
-	model->addPolygon(cube21);
-	model->addPolygon(cube22);
-	model->addPolygon(cube23);
-	model->addPolygon(cube24);
-	model->addPolygon(cube25);
-	model->addPolygon(cube26);
-	model->addPolygon(cube27);
-	model->addPolygon(cube28);
-	model->addPolygon(cube29);
-	model->addPolygon(cube30);
-	model->addPolygon(cube31);
-	model->addPolygon(cube32);
 
 	// Set initial position
 	glm::mat4 mat(1.0f);
