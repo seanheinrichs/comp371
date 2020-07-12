@@ -39,42 +39,92 @@ static void createSeansModel(Model * model)
 
 static void createWaynesModel(Model * model)
 {
-	Cube * cb1 = new Cube(glm::vec3(0.0f, 3.5f, 0.0f));
-	Cube * cb2 = new Cube(glm::vec3(0.0f, 4.5f, 0.0f));
-	Cube * cb3 = new Cube(glm::vec3(1.0f, 0.5f, 0.0f));
-	Cube * cb4 = new Cube(glm::vec3(1.0f, 1.5f, 0.0f));
-	Cube * cb5 = new Cube(glm::vec3(1.0f, 2.5f, 0.0f));
-	Cube * cb6 = new Cube(glm::vec3(1.0f, 3.5f, 0.0f));
-	Cube * cb7 = new Cube(glm::vec3(2.0f, 3.5f, 0.0f));
-	Cube * cb8 = new Cube(glm::vec3(2.0f, 4.5f, 0.0f));
+	// Y model
+	Cube *cb1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.5f, 0.5f, 0.0f));
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 1.0f, 1.0f));
+	glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	glm::mat4 transform = translate * rotate * scale;
+	cb1->transform(transform);
 
-	Cube * cb9 = new Cube(glm::vec3(4.0f, 3.5f, 0.0f));
-	Cube * cb10 = new Cube(glm::vec3(4.0f, 4.5f, 0.0f));
-	Cube * cb11 = new Cube(glm::vec3(5.0f, 4.5f, 0.0f));
-	Cube * cb12 = new Cube(glm::vec3(6.0f, 0.5f, 0.0f));
-	Cube * cb13 = new Cube(glm::vec3(6.0f, 1.5f, 0.0f));
-	Cube * cb14 = new Cube(glm::vec3(6.0f, 2.5f, 0.0f));
-	Cube * cb15 = new Cube(glm::vec3(6.0f, 3.5f, 0.0f));
-	Cube * cb16 = new Cube(glm::vec3(6.0f, 4.5f, 0.0f));
+	Cube *cb2 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.5f, 1.5f, 0.0f));
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 3.0f, 1.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	transform = translate * rotate * scale;
+	cb2->transform(transform);
+
+	Cube *cb3 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.85f, 3.5f, 0.0f));
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f, 1.0f, 1.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(65.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	transform = translate * rotate * scale;
+	cb3->transform(transform);
+
+	Cube *cb4 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-4.15f, 3.5f, 0.0f));
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f, 1.0f, 1.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-65.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	transform = translate * rotate * scale;
+	cb4->transform(transform);
+
+	Cube *cb5 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-4.75f, 5.0f, 0.0f));
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 1.0f, 1.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	transform = translate * rotate * scale;
+	cb5->transform(transform);
+
+	Cube *cb6 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25f, 5.0f, 0.0f));
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 1.0f, 1.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	transform = translate * rotate * scale;
+	cb6->transform(transform);
+
+	// 7 model
+	Cube *cb7 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(1.90f, 2.25f, 0.0f));
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 4.5f, 1.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	glm::mat4 skew(1.0f);
+	skew = {
+		1.0, 0.0, 0.0, 0.0,
+		0.46630765, 1.0, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 1.0
+	};
+	transform = skew * translate * rotate * scale;
+	cb7->transform(transform);
+
+	Cube *cb8 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.5f, 5.0f, 0.0f));
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 1.0f, 1.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	transform = translate * rotate * scale;
+	cb8->transform(transform);
+
+	Cube *cb9 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 4.5f, 0.0f));
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 2.0f, 1.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
+	transform = translate * rotate * scale;
+	cb9->transform(transform);
 
 	Model * waynesModel = new Model(true, false, false);
+
+	// Y model
 	model->addPolygon(cb1);
 	model->addPolygon(cb2);
 	model->addPolygon(cb3);
 	model->addPolygon(cb4);
 	model->addPolygon(cb5);
 	model->addPolygon(cb6);
+
+	// 7 model
 	model->addPolygon(cb7);
 	model->addPolygon(cb8);
-
 	model->addPolygon(cb9);
-	model->addPolygon(cb10);
-	model->addPolygon(cb11);
-	model->addPolygon(cb12);
-	model->addPolygon(cb13);
-	model->addPolygon(cb14);
-	model->addPolygon(cb15);
-	model->addPolygon(cb16);
 }
 
 
