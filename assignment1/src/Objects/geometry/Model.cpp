@@ -6,8 +6,6 @@ Depends on: Polygon.h
 Description: A container for groups of related geometry. It handles the creation of 
 arbitrarily sized vertex arrays from the polgons that it contains.
 
-TODO: Create API for one origin point for the entire polygon
-
 origin: the point of origin for this particular polygon
 vaComponentCount: the number of vertex components in the Polygons of the model
 vaByteSize: the number Bytes required to contain the vertices of all the polygons in memory
@@ -16,25 +14,25 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 
 #pragma once
 
-
 #include "Model.h"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
 
+//Model constructor, setting up position, texture and color components
 Model::Model(bool position, bool texture, bool color)
 {
 	Model::position = position;
 	Model::texture = texture;
 	Model::color = color;
 	origin = glm::vec3(0.f);
-	//Model::binder = new Binder(position, texture, color);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
 }
 
+//default constructor
 Model::Model() 
 {
 	Model::position = true;
@@ -42,18 +40,11 @@ Model::Model()
 	Model::color = false;
 	origin = glm::vec3(0.f);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
-	translate_vec_origin = translate_vec = glm::vec3(0.0f, 0.0f, 0.0f); //not sure if this is the best way to set up the translate_vec_origin
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
 }
 
-void Model::addTranslationOrigin(glm::vec3 translate)
-{
-	Model::translate_vec_origin.x = translate.x;
-	Model::translate_vec_origin.y = translate.y;
-	Model::translate_vec_origin.z = translate.z;
-}
-
+//Method that updates the values of the x-y-z components of the rotation vector used to calculate the model transformation matrix
 void Model::addRotation(float degrees, glm::vec3 axis) 
 {
 	rotate_vec.x += axis.x;
@@ -62,6 +53,7 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 	rotate_angle += degrees;
 }
 
+//Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
 void Model::addScale(glm::vec3 scale)
 {
 	if (scale_vec.x >= 0.0 && scale_vec.y >= 0.0 && scale_vec.z >= 0.0) {
@@ -77,53 +69,33 @@ void Model::addScale(glm::vec3 scale)
 
 }
 
+//Method that updates the values of the x-y-z components of the translation vector used to calculate the model transformation matrix
 void Model::addTranslation(glm::vec3 translate)
 {
-	//std::cout << "translation updated" << std::endl;
 	Model::translate_vec.x += translate.x;
 	Model::translate_vec.y += translate.y;
 	Model::translate_vec.z += translate.z;
 }
 
-void Model::printTranslate()
-{
-	//std::cout << "translation updated" << std::endl;
-	std::cout << "x:"<< Model::translate_vec.x << std::endl;
-	std::cout << "y:"<< Model::translate_vec.y << std::endl;
-	std::cout << "z:"<< Model::translate_vec.z << std::endl;
-}
-
+//Method that returns the rotation matrix
 glm::mat4 Model::getRotation() 
 {
 	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec);
-
-	//an attempt, maybe not placed in the right method
-	//missing the point translation step from the model to rotate around itself
-	//1. translate to center of model
-	//2. rotate
-	//3. translate back to origin 
-	return
-	getTranslation() *
-		glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec) *
-			glm::translate(glm::mat4(1.0f), glm::vec3(-translate_vec_origin.x, -translate_vec_origin.y, translate_vec_origin.z));
 }
 
-
+//Method that returns the translation matrix
 glm::mat4 Model::getTranslation() 
 {
 	return glm::translate(glm::mat4(1.0f), translate_vec);
 }
 
-glm::mat4 Model::getTranslationOrigin()
-{
-	return glm::translate(glm::mat4(1.0f), translate_vec_origin);
-}
-
+//Method that returns the scale matrix
 glm::mat4 Model::getScale() 
 {
 	return glm::scale(glm::mat4(1.0f), scale_vec);
 }
 
+//Method that calculates the transformation matrix of the model
 glm::mat4 Model::getModelMatrix()
 {
 	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
@@ -132,13 +104,14 @@ glm::mat4 Model::getModelMatrix()
 		return getTranslation() * getRotation() * getScale();
 }
 
-
+//Method that adds a polygon object to the list of polygons that this model is composed of
 void Model::addPolygon(Polygon* poly) 
 {
 	poly->setVertexController(position, texture, color);
 	polygons.push_back(poly);
 }
 
+//Method that sets the position, texture and color components
 void Model::setVertexController(bool position, bool texture, bool color) 
 {
 	Model::position = position;
@@ -146,12 +119,13 @@ void Model::setVertexController(bool position, bool texture, bool color)
 	Model::color = color;
 }
 
+//Method that returns the sample vertex of the polygon list
 Vertex Model::getSampleVertex() 
 {
 	return polygons.front()->getSampleVertex();
 }
 
-
+//Method that returns the vertex array float count
 int Model::getVAFloatCount()
 {
 	vaComponentCount = 0;
@@ -162,6 +136,7 @@ int Model::getVAFloatCount()
 	return vaComponentCount;
 }
 
+//Method that applies the passed tranformation matrix to every polygon in the list
 void Model::transform(glm::mat4 transmat)
 {
 	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
@@ -170,6 +145,7 @@ void Model::transform(glm::mat4 transmat)
 	}
 }
 
+//Method that retusn the vertex array byte size
 int Model::getVAByteSize()
 {
 	vaByteSize = 0;
@@ -180,6 +156,7 @@ int Model::getVAByteSize()
 	return vaByteSize;
 }
 
+//Method that returns the vertex array count
 int Model::getVAVertexCount() 
 {
 	int vertexCount = 0;
@@ -190,6 +167,7 @@ int Model::getVAVertexCount()
 	return vertexCount;
 }
 
+//Method that returns the array of vertices that make each polygon
 float* Model::getVertexArray()
 {
 	float* va = new float[getVAFloatCount()];
@@ -205,7 +183,7 @@ float* Model::getVertexArray()
 
 }
 
-
+//Method that returns the origin coordinate of a model
 std::map<std::string, glm::vec3> Model::getMinMax()
 {
 	std::map<std::string, glm::vec3> map;
@@ -231,18 +209,17 @@ std::map<std::string, glm::vec3> Model::getMinMax()
 
 		if (map["min"].z > temp["min"].z)
 			map["min"].z = temp["min"].z;
-
 	}
-
 	return map;
-
 }
 
+//Method that returns the vertex byte size
 int Model::getVertexByteSize() 
 {
 	return polygons.front()->getVertexByteSize();
 }
 
+//Method that translates the model to its origin
 void Model::translateToOrigin()
 {
 	std::map<std::string, glm::vec3> map;
@@ -254,5 +231,4 @@ void Model::translateToOrigin()
 	temp.z = -(map["min"].z + map["max"].z) / 2;
 
 	transform(glm::translate(glm::mat4(1.0f), temp));
-
 }

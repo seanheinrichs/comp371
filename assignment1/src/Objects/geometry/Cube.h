@@ -11,8 +11,6 @@ vaComponentCount: the number of vertex components in this Cube
 vaByteSize: the number Bytes required to contain the vertices of this cube
 */
 
-
-
 #include "Polygon.h"
 
 class VertexComponent;

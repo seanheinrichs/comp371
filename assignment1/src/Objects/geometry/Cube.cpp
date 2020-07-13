@@ -6,7 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "../../Opengl_a/VertexComponent.h"
 
-
+//Method that sets up the vertices that build a single cube
 void Cube::setupVC() 
 {
 
@@ -209,6 +209,7 @@ void Cube::setupVC()
 	
 }
 
+//Cube constructor that passes a vec3 as the original position
 Cube::Cube(glm::vec3 origin_a)
 {
 	setupVC();
@@ -216,6 +217,7 @@ Cube::Cube(glm::vec3 origin_a)
 	translate_fromOrigin();
 }
 
+//Method that sets up the position, texture and color components
 void Cube::setVertexController(bool position, bool texture, bool color) 
 {
 	vc->position = position;
@@ -223,50 +225,56 @@ void Cube::setVertexController(bool position, bool texture, bool color)
 	vc->color = color;
 }
 
+//Method that returns the vertices of the cube 
 Vertex Cube::getSampleVertex()
 {
 	return vc->vertices.front();
 }
 
+//Method that applies a transformation matrix to the vertices of the cube
 void Cube::transform(glm::mat4 transmat)
 {
 	vc->transform(transmat);
 }
 
+//Method that translates the cube from origin (used for when moving the model so it is according to the origin of the model)
 void Cube::translate_fromOrigin()
 {
 	glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.0 + origin.x, 0.0 + origin.y, 0.0 + origin.z));
 	vc->transform(translation);
 }
 
+//Method that returns the vertex array count
 int Cube::getVAVertexCount()
 {
 	return vc->getVAVertexCount();
 }
 
+//Method that returns the vertex array float count
 int Cube::getVAFloatCount()
 {
 	return vc->getVAFloatCount();
 }
 
+//Method that returns the vertex array byte size
 int Cube::getVAByteSize()
 {
 	return vc->getVAByteSize();
 }
-
+//Method that returns the vertex byte size
 int Cube::getVertexByteSize()
 {
 
 	return vc->getVertexByteSize(vc->vertices.front());
 }
 
-
+//Method that returns the vertex array
 float* Cube::getVertexArray()
 {
 	return vc->getVertexArray();
 }
 
-
+//Method that returns the origin, as a vec3 coordinate, of the combination of the vertices
 std::map<std::string, glm::vec3> Cube::getMinMax()
 {
 	return vc->getMinMax();
