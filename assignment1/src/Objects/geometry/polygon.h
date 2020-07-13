@@ -1,20 +1,18 @@
-/*
-Polygon 
-
-Description: A base class for any polygons we may need to create. The virtual methods bellow
-are a necessary API for interacting with the model object that will be able to
-
-Note: The virtual methods below must be overriden to for correct polymorphic behaviour
-
-
-*/
-
 #pragma once
 
 #include "../../Opengl_a/vertex.h"
 #include <map>
 #include <string>
 
+/*
+*Polygon
+*
+*Description: A base class for any polygons we may need to create. The virtual methods bellow
+*are a necessary API for interacting with the model object to properly calculate vertice byte sizes
+*
+*Note: The virtual methods below must be overriden to for correct polymorphic behaviour
+*
+*/
 class Polygon 
 {
 	public:
@@ -40,6 +38,4 @@ class Polygon
 
 			return a;
 		}
-		//virtual ~Polygon();
-
 };

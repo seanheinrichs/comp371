@@ -1,11 +1,16 @@
-// Shader code taken from https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.h
-
 #ifndef SHADER_H
 #define SHADER_H
 
 #include <string>
 #include <glm/glm.hpp>
 
+/*
+*The code for the following class is not our own.
+* All credit should be given to learnopengl.com
+*
+*source: https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.h
+*
+*/
 class Shader
 {
 public:

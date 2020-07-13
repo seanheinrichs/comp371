@@ -53,7 +53,7 @@ List of Controls:
 * SHIFT + W - Move the selected model up
 * SHIFT + S - Move the selected model down
 * SHIFT + A - Move the selected model left
-* SHIFT + D - Move the selected model 
+* SHIFT + D - Move the selected model right
 
 **Rotation**
 * A - Rotate left 5 degrees about y-axis
@@ -63,7 +63,7 @@ List of Controls:
 * G - Move camera forward
 * V - Move camera backward
 * C - Move camera left
-* B - MoVE camera right
+* B - Move camera right
 * Left mouse botton - Move to zoom in and out of the scene
 * Middle mouse botton - Move in y direction to tilt
 * Right mouse botton - Move in x direction to pan

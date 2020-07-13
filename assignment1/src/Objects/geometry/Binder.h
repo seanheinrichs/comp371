@@ -2,6 +2,13 @@
 
 class Model;
 
+
+/*
+*Binder
+*
+*Description: An interface that provides the necessary methods to bind vertices for a model object
+*
+*/
 class Binder
 {
 
