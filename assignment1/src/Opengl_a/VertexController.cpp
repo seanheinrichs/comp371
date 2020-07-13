@@ -8,6 +8,10 @@
 #include <string>
 #include <map>
 
+
+/*
+* Constructor specifying only the vertex components that should be accounted for
+*/
 VertexController::VertexController(bool position, bool texture, bool color)
 {
 	VertexController::position = position;
@@ -15,11 +19,15 @@ VertexController::VertexController(bool position, bool texture, bool color)
 	VertexController::color = color;
 }
 
-
-VertexController::VertexController(std::vector<Vertex> verts, bool position, bool texture)
+/*
+* Constructor that allows passing a vector of vertices and specifying 
+* the vertex components that should be accounted for
+*/
+VertexController::VertexController(std::vector<Vertex> verts, bool position, bool texture, bool color)
 {
 	VertexController::position = position;
 	VertexController::texture = texture;
+	VertexController::color = color;
 	VertexController::vertices = verts;
 }
 
@@ -28,6 +36,12 @@ void VertexController::appendVertex(Vertex& ver)
 	vertices.push_back(ver);
 }
 
+
+/*
+* @param [in] vert : the vertex to inspect
+* @param [out] size : the number of bytes contained inside the vertex
+*					  given the current color, position, and texture configuration
+*/
 int VertexController::getVertexByteSize(Vertex vert)
 {
 	int size = 0;
@@ -54,6 +68,11 @@ int VertexController::getVertexByteSize(Vertex vert)
 	return size;
 }
 
+/*
+* @param [in] vert : the vertex to inspect
+* @param [out] size : the number of floats contained inside the vertex
+*					  given the current color, position, and texture configuration
+*/
 int VertexController::getVertexFloatCount(Vertex vert)
 {
 	int size = 0;
@@ -80,7 +99,10 @@ int VertexController::getVertexFloatCount(Vertex vert)
 	return size;
 }
 
-
+/*
+* @param [in] vert : the vertex to inspect
+* @param [out] a : an array of floats representing vertex
+*/
 float* VertexController::getVertex(Vertex vert)
 {
 	float* a = new float[getVertexFloatCount(vert)];
@@ -107,24 +129,39 @@ float* VertexController::getVertex(Vertex vert)
 	return a;
 }
 
-
+/*
+* @output : the byte size of all the vertices contained inside the calling vertex controller
+*			given the current color, position, and texture configuration
+*/
 int VertexController::getVAByteSize()
 {
 	return  getVertexByteSize(vertices.front()) * vertices.size();
 }
 
-
+/*
+* @output : the number of floats for all the vertices contained inside the calling vertex controller
+*			given the current color, position, and texture configuration
+*/
 int VertexController::getVAFloatCount()
 {
 	return  getVertexFloatCount(vertices.front()) * vertices.size();
 }
 
-
+/*
+* @output : the number vertices contained inside the calling vertex controller
+*/
 int VertexController::getVAVertexCount()
 {
 	return  vertices.size();
 }
 
+
+/*
+*Description: applies a transformation to a given vertex component 
+*
+* @param [in] transmat : the transformation matrix to be applied to the vertex component
+* @param [in] vc : the vertex component to be transformed -- this should always be a position component
+*/
 void VertexController::transformOne(glm::mat4 transmat, VertexComponent& vc)
 {
 	if (vc.getFloatCount() == 4) 
@@ -167,6 +204,11 @@ void VertexController::transformOne(glm::mat4 transmat, VertexComponent& vc)
 	}
 }
 
+/*
+*Description: applies a transformation to all vertices
+*
+* @param [in] transmat : the transformation matrix to be applied to all vertices
+*/
 void VertexController::transform(glm::mat4 transmat)
 {
 	for (std::vector<Vertex>::iterator it = vertices.begin(); it < vertices.end(); it++)
@@ -187,6 +229,14 @@ void VertexController::transform(glm::mat4 transmat)
 	
 }
 
+/*
+*Description: iterates through all the vertices and places 
+*them one by one into an array of floats
+*
+* @output va : a float array containing all the floats of 
+*        all the vertices in the calling VertecController
+*	     for its current configuration
+*/
 float* VertexController::getVertexArray()
 {
 	float* va = new float[getVAFloatCount()];
@@ -203,7 +253,14 @@ float* VertexController::getVertexArray()
 }
 
 
-
+/*
+*Description: iterates through all the vertices in the calling
+*			  VertexController and find the min and max for x,y,z 
+*
+* @output map : a vec3 map containing "min" and "max"
+*				"max" is a vec3 conatinig the maximum for each components
+*				"min" is a vec3 conatinig the minimum for each components
+*/
 std::map<std::string, glm::vec3> VertexController::getMinMax()
 {
 	std::map<std::string, glm::vec3> map;

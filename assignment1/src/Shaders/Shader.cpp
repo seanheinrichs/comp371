@@ -1,4 +1,10 @@
-// Shader code taken from https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.h
+/*
+* The code for the Shader class contained in this file is not our own.
+* All credit should be given to learnopengl.com
+*
+*source: https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.h
+*
+*/
 
 #include "Shader.h"
 
@@ -108,6 +114,15 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 	}
 }
 
+
+/*
+* The following code is not our own.
+* All credit should be given to learnopengl.com
+*
+*source: https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.h
+*
+*/
+
 /* Functions (Public) */
 void Shader::use()
 {
@@ -153,6 +168,16 @@ void Shader::setVec4(const std::string &name, const glm::vec4 &value) const
 {
 	glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
 }
+
+
+/*
+* The following code is not our own.
+* All credit should be given to learnopengl.com
+*
+*source: https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.h
+*
+*/
+
 
 void Shader::setVec4(const std::string &name, float x, float y, float z, float w)
 {

@@ -1,6 +1,9 @@
 #include "VertexComponent.h"
 
-
+/*
+*@param tp : the type of Vertex component we wish to create
+*@param dat : the floats that define this vertex component
+*/
 VertexComponent::VertexComponent(Components tp, glm::vec2 dat) 
 {
 	type = tp;

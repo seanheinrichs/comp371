@@ -2,24 +2,40 @@
 #include <glm/glm.hpp>
 
 
-//#define POSITION 0
-//#define TEXTURE 1 
-//#define COLOR 2 
-
+/*
+* Components
+*
+*This enum makes the types of components more readable
+*
+*/
 enum Components
 {
+
 	POSITION = 0,
 	TEXTURE ,
 	COLOR 
 };
 
+//overload == for the above enum
 static bool operator==(Components& a, Components& b)  
 {
 	return (int)a == (int)b;
 }
 
+
+/*
+* Vertex Component
+*
+*An abstraction of one component of an opengl vertex,
+*this class may represent a position, color, texture, etc..
+*
+*@member data : holds the values of this particular vertex component 
+*
+*
+*/
 class VertexComponent 
 {
+
 	public:
 
 		Components type;
