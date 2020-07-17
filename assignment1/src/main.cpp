@@ -17,13 +17,14 @@
 #include <filesystem>
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
+
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "Objects/geometry/Polygon.h"
 #include "Objects/Grid.hpp"
 #include "Objects/Camera.h"
 #include "OurModels.cpp"
-
+#include "objloader.cpp"
 #include <GL/glew.h>    
 #include <GLFW/glfw3.h> 
 #include <glm/gtc/matrix_transform.hpp>
@@ -218,6 +219,25 @@ int main(void)
 	
 	shaderProgram.use();
 
+	//obj loader
+	// Read our .obj file
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec3> normals; // Won't be used at the moment.
+	bool res = loadOBJ("../../Assets/Models/planet.obj", vertices, uvs, normals);
+	// Load it into a VBO
+
+	GLuint vertexbuffer;
+	glGenBuffers(1, &vertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+	GLuint uvbuffer;
+	glGenBuffers(1, &uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -308,6 +328,35 @@ int main(void)
 		glDrawArrays(GL_LINES, 0, 6);
 		glLineWidth(1.0f);
 
+
+		//obj loader
+		// 1rst attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+			0,                  // attribute
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		// 2nd attribute buffer : UVs
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glVertexAttribPointer(
+			1,                                // attribute
+			2,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
+		// Draw the triangle !
+		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+		//obj loader end
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
 		glfwPollEvents();
