@@ -20,6 +20,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "Objects/geometry/Polygon.h"
+#include "Objects/geometry/SphereModel.h"
 #include "Objects/Grid.hpp"
 #include "Objects/Camera.h"
 #include "OurModels.cpp"
@@ -28,6 +29,7 @@
 #include <GLFW/glfw3.h> 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glad/glad.h>
 
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
@@ -217,6 +219,9 @@ int main(void)
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
 	
 	shaderProgram.use();
+
+	//-----
+	SphereModel ourModel("Models/planet.obj");
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
