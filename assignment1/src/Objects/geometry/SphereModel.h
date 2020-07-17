@@ -1,12 +1,11 @@
-#ifndef MODEL_H
-#define MODEL_H
+//#ifndef SPHEREMODEL_H
+//#define SPHEREMODEL_H
 
 #include <glad/glad.h> 
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-//#define STB_IMAGE_IMPLEMENTATION
-//#include <stb_image.h>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -19,21 +18,25 @@
 #include <iostream>
 #include <map>
 #include <vector>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 using namespace std;
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
 
-class Model
+class SphereModel
 {
 public:
-	// model data 
+	// SphereModel data 
 	vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 	vector<Mesh>    meshes;
 	string directory;
 	bool gammaCorrection;
 
-	// constructor, expects a filepath to a 3D model.
-	Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
+	// constructor, expects a filepath to a 3D SphereModel.
+	SphereModel(string const &path, bool gamma = false) : gammaCorrection(gamma)
 	{
 		loadModel(path);
 	}
@@ -238,4 +241,4 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 
 	return textureID;
 }
-#endif
+//#endif

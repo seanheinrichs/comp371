@@ -2,11 +2,11 @@
 #define MESH_H
 
 #include <glad/glad.h> // holds all OpenGL type declarations
-
+#include "../../A1/comp371/assignment1/src/Shaders/Shader.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Shaders/Shader.h"
+
 
 #include <string>
 #include <vector>
