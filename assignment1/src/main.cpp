@@ -29,6 +29,7 @@
 #include <GLFW/glfw3.h> 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <../../A1/comp371/assignment1/src/stb_image.h>
 
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
@@ -262,6 +263,34 @@ int main(void)
 		(void*)0                          // array buffer offset
 	);
 
+
+	//TEXTURES
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+										   // set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load image, create texture and generate mipmaps
+	int width, height, nrChannels;
+	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+	unsigned char *data = stbi_load("../../Resources/container.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+	//TEXTURES END
+
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -290,7 +319,7 @@ int main(void)
 		shaderProgram.setMat4("view", view);
 
 		// [Models]
-
+		// glBindTexture(GL_TEXTURE_2D, texture);
 		ben->bind();
 		selected == 0 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);
 		model = ben->getModelMatrix();
@@ -354,19 +383,38 @@ int main(void)
 
 
 		model = glm::mat4(1.0f);
-		
+		shaderProgram.setInt("fill", 4);
 		float offset = 5.5f;
 		model = ben->getModelMatrix();
 		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
 		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		glDrawArrays(GL_LINES, 0, vertices.size());
-		//glfwSwapBuffers(window);
-		//glfwPollEvents();
 
 		model = sean->getModelMatrix();
+		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		glDrawArrays(GL_LINES, 0, vertices.size());
+
+		model = wayne->getModelMatrix();
+		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		glDrawArrays(GL_LINES, 0, vertices.size());
+
+		model = isa->getModelMatrix();
+		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		glDrawArrays(GL_LINES, 0, vertices.size());
+
+		model = ziming->getModelMatrix();
+		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		glDrawArrays(GL_LINES, 0, vertices.size());
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -552,6 +600,15 @@ void processInput(GLFWwindow *window, Model** models)
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 	{
 		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
+	}
+
+	// Press 'J' to scale DOWN the model
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		float randX = rand() % 3 + (-3.0);
+		float randY = rand() % 3 + (-3.0);
+		float randZ = rand() % 3;
+		models[selected]->addTranslation(glm::vec3(randX, randY, randZ));
 	}
 }
 

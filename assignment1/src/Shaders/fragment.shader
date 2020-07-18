@@ -27,6 +27,11 @@ void main()
 	{
 		FragColor = vec4(0.6f, 0.0f, 0.8f, 1.0f);
 	}
+	// shpere volor
+	else if (fill == 4)
+	{
+		FragColor = vec4(0.9f, 0.5f, 0.6f, 1.0f);
+	}
 	// Vertex Defined Colors
 	else 
 	{
