@@ -354,14 +354,19 @@ int main(void)
 
 
 		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f));
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		
+		float offset = 5.5f;
+		model = ben->getModelMatrix();
+		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		// Draw the triangle !
 		glDrawArrays(GL_LINES, 0, vertices.size());
-		//obj loader end
-		// Swap Buffers and Poll for Events
+		//glfwSwapBuffers(window);
+		//glfwPollEvents();
+
+		model = sean->getModelMatrix();
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		glDrawArrays(GL_LINES, 0, vertices.size());
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

@@ -75,6 +75,10 @@ void Model::addTranslation(glm::vec3 translate)
 	Model::translate_vec.x += translate.x;
 	Model::translate_vec.y += translate.y;
 	Model::translate_vec.z += translate.z;
+
+	Model::translate_vec_sphere.x = Model::translate_vec.x;
+	Model::translate_vec_sphere.x = Model::translate_vec.y + 2.0f;
+	Model::translate_vec_sphere.x = Model::translate_vec.z ;
 }
 
 //Method that returns the rotation matrix
@@ -87,6 +91,16 @@ glm::mat4 Model::getRotation()
 glm::mat4 Model::getTranslation() 
 {
 	return glm::translate(glm::mat4(1.0f), translate_vec);
+}
+
+//Method that returns the translation matrix
+glm::mat4 Model::getTranslationSphere()
+{
+
+	Model::translate_vec_sphere.x = Model::translate_vec.x;
+	Model::translate_vec_sphere.x = Model::translate_vec.y + 2.0f;
+	Model::translate_vec_sphere.x = Model::translate_vec.z;
+	return glm::translate(glm::mat4(1.0f), translate_vec_sphere);
 }
 
 //Method that returns the scale matrix
@@ -102,6 +116,19 @@ glm::mat4 Model::getModelMatrix()
 		return getTranslation() *  getScale();
 	else
 		return getTranslation() * getRotation() * getScale();
+}
+
+//Method that calculates the transformation matrix of the model to add the sphere on top
+glm::mat4 Model::getModelMatrixSphere()
+{
+	float offset = 2.0f;
+	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0) {
+	return getTranslationSphere() *  getScale();
+	}else {
+
+		return getTranslationSphere() * getRotation() * getScale();
+	}
+		
 }
 
 //Method that adds a polygon object to the list of polygons that this model is composed of

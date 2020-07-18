@@ -35,9 +35,10 @@ public:
 	void addTranslation(glm::vec3 translate);
 	glm::mat4 getRotation();
 	glm::mat4 getTranslation();
+	glm::mat4 getTranslationSphere();
 	glm::mat4 getScale();
 	glm::mat4 getModelMatrix();
-
+	glm::mat4 getModelMatrixSphere();
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();
 	virtual int getVAByteSize();
@@ -58,6 +59,7 @@ public:
 	bool position, color, texture;
 	glm::vec3 rotate_vec;
 	glm::vec3 translate_vec;
+	glm::vec3 translate_vec_sphere;
 	glm::vec3 scale_vec;
 	float rotate_angle;
 
