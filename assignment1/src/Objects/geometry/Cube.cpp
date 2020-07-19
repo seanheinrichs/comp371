@@ -218,11 +218,12 @@ Cube::Cube(glm::vec3 origin_a)
 }
 
 //Method that sets up the position, texture and color components
-void Cube::setVertexController(bool position, bool texture, bool color) 
+void Cube::setVertexController(bool position, bool texture, bool color, bool normal) 
 {
 	vc->position = position;
 	vc->texture = texture;
 	vc->color = color;
+	vc->normal = normal;
 }
 
 //Method that returns the vertices of the cube 

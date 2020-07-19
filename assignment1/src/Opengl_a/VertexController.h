@@ -28,10 +28,11 @@ public:
 	bool position;
 	bool texture;
 	bool color;
+	bool normal;
 
 
-	VertexController(bool position = true, bool texture = false, bool color = false);
-	VertexController(std::vector<Vertex> verts, bool position = true, bool texture = false, bool color = false);
+	VertexController(bool position = true, bool texture = false, bool color = false, bool normal = false);
+	VertexController(std::vector<Vertex> verts, bool position = true, bool texture = false, bool color = false, bool normal = false);
 
 	void appendVertex(Vertex& ver);
 
