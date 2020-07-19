@@ -208,7 +208,7 @@ int main(void)
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
 
 	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	wayne->addTranslation(glm::vec3(-4.5f, 0.0f, -4.0f));
+	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
 
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
@@ -473,13 +473,13 @@ void processInput(GLFWwindow *window, Model** models)
 	// Press 'A' to rotate the model to the left 5 degrees about y-axis
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addRotation(0.5f,glm::vec3(0.0f, 1.0f, 0.0f));
+		models[selected]->addRotation(5.0f,glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
 	// Press 'D' to rotate the model to the right 5 degrees about y-axis
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addRotation(-0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
+		models[selected]->addRotation(-5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
 	// [Scale]
