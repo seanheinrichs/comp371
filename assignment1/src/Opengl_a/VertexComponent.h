@@ -13,7 +13,8 @@ enum Components
 
 	POSITION = 0,
 	TEXTURE ,
-	COLOR 
+	COLOR,
+	NORMAL
 };
 
 //overload == for the above enum

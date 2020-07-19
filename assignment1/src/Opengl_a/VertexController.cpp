@@ -12,23 +12,26 @@
 /*
 * Constructor specifying only the vertex components that should be accounted for
 */
-VertexController::VertexController(bool position, bool texture, bool color)
+VertexController::VertexController(bool position, bool texture, bool color, bool normal)
 {
 	VertexController::position = position;
 	VertexController::texture = texture;
 	VertexController::color = color;
+	VertexController::normal = normal;
 }
 
 /*
 * Constructor that allows passing a vector of vertices and specifying 
 * the vertex components that should be accounted for
 */
-VertexController::VertexController(std::vector<Vertex> verts, bool position, bool texture, bool color)
+VertexController::VertexController(std::vector<Vertex> verts, bool position, bool texture, bool color, bool normal)
 {
 	VertexController::position = position;
 	VertexController::texture = texture;
 	VertexController::color = color;
 	VertexController::vertices = verts;
+	VertexController::normal = normal;
+
 }
 
 void VertexController::appendVertex(Vertex& ver) 
@@ -59,6 +62,10 @@ int VertexController::getVertexByteSize(Vertex vert)
 		{
 			size += it->getByteSize();
 		}
+		else if (normal && it->type == NORMAL)
+		{
+			size += it->getFloatCount();
+		}
 		else 
 		{
 			//pass
@@ -87,6 +94,10 @@ int VertexController::getVertexFloatCount(Vertex vert)
 			size += it->getFloatCount();
 		}
 		else if (color && it->type == COLOR)
+		{
+			size += it->getFloatCount();
+		}
+		else if (normal && it->type == NORMAL)
 		{
 			size += it->getFloatCount();
 		}
@@ -120,6 +131,11 @@ float* VertexController::getVertex(Vertex vert)
 			currentCount += it->getFloatCount();
 		}
 		else if (color && it->type == COLOR)
+		{
+			std::copy(it->data, it->data + it->getFloatCount(), a + currentCount);
+			currentCount += it->getFloatCount();
+		}
+		else if (normal && it->type == NORMAL)
 		{
 			std::copy(it->data, it->data + it->getFloatCount(), a + currentCount);
 			currentCount += it->getFloatCount();

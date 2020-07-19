@@ -13,7 +13,7 @@ class Binder
 {
 
 public: 
-	Binder(bool position, bool texture, bool color);
+	Binder(bool position, bool texture, bool color, bool normal = false);
 	void bindArrayBuffer(bool unbind, Model* model);
 	void deallocate();
 	Binder();
@@ -21,6 +21,6 @@ public:
 	void unbind();
 
 	unsigned int vao, vbo;
-	bool position, texture, color;
+	bool position, texture, color, normal;
 
 };

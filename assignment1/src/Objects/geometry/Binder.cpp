@@ -48,6 +48,7 @@ Binder::Binder()
 	Binder::position = true;
 	Binder::texture = false;
 	Binder::color = false;
+	Binder::normal = false;
 }
 
 /*
@@ -56,11 +57,12 @@ Binder::Binder()
 *@param : color a boolean indicating whether or not to load color vertex components
 *@param : texture a boolean indicating whether or not to load texture vertex components
 */
-Binder::Binder(bool position, bool texture, bool color)
+Binder::Binder(bool position, bool texture, bool color, bool normal)
 {
 	Binder::position = position;
 	Binder::texture = texture;
 	Binder::color = color;
+	Binder::normal = normal;
 }
 
 /*
@@ -72,10 +74,11 @@ Binder::Binder(bool position, bool texture, bool color)
 void Binder::bindArrayBuffer(bool unbind, Model* model)
 {
 
-	bool* arr = new bool[3];
+	bool* arr = new bool[4];
 	arr[POSITION] = position;
 	arr[TEXTURE] = texture;
 	arr[COLOR] = color;
+	arr[NORMAL] = normal;
 
 	GLCall(glGenVertexArrays(1, &vao));
 	GLCall(glGenBuffers(1, &vbo));

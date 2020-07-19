@@ -20,11 +20,12 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 
 
 //Model constructor, setting up position, texture and color components
-Model::Model(bool position, bool texture, bool color)
+Model::Model(bool position, bool texture, bool color, bool normal)
 {
 	Model::position = position;
 	Model::texture = texture;
 	Model::color = color;
+	Model::normal = normal;
 	origin = glm::vec3(0.f);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -38,6 +39,7 @@ Model::Model()
 	Model::position = true;
 	Model::texture = false;
 	Model::color = false;
+	Model::normal = false;
 	origin = glm::vec3(0.f);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -107,16 +109,17 @@ glm::mat4 Model::getModelMatrix()
 //Method that adds a polygon object to the list of polygons that this model is composed of
 void Model::addPolygon(Polygon* poly) 
 {
-	poly->setVertexController(position, texture, color);
+	poly->setVertexController(position, texture, color, normal);
 	polygons.push_back(poly);
 }
 
 //Method that sets the position, texture and color components
-void Model::setVertexController(bool position, bool texture, bool color) 
+void Model::setVertexController(bool position, bool texture, bool color, bool normal) 
 {
 	Model::position = position;
 	Model::texture = texture;
 	Model::color = color;
+	Model::normal = normal;
 }
 
 //Method that returns the sample vertex of the polygon list

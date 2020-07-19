@@ -23,11 +23,11 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 class Model : public Polygon, public Binder
 {
 public:
-	virtual void setVertexController(bool position, bool texture, bool color);
+	virtual void setVertexController(bool position, bool texture, bool color, bool normal);
 	virtual void transform(glm::mat4 transmat);
 	std::vector<Polygon*> polygons;
 	void addPolygon(Polygon* poly);
-	Model(bool position, bool texture, bool color);
+	Model(bool position = true, bool texture = false, bool color = false, bool normal = false);
 	Model();
 
 	void addRotation(float radians, glm::vec3 axis);

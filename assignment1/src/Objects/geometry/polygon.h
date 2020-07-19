@@ -21,7 +21,7 @@ class Polygon
 		virtual int getVAByteSize() { return 5; }
 		virtual int getVAFloatCount() { return 5; }
 		virtual int getVertexByteSize() { return 5; }
-		virtual void setVertexController(bool position, bool texture, bool color) {}
+		virtual void setVertexController(bool position, bool texture, bool color, bool normal) {}
 		virtual Vertex getSampleVertex() { return Vertex(); }
 		virtual std::map<std::string, glm::vec3> getMinMax()
 		{
