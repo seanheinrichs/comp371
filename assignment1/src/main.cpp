@@ -23,11 +23,14 @@
 #include "Objects/Grid.hpp"
 #include "Objects/Camera.h"
 #include "OurModels.cpp"
+#include "objLoader.cpp"
 
 #include <GL/glew.h>    
 #include <GLFW/glfw3.h> 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+
 
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
@@ -218,6 +221,24 @@ int main(void)
 	
 	shaderProgram.use();
 
+	//obj loader
+	// Read our .obj file
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec3> normals; // Won't be used at the moment.
+	bool res = loadOBJ("../../Models/planet.obj", vertices, uvs, normals); //the obj file needs to be outside of the project folder because otherwise you keep getting corrupt file errors (???)
+	// Load it into a VBO
+
+	GLuint vertexbuffer;
+	glGenBuffers(1, &vertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+	GLuint uvbuffer;
+	glGenBuffers(1, &uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -307,6 +328,69 @@ int main(void)
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		glDrawArrays(GL_LINES, 0, 6);
 		glLineWidth(1.0f);
+
+		//obj loader
+		// 1rst attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+			0,                  // attribute
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		// 2nd attribute buffer : UVs
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glVertexAttribPointer(
+			1,                                // attribute
+			2,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
+		// Draw the triangle !
+		glDrawArrays(GL_LINES, 0, vertices.size());
+		//obj loader end
+	
+		//each sphere for each model
+		model = glm::mat4(1.0f);
+		shaderProgram.setInt("fill", 4);
+		float offset = 5.5f;
+		model = ben->getModelMatrix();
+		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		glDrawArrays(GL_LINES, 0, vertices.size());
+
+		model = sean->getModelMatrix();
+		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		glDrawArrays(GL_LINES, 0, vertices.size());
+
+		model = wayne->getModelMatrix();
+		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		glDrawArrays(GL_LINES, 0, vertices.size());
+
+		model = isa->getModelMatrix();
+		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		glDrawArrays(GL_LINES, 0, vertices.size());
+
+		model = ziming->getModelMatrix();
+		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		glDrawArrays(GL_LINES, 0, vertices.size());
 
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
