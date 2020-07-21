@@ -362,7 +362,9 @@ int main(void)
 
 		sphere->bind();
 		selected == 0 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);
-		model = sphere->getModelMatrix();
+		model = wayne->getModelMatrix();
+		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(GL_LINES, 0, sphere->getVAVertexCount()));
 
