@@ -55,9 +55,11 @@ public:
 	int vaComponentCount;
 	int vaByteSize;
 
+	void setBoolean(bool position, bool texture, bool color, bool normal);
+
 
 	//vertex components
-	bool position, color, texture;
+	bool position, color, texture, normal;
 	glm::vec3 rotate_vec;
 	glm::vec3 translate_vec;
 	glm::vec3 scale_vec;

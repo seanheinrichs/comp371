@@ -261,6 +261,11 @@ void Cube::setVertexController(bool position, bool texture, bool color, bool nor
 	vc->normal = normal;
 }
 
+void Cube::setBoolean(bool position, bool texture, bool color, bool normal) 
+{
+	setVertexController(position, texture, color, normal);
+}
+
 //Method that returns the vertices of the cube 
 Vertex Cube::getSampleVertex()
 {

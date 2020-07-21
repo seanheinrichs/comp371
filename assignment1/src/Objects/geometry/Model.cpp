@@ -46,6 +46,20 @@ Model::Model()
 	rotate_angle = 0.0;
 }
 
+void Model::setBoolean(bool position, bool texture, bool color, bool normal) 
+{
+	Model::position = position;
+	Model::texture = texture;
+	Model::color = color;
+	Model::normal = normal;
+
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		(**it).setVertexController(position, texture, color, normal);
+	}
+
+}
+
 //Method that updates the values of the x-y-z components of the rotation vector used to calculate the model transformation matrix
 void Model::addRotation(float degrees, glm::vec3 axis) 
 {
@@ -123,7 +137,7 @@ glm::mat4 Model::getModelMatrix()
 //Method that adds a polygon object to the list of polygons that this model is composed of
 void Model::addPolygon(Polygon* poly) 
 {
-	poly->setVertexController(position, texture, color, normal);
+	poly->setBoolean(position, texture, color, normal);
 	polygons.push_back(poly);
 }
 
@@ -139,6 +153,7 @@ void Model::setVertexController(bool position, bool texture, bool color, bool no
 	{
 		(**it).setVertexController(position, texture, color, normal);
 	}
+
 }
 
 //Method that returns the sample vertex of the polygon list

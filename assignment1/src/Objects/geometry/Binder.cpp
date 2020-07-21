@@ -65,6 +65,14 @@ Binder::Binder(bool position, bool texture, bool color, bool normal)
 	Binder::normal = normal;
 }
 
+void Binder::setBooleans(bool position, bool texture, bool color, bool normal)
+{
+	Binder::position = position;
+	Binder::texture = texture;
+	Binder::color = color;
+	Binder::normal = normal;
+}
+
 /*
 * Description: bind a vertex array for a certain component
 *
@@ -96,8 +104,6 @@ void Binder::bindArrayBuffer(bool unbind, Model* model)
 		{
 			GLCall(glVertexAttribPointer(vertexAttribCount, it->getFloatCount(), GL_FLOAT, GL_FALSE, model->getVertexByteSize(), (void*)(vertexByteOffset)));
 			GLCall(glEnableVertexAttribArray(vertexAttribCount));
-			std::cout << vertexByteOffset << std::endl;
-			
 			vertexAttribCount += 1;
 			vertexByteOffset += it->getByteSize();
 		}

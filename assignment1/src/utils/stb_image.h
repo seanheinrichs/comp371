@@ -916,7 +916,8 @@ static void *stbi__malloc(size_t size)
 	return STBI_MALLOC(size);
 }
 
-// stb_image uses ints pervasively, including for offset calculations.
+// 
+//ge uses ints pervasively, including for offset calculations.
 // therefore the largest decoded image size we can support with the
 // current code, even on 64-bit targets, is INT_MAX. this is not a
 // significant limitation for the intended use case.

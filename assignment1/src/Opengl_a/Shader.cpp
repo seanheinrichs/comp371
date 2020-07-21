@@ -5,7 +5,7 @@
 *source: https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.h
 *
 */
-
+#include "../utils/GL_Error.h"
 #include "Shader.h"
 
 #include <string>
@@ -15,6 +15,44 @@
 
 #include <GL/glew.h>  
 
+std::string Shader::readShaderCode(const char* path) 
+{
+	std::string code;
+	std::ifstream shaderFile;
+
+	// Ensure ifstream objects can throw exceptions:
+	shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+	try 
+	{
+		shaderFile.open(path);
+
+		std::stringstream shaderStream;
+
+		shaderStream << shaderFile.rdbuf();
+
+		shaderFile.close();
+
+		code = shaderStream.str();
+	}
+	catch (std::ifstream::failure& e)
+	{
+		std::cout << "ERROR: The Shader file was not successfully read." << std::endl;
+	}
+
+	return code;
+
+
+}
+
+unsigned int Shader::compileShader(const char* code, std::string type)
+{
+	unsigned int shader_id = glCreateShader(GL_VERTEX_SHADER);
+	GLCall(glShaderSource(shader_id, 1, &code, NULL));
+	GLCall(glCompileShader(shader_id));
+	checkCompileErrors(shader_id, type);
+	return shader_id;
+}
 
 /* Constructor */
 Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath)
@@ -112,6 +150,46 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 	{
 		glDeleteShader(geometry);
 	}
+
+	/*
+	std::string vCode = readShaderCode(vertexPath);
+	std::string fCode = readShaderCode(fragmentPath);
+
+	const char* vertex = vCode.c_str();
+	const char* fragment = fCode.c_str();
+
+	unsigned int v_id = compileShader(vertex, "vertex");
+	unsigned int f_id =	compileShader(fragment, "fragment");
+	unsigned int g_id;
+
+	if (geometryPath != nullptr)
+	{
+		std::string gCode = readShaderCode(fragmentPath);
+		const char* geometry = gCode.c_str();
+		g_id = compileShader(geometry, "geometry");
+	}
+
+	glLinkProgram(ID);
+	checkCompileErrors(ID, "PROGRAM");
+
+	ID = glCreateProgram();
+	glAttachShader(ID, v_id);
+	glAttachShader(ID, f_id);
+	if (geometryPath != nullptr)
+	{
+		glAttachShader(ID, g_id);
+	}
+
+	// Clean up (shaders are already linked)
+	glDeleteShader(v_id);
+	glDeleteShader(f_id);
+	if (geometryPath != nullptr)
+	{
+		glDeleteShader(g_id);
+	}
+	*/
+
+	
 }
 
 
@@ -196,7 +274,7 @@ void Shader::setMat3(const std::string &name, const glm::mat3 &mat) const
 
 void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const
 {
-	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+	GLCall(glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]));
 }
 
 /* Utility Functions (Private) */

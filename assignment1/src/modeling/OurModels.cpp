@@ -1,5 +1,5 @@
-#include "Objects/geometry/Cube.h"
-#include "Objects/geometry/Model.h"
+#include "../Objects/geometry/Cube.h"
+#include "../Objects/geometry/Model.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 /* Static methods to create our Models */
