@@ -26,7 +26,7 @@ Model::Model(bool position, bool texture, bool color, bool normal)
 	Model::texture = texture;
 	Model::color = color;
 	Model::normal = normal;
-	origin = glm::vec3(0.f);
+	origin = glm::vec3(0.0f);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -120,6 +120,11 @@ void Model::setVertexController(bool position, bool texture, bool color, bool no
 	Model::texture = texture;
 	Model::color = color;
 	Model::normal = normal;
+
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		(**it).setVertexController(position, texture, color, normal);
+	}
 }
 
 //Method that returns the sample vertex of the polygon list
@@ -156,6 +161,7 @@ int Model::getVAByteSize()
 	{
 		vaByteSize += (**it).getVAByteSize();
 	}
+
 	return vaByteSize;
 }
 

@@ -17,11 +17,11 @@ class Polygon
 {
 	public:
 		virtual void transform(glm::mat4 transMat) {}
-		virtual int getVAVertexCount() { return 5; }
-		virtual int getVAByteSize() { return 5; }
-		virtual int getVAFloatCount() { return 5; }
-		virtual int getVertexByteSize() { return 5; }
-		virtual void setVertexController(bool position, bool texture, bool color, bool normal) {}
+		virtual int getVAVertexCount() = 0;
+		virtual int getVAByteSize() = 0;
+		virtual int getVAFloatCount() = 0;
+		virtual int getVertexByteSize() = 0;
+		virtual void setVertexController(bool position, bool texture, bool color, bool normal) = 0;
 		virtual Vertex getSampleVertex() { return Vertex(); }
 		virtual std::map<std::string, glm::vec3> getMinMax()
 		{
@@ -30,12 +30,5 @@ class Polygon
 			map["max"] = glm::vec3(0.0f);
 			return map;
 		};
-		virtual float* getVertexArray() {
-			float* a = new float[3];
-			a[0] = 5.0;
-			a[1] = 5.0;
-			a[2] = 5.0;
-
-			return a;
-		}
+		virtual float* getVertexArray() = 0;
 };

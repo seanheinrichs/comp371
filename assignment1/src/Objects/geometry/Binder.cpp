@@ -75,10 +75,10 @@ void Binder::bindArrayBuffer(bool unbind, Model* model)
 {
 
 	bool* arr = new bool[4];
-	arr[POSITION] = position;
-	arr[TEXTURE] = texture;
-	arr[COLOR] = color;
-	arr[NORMAL] = normal;
+	arr[POSITION] = model->position;
+	arr[TEXTURE] = model->texture;
+	arr[COLOR] = model->color;
+	arr[NORMAL] = model->normal;
 
 	GLCall(glGenVertexArrays(1, &vao));
 	GLCall(glGenBuffers(1, &vbo));
@@ -94,8 +94,10 @@ void Binder::bindArrayBuffer(bool unbind, Model* model)
 	{
 		if (arr[(int)it->type]) 
 		{
-			GLCall(glVertexAttribPointer(vertexAttribCount, it->getFloatCount(), GL_FLOAT, GL_FALSE, model->getVertexByteSize(), (void*)0));
-			GLCall(glEnableVertexAttribArray(0));
+			GLCall(glVertexAttribPointer(vertexAttribCount, it->getFloatCount(), GL_FLOAT, GL_FALSE, model->getVertexByteSize(), (void*)(vertexByteOffset)));
+			GLCall(glEnableVertexAttribArray(vertexAttribCount));
+			std::cout << vertexByteOffset << std::endl;
+			
 			vertexAttribCount += 1;
 			vertexByteOffset += it->getByteSize();
 		}

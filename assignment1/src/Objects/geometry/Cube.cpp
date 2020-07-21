@@ -16,26 +16,32 @@ void Cube::setupVC()
 	Vertex a1;
 	a1.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, -0.5f)));
 	a1.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 0.0f)));
+	a1.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, -1.0f)));
 
 	Vertex a2;
 	a2.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, -0.5f, -0.5f)));
 	a2.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 0.0f)));
+	a2.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, -1.0f)));
 
 	Vertex a3;
 	a3.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, 0.5f, -0.5f)));
 	a3.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 1.0f)));
+	a3.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, -1.0f)));
 
 	Vertex a4;
 	a4.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, 0.5f, -0.5f)));
 	a4.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 1.0f)));
+	a4.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, -1.0f)));
 
 	Vertex a5;
 	a5.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, 0.5f, -0.5f)));
 	a5.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 1.0f)));
+	a5.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, -1.0f)));
 
 	Vertex a6;
 	a6.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, -0.5f)));
 	a6.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 0.0f)));
+	a6.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, -1.0f)));
 
 	vc->appendVertex(a3);
 	vc->appendVertex(a2);
@@ -49,26 +55,32 @@ void Cube::setupVC()
 	Vertex l1;
 	l1.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, 0.5f)));
 	l1.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 0.0f)));
+	l1.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, 1.0f)));
 
 	Vertex l2;
 	l2.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, -0.5f, 0.5f)));
 	l2.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 0.0f)));
+	l2.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, 1.0f)));
 
 	Vertex l3;
 	l3.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, 0.5f, 0.5f)));
 	l3.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 1.0f)));
+	l3.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, 1.0f)));
 
 	Vertex l4;
 	l4.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, 0.5f, 0.5f)));
 	l4.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 1.0f)));
+	l4.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, 1.0f)));
 
 	Vertex l5;
 	l5.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, 0.5f, 0.5f)));
 	l5.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 1.0f)));
+	l5.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, 1.0f)));
 
 	Vertex l6;
 	l6.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, 0.5f)));
 	l6.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 0.0f)));
+	l6.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 0.0f, 1.0f)));
 	
 	vc->appendVertex(l1);
 	vc->appendVertex(l2);
@@ -81,26 +93,32 @@ void Cube::setupVC()
 	Vertex p1;
 	p1.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, 0.5f, 0.5f)));
 	p1.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 0.0f)));
+	p1.addVertexComponent(VertexComponent(NORMAL, glm::vec3(-1.0f, 0.0f, 0.0f)));
 
 	Vertex p2;
 	p2.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, 0.5f, -0.5f)));
 	p2.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 1.0f)));
+	p2.addVertexComponent(VertexComponent(NORMAL, glm::vec3(-1.0f, 0.0f, 0.0f)));
 
 	Vertex p3;
 	p3.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, -0.5f)));
 	p3.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 1.0f)));
+	p3.addVertexComponent(VertexComponent(NORMAL, glm::vec3(-1.0f, 0.0f, 0.0f)));
 
 	Vertex p4;
 	p4.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, -0.5f)));
 	p4.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 1.0f)));
+	p4.addVertexComponent(VertexComponent(NORMAL, glm::vec3(-1.0f, 0.0f, 0.0f)));
 
 	Vertex p5;
 	p5.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, 0.5f)));
 	p5.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 0.0f)));
+	p5.addVertexComponent(VertexComponent(NORMAL, glm::vec3(-1.0f, 0.0f, 0.0f)));
 
 	Vertex p6;
 	p6.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, 0.5f, 0.5f)));
 	p6.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 0.0f)));
+	p6.addVertexComponent(VertexComponent(NORMAL, glm::vec3(-1.0f, 0.0f, 0.0f)));
 
 	vc->appendVertex(p1);
 	vc->appendVertex(p2);
@@ -114,26 +132,32 @@ void Cube::setupVC()
 	Vertex o1;
 	o1.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, 0.5f, 0.5f)));
 	o1.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 0.0f)));
+	o1.addVertexComponent(VertexComponent(NORMAL, glm::vec3(1.0f, 0.0f, 0.0f)));
 	
 	Vertex o2;
 	o2.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, 0.5f, -0.5f)));
 	o2.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 1.0f)));
+	o2.addVertexComponent(VertexComponent(NORMAL, glm::vec3(1.0f, 0.0f, 0.0f)));
 
 	Vertex o3;
 	o3.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, -0.5f, -0.5f)));
 	o3.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 1.0f)));
+	o3.addVertexComponent(VertexComponent(NORMAL, glm::vec3(1.0f, 0.0f, 0.0f)));
 
 	Vertex o4;
 	o4.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, -0.5f, -0.5f)));
 	o4.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 1.0f)));
+	o4.addVertexComponent(VertexComponent(NORMAL, glm::vec3(1.0f, 0.0f, 0.0f)));
 
 	Vertex o5;
 	o5.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, -0.5f, 0.5f)));
 	o5.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 0.0f)));
+	o5.addVertexComponent(VertexComponent(NORMAL, glm::vec3(1.0f, 0.0f, 0.0f)));
 
 	Vertex o6;
 	o6.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, 0.5f, 0.5f)));
 	o6.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 0.0f)));
+	o6.addVertexComponent(VertexComponent(NORMAL, glm::vec3(1.0f, 0.0f, 0.0f)));
 
 	vc->appendVertex(o3);
 	vc->appendVertex(o2);
@@ -147,26 +171,32 @@ void Cube::setupVC()
 	Vertex k1;
 	k1.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, -0.5f)));
 	k1.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 1.0f)));
+	k1.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, -1.0f, 0.0f)));
 
 	Vertex k2;
 	k2.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, -0.5f, -0.5f)));
 	k2.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 1.0f)));
+	k2.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, -1.0f, 0.0f)));
 
 	Vertex k3;
 	k3.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, -0.5f, 0.5f)));
 	k3.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 0.0f)));
+	k3.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, -1.0f, 0.0f)));
 
 	Vertex k4;
 	k4.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, -0.5f, 0.5f)));
 	k4.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 0.0f)));
+	k4.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, -1.0f, 0.0f)));
 
 	Vertex k5;
 	k5.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, 0.5f)));
 	k5.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 0.0f)));
+	k5.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, -1.0f, 0.0f)));
 
 	Vertex k6;
 	k6.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, -0.5f, -0.5f)));
 	k6.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 1.0f)));
+	k6.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, -1.0f, 0.0f)));
 
 	vc->appendVertex(k1);
 	vc->appendVertex(k2);
@@ -179,26 +209,32 @@ void Cube::setupVC()
 	Vertex u1;
 	u1.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, 0.5f, -0.5f)));
 	u1.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 1.0f)));
+	u1.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 	Vertex u2;
 	u2.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, 0.5f, -0.5f)));
 	u2.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 1.0f)));
+	u2.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 	Vertex u3;
 	u3.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, 0.5f, 0.5f)));
 	u3.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 0.0f)));
+	u3.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 	Vertex u4;
 	u4.addVertexComponent(VertexComponent(POSITION, glm::vec3(0.5f, 0.5f, 0.5f)));
 	u4.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(1.0f, 0.0f)));
+	u4.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 	Vertex u5;
 	u5.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, 0.5f, 0.5f)));
 	u5.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 0.0f)));
+	u5.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 	Vertex u6;
 	u6.addVertexComponent(VertexComponent(POSITION, glm::vec3(-0.5f, 0.5f, -0.5f)));
 	u6.addVertexComponent(VertexComponent(TEXTURE, glm::vec2(0.0f, 1.0f)));
+	u6.addVertexComponent(VertexComponent(NORMAL, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 	vc->appendVertex(u3);
 	vc->appendVertex(u2);
@@ -206,7 +242,6 @@ void Cube::setupVC()
 	vc->appendVertex(u6);
 	vc->appendVertex(u5);
 	vc->appendVertex(u4);
-	
 }
 
 //Cube constructor that passes a vec3 as the original position

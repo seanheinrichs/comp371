@@ -53,6 +53,7 @@ int VertexController::getVertexByteSize(Vertex vert)
 		if (position && it->type == POSITION)
 		{
 			size += it->getByteSize();
+
 		}
 		else if (texture && it->type == TEXTURE)
 		{
@@ -64,7 +65,7 @@ int VertexController::getVertexByteSize(Vertex vert)
 		}
 		else if (normal && it->type == NORMAL)
 		{
-			size += it->getFloatCount();
+			size += it->getByteSize();
 		}
 		else 
 		{
