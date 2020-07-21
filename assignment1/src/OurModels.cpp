@@ -2,6 +2,16 @@
 #include "Objects/geometry/Model.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+static void createSphere(Model * model, 
+	std::vector<glm::vec3> & in_vertices,
+	std::vector<glm::vec2> & in_uvs,
+	std::vector<glm::vec3> & in_normals) {
+	//ObjParser * obj = new ObjParser();
+	Cube * sphere = new Cube(glm::vec3(0.0f, 0.0f, 0.0f), in_vertices, in_uvs, in_normals);
+	model->addPolygon(sphere);
+	//ObjParser.setupVC
+}
+
 /* Static methods to create our Models */
 static void createSeansModel(Model * model)
 {

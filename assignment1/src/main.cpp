@@ -130,6 +130,16 @@ int main(void)
 	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader");
 
 	// [Models]
+	//obj loader
+	// Read our .obj file
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec3> normals; // Won't be used at the moment.
+	bool res = loadOBJ("../../Assets/Models/planet.obj", vertices, uvs, normals); 
+
+	Model * sphere = new Model(true, false, false);
+	createSphere(sphere, vertices, uvs, normals);
+	sphere->bindArrayBuffer(true, sphere);
 
 	Model * ben = new Model(true, false, false);
 	createBensModel(ben);
@@ -190,19 +200,21 @@ int main(void)
 	unsigned int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
 	unsigned int projectionLoc = glGetUniformLocation(shaderProgram.ID, "projection");
 
-	Model** models = new Model*[5];
+	Model** models = new Model*[6];
 	models[0] = ben;
 	models[1] = sean;
 	models[2] = isa;
 	models[3] = ziming;
 	models[4] = wayne;
+	models[4] = sphere;
 
 	ben->translateToOrigin();
 	sean->translateToOrigin();
 	isa->translateToOrigin();
 	wayne->translateToOrigin();
 	ziming->translateToOrigin();
-	
+	sphere->translateToOrigin();
+
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, -1.0f));
 	
@@ -218,16 +230,14 @@ int main(void)
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
 	
+	sphere->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	sphere->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
+
 	shaderProgram.use();
 
-	//obj loader
-	// Read our .obj file
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec2> uvs;
-	std::vector<glm::vec3> normals; // Won't be used at the moment.
-	bool res = loadOBJ("../../Assets/Models/planet.obj", vertices, uvs, normals);
-	// Load it into a VBO
 
+	// Load it into a VBO
+	/*
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -262,7 +272,7 @@ int main(void)
 		0,                                // stride
 		(void*)0                          // array buffer offset
 	);
-
+	*/
 
 	//TEXTURES
 	unsigned int texture;
@@ -350,6 +360,13 @@ int main(void)
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
 
+		sphere->bind();
+		selected == 0 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);
+		model = sphere->getModelMatrix();
+		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		GLCall(glDrawArrays(MODE, 0, sphere->getVAVertexCount()));
+
+
 		// [Grid Mesh]
 
 		GLCall(glBindVertexArray(grid_VAOs[0]));
@@ -381,7 +398,7 @@ int main(void)
 		glDrawArrays(GL_LINES, 0, 6);
 		glLineWidth(1.0f);
 
-
+		/*
 		model = glm::mat4(1.0f);
 		shaderProgram.setInt("fill", 4);
 		float offset = 5.5f;
@@ -414,7 +431,7 @@ int main(void)
 		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		glDrawArrays(GL_LINES, 0, vertices.size());
-
+		*/
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -425,7 +442,7 @@ int main(void)
 	wayne->deallocate();
 	isa->deallocate();
 	ziming->deallocate();
-
+	sphere->deallocate();
 	// Terminate Program 
 	glfwTerminate();
 	return 0;

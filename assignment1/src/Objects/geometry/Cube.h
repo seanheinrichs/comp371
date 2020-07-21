@@ -21,6 +21,10 @@ class Cube : public Polygon{
 
 	public:
 		Cube(glm::vec3 origin_a);
+		Cube(glm::vec3 origin_a,
+			std::vector<glm::vec3> & in_vertices,
+			std::vector<glm::vec2> & in_uvs,
+			std::vector<glm::vec3> & in_normals);
 		virtual void transform(glm::mat4 transmat);
 		void translate_fromOrigin();
 		virtual float* getVertexArray();
@@ -38,6 +42,10 @@ class Cube : public Polygon{
 		int vaByteSize;
 
 		void setupVC();
+		void setUpObj(
+			std::vector<glm::vec3> & in_vertices,
+			std::vector<glm::vec2> & in_uvs,
+			std::vector<glm::vec3> & in_normals);
 
 		VertexController* vc;
 

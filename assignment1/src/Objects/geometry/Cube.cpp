@@ -6,6 +6,21 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "../../Opengl_a/VertexComponent.h"
 
+void Cube::setUpObj(
+	std::vector<glm::vec3> & in_vertices,
+	std::vector<glm::vec2> & in_uvs,
+	std::vector<glm::vec3> & in_normals)
+{
+	for (int i = 0; i < in_vertices.size(); i++)
+	{
+		vc = new VertexController(true, false, false);
+		Vertex v;
+		v.addVertexComponent(VertexComponent(POSITION, in_vertices.at(i)));
+		vc->appendVertex(v);
+		//v.addVertexComponent(VertexComponent(NORMAL, in_normals.at(i)));
+	}
+
+}
 //Method that sets up the vertices that build a single cube
 void Cube::setupVC() 
 {
@@ -216,6 +231,19 @@ Cube::Cube(glm::vec3 origin_a)
 	origin = origin_a;
 	translate_fromOrigin();
 }
+
+//Cube constructor that passes a the parsed info from the obj file
+Cube::Cube(glm::vec3 origin_a, 
+	std::vector<glm::vec3> & in_vertices,
+	std::vector<glm::vec2> & in_uvs,
+	std::vector<glm::vec3> & in_normals)
+{
+
+	setUpObj(in_vertices, in_uvs, in_normals);
+	origin = origin_a;
+	translate_fromOrigin();
+}
+
 
 //Method that sets up the position, texture and color components
 void Cube::setVertexController(bool position, bool texture, bool color) 
