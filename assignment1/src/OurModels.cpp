@@ -39,7 +39,6 @@ static void createSeansModel(Model * model)
 	model->transform(mat);
 }
 
-
 static void createWaynesModel(Model * model)
 {
 	// Y model
@@ -135,12 +134,10 @@ static void createWaynesModel(Model * model)
 	model->transform(mat);
 }
 
-
-/* Static methods to create our Models */
 static void createBensModel(Model* model)
 {
 
-	Model* three = new Model(true, false, false);
+	Model* three = new Model(true, false, false, true);
 
 	three->addPolygon(new Cube(glm::vec3(6.0f, 3.5f, 0.0f)));
 	three->addPolygon(new Cube(glm::vec3(6.5f, 3.5f, 0.0f)));
@@ -170,7 +167,7 @@ static void createBensModel(Model* model)
 	cb->transform(scale);
 	cb1->transform(scale);
 	cb2->transform(transform);
-	Model* N = new Model(true, false, false);
+	Model* N = new Model(true, false, false, true);
 	N->addPolygon(cb);
 	N->addPolygon(cb1);
 	N->addPolygon(cb2);
@@ -180,7 +177,6 @@ static void createBensModel(Model* model)
 	model->addPolygon(N);
 	model->addPolygon(three);
 }
-
 
 static void createIsabellesModel(Model * model)
 {
@@ -272,4 +268,10 @@ static void createZimingsModel(Model * model)
 	glm::mat4 mat(1.0f);
 	mat = glm::rotate(mat, glm::radians(-225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	model->transform(mat);
+}
+
+static void createLightModel(Model * model) {
+	Cube * cb1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+
+	model->addPolygon(cb1);
 }

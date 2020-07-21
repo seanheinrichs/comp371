@@ -62,6 +62,7 @@ static bool GLLogCall(const char* function, const char* file, int line)
 /* Function Declarations */
 void processInput(GLFWwindow *window, Model** models);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
+void setModelColor(int modelIndex, Shader * modelShader);
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
@@ -79,6 +80,9 @@ float xOffset = 0.0f;
 float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
+
+// Lighting Locations
+glm::vec3 bensLightPos(0.0f, 3.0f, 5.0f);
 
 //globals used for selecting render mode and models
 GLenum MODE = GL_TRIANGLES;
@@ -124,30 +128,35 @@ int main(void)
 	GLCall(glCullFace(GL_FRONT));
 	GLCall(glFrontFace(GL_CW));
 
-	// Build and Compile Shader Program 
-	Shader shaderProgram("comp371/assignment1/src/Shaders/vertex.shader", "comp371/assignment1/src/Shaders/fragment.shader");
+	// Build and Compile Shader Program (set defaults)
+	Shader modelShader("comp371/assignment1/src/Shaders/modelShader.vertex", "comp371/assignment1/src/Shaders/modelShader.fragment");
+	Shader lightShader("comp371/assignment1/src/Shaders/lightShader.vertex", "comp371/assignment1/src/Shaders/lightShader.fragment");
 
 	// [Models]
 
-	Model * ben = new Model(true, false, false);
+	Model* ben = new Model(true, false, false, true);
 	createBensModel(ben);
 	ben->bindArrayBuffer(true, ben);
 
-	Model * sean = new Model(true, false, false);
+	Model* sean = new Model(true, false, false, true);
 	createSeansModel(sean);
 	sean->bindArrayBuffer(true, sean);
 
-	Model* wayne = new Model(true, false, false);
+	Model* wayne = new Model(true, false, false, true);
 	createWaynesModel(wayne);
 	wayne->bindArrayBuffer(true, wayne);
 
-	Model* isa = new Model(true, false, false);
+	Model* isa = new Model(true, false, false, true);
 	createIsabellesModel(isa);
 	isa->bindArrayBuffer(true, isa);
 
-	Model* ziming = new Model(true, false, false);
+	Model* ziming = new Model(true, false, false, true);
 	createZimingsModel(ziming);
 	ziming->bindArrayBuffer(true, ziming);
+
+	Model* light = new Model(true, false, false, true);
+	createLightModel(light);
+	light->bindArrayBuffer(true, light);
 
 	// [Grid]
 
@@ -159,11 +168,11 @@ int main(void)
 	GLCall(glGenBuffers(1, &grid_EBO));
 
 	// [Grid Mesh] 
-	GLCall(glBindVertexArray(grid_VAOs[0]));
-	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW));
-	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
-	GLCall(glEnableVertexAttribArray(0));
+	//GLCall(glBindVertexArray(grid_VAOs[0]));
+	//GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]));
+	//GLCall(glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW));
+	//GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
+	//GLCall(glEnableVertexAttribArray(0));
 
 	// [Grid Floor] 
 	GLCall(glBindVertexArray(grid_VAOs[1]));
@@ -171,8 +180,10 @@ int main(void)
 	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW));
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grid_EBO));
 	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mainGrid.floorIndices), mainGrid.floorIndices, GL_STATIC_DRAW));
-	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0));
 	GLCall(glEnableVertexAttribArray(0));
+	GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(1));
 
 	// [Coordinate Axis]
 	GLCall(glBindVertexArray(grid_VAOs[2]));
@@ -182,11 +193,6 @@ int main(void)
 	GLCall(glEnableVertexAttribArray(0));
 	GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))));
 	GLCall(glEnableVertexAttribArray(1));
-
-	// Uniform Declarations
-	unsigned int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
-	unsigned int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
-	unsigned int projectionLoc = glGetUniformLocation(shaderProgram.ID, "projection");
 
 	Model** models = new Model*[5];
 	models[0] = ben;
@@ -200,6 +206,7 @@ int main(void)
 	isa->translateToOrigin();
 	wayne->translateToOrigin();
 	ziming->translateToOrigin();
+	light->translateToOrigin();
 	
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, -1.0f));
@@ -215,8 +222,9 @@ int main(void)
 	
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
-	
-	shaderProgram.use();
+
+	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	light->addTranslation(bensLightPos);
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -233,80 +241,100 @@ int main(void)
 		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
+		// Start Using Model Shader
+		modelShader.use();
+		modelShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		modelShader.setVec3("lightPos", bensLightPos);
+		modelShader.setVec3("viewPos", camera.position);
+
 		// Recompute Camera Pipeline
 		glm::mat4 model;
-		shaderProgram.setMat4("model", model);
+		modelShader.setMat4("model", model);
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-		shaderProgram.setMat4("projection", projection);
+		modelShader.setMat4("projection", projection);
 
 		glm::mat4 view = camera.calculateViewMatrix();
 		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
-		shaderProgram.setMat4("view", view);
+		modelShader.setMat4("view", view);
 
 		// [Models]
 
 		ben->bind();
-		selected == 0 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);
+		setModelColor(0, &modelShader);
 		model = ben->getModelMatrix();
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));	
+		modelShader.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 
 		sean->bind();
-		selected == 1 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);                            
+		setModelColor(1, &modelShader);
 		model = sean->getModelMatrix();
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		modelShader.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
 		
 		isa->bind();
-		selected == 2 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);                                    
+		setModelColor(2, &modelShader);
 		model = isa->getModelMatrix();
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		modelShader.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
 		
 		ziming->bind();
-		selected == 3 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);                            
+		setModelColor(3, &modelShader);
 		model = ziming->getModelMatrix();
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		modelShader.setMat4("model", model);;
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
 		
 		wayne->bind();
-		selected == 4 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);                                 	
+		setModelColor(4, &modelShader);
 		model = wayne->getModelMatrix();
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
-
+		modelShader.setMat4("model", model);
+		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount() ));
+		
 		// [Grid Mesh]
-
+		
 		GLCall(glBindVertexArray(grid_VAOs[0]));
-		shaderProgram.setInt("fill", 0);
+		modelShader.setVec3("modelColor", 1.0f, 1.0f, 0.0f);
 		model = glm::mat4(1.0f);
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		modelShader.setMat4("model", model);
 		glDrawArrays(GL_LINES, 0, mainGrid.meshVertices.size());
 
 		// [Grid Floor]
-
+		
 		GLCall(glBindVertexArray(grid_VAOs[1]));
-		shaderProgram.setInt("fill", 1);
+		modelShader.setVec3("modelColor", 0.2f, 0.3f, 0.3f);
 		model = glm::mat4(1.0f);
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		modelShader.setMat4("model", model);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		
+		// [Objects Not Affected by Light Source]
+
+		// Start Using Lighting Shader
+		lightShader.use();
+		lightShader.setMat4("projection", projection);
+		lightShader.setMat4("view", view);
 
 		// [Coordinate Axis]
 		glLineWidth(5.0f);
 		GLCall(glBindVertexArray(grid_VAOs[2]));
-		shaderProgram.setInt("fill", -1);
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.05f, 0.0f));
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
+		lightShader.setMat4("model", model);
+		lightShader.setInt("fill", 0);
 		glDrawArrays(GL_LINES, 0, 6);
 		glLineWidth(1.0f);
+
+		model = glm::mat4(1.0f);
+		light->bind();
+		model = light->getModelMatrix();
+		lightShader.setMat4("model", model);
+		lightShader.setInt("fill", -1);
+		GLCall(glDrawArrays(GL_TRIANGLES, 0, light->getVAVertexCount()));
 
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
@@ -319,10 +347,16 @@ int main(void)
 	wayne->deallocate();
 	isa->deallocate();
 	ziming->deallocate();
+	light->deallocate();
 
 	// Terminate Program 
 	glfwTerminate();
 	return 0;
+}
+
+void setModelColor(int modelIndex, Shader* modelShader)
+{
+	selected == modelIndex ? modelShader->setVec3("modelColor", 0.6f, 0.0f, 0.8f) : modelShader->setVec3("modelColor", 0.75f, 0.75f, 0.75f);
 }
 
 // Event handling functions
