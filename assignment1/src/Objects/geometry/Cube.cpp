@@ -11,12 +11,13 @@ void Cube::setUpObj(
 	std::vector<glm::vec2> & in_uvs,
 	std::vector<glm::vec3> & in_normals)
 {
+	vc = new VertexController(true, false, false);
 	for (int i = 0; i < in_vertices.size(); i++)
 	{
-		vc = new VertexController(true, false, false);
-		Vertex v;
-		v.addVertexComponent(VertexComponent(POSITION, in_vertices.at(i)));
-		vc->appendVertex(v);
+		
+		Vertex * v = new Vertex();
+		v->addVertexComponent(VertexComponent(POSITION, in_vertices.at(i)));
+		vc->appendVertex(*v);
 		//v.addVertexComponent(VertexComponent(NORMAL, in_normals.at(i)));
 	}
 

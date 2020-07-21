@@ -206,7 +206,7 @@ int main(void)
 	models[2] = isa;
 	models[3] = ziming;
 	models[4] = wayne;
-	models[4] = sphere;
+	models[5] = sphere;
 
 	ben->translateToOrigin();
 	sean->translateToOrigin();
@@ -364,7 +364,7 @@ int main(void)
 		selected == 0 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);
 		model = sphere->getModelMatrix();
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		GLCall(glDrawArrays(MODE, 0, sphere->getVAVertexCount()));
+		GLCall(glDrawArrays(GL_LINES, 0, sphere->getVAVertexCount()));
 
 
 		// [Grid Mesh]
@@ -565,6 +565,11 @@ void processInput(GLFWwindow *window, Model** models)
 		selected = 4;
 	}
 
+	// Press "5" to select MODEL 4 (Y 7)
+	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS && (selected != 5))
+	{
+		selected = 5;
+	}
 	// [Translation]
 	
 	// Press "SHIFT + A" to move the selected model to the LEFT
