@@ -133,7 +133,6 @@ Vertex Model::getSampleVertex()
 	return polygons.front()->getSampleVertex();
 }
 
-// WORKING 
 //Method that returns the vertex array float count
 int Model::getVAFloatCount()
 {
@@ -177,7 +176,6 @@ int Model::getVAVertexCount()
 	return vertexCount;
 }
 
-// FILLED
 //Method that returns the array of vertices that make each polygon
 float* Model::getVertexArray()
 {
