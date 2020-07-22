@@ -63,6 +63,7 @@ static bool GLLogCall(const char* function, const char* file, int line)
 void processInput(GLFWwindow *window, Model** models);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 void setModelColor(int modelIndex, Shader * modelShader);
+float RandomFloat(float a, float b);
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
@@ -529,6 +530,39 @@ void processInput(GLFWwindow *window, Model** models)
 	{
 		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
 	}
+
+	// Press 'SPACE' to re-position the model at a random location on the grid
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		float a = -5.0f;
+		float b = 5.0f;
+		float x = RandomFloat(a, b);
+		float z = RandomFloat(a, b);
+		models[selected]->Reposition(glm::vec3(x, 0.0f, z));
+	}
+
+	// Press 'BACKSPACE' to reset to original position
+	if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
+	{
+		if (selected == 0) {
+			models[selected]->Reposition(glm::vec3(0.0f, 0.0f, -1.0f));
+		}
+		else if (selected == 1) {
+			models[selected]->Reposition(glm::vec3(3.5f, 0.0f, -4.0f));
+		}
+		else if (selected == 2) {
+			models[selected]->Reposition(glm::vec3(3.5f, 0.0f, 4.0f));
+		}
+		else if (selected == 3) {
+			models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, 4.0f));
+		}
+		else if (selected == 4) {
+			models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, -4.0f));
+		}
+		else {
+
+		}
+	}
 }
 
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
@@ -564,5 +598,11 @@ void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 	}
 }
 
-
+//Method to generate random float between a & b
+float RandomFloat(float a, float b) {
+	float random = ((float)rand()) / (float)RAND_MAX;
+	float diff = b - a;
+	float r = random * diff;
+	return a + r;
+}
 

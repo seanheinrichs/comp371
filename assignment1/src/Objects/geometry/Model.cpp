@@ -79,6 +79,14 @@ void Model::addTranslation(glm::vec3 translate)
 	Model::translate_vec.z += translate.z;
 }
 
+//Method that updates the position of the model
+void Model::Reposition(glm::vec3 position)
+{
+	Model::translate_vec.x = position.x;
+	Model::translate_vec.y = position.y;
+	Model::translate_vec.z = position.z;
+}
+
 //Method that returns the rotation matrix
 glm::mat4 Model::getRotation() 
 {
@@ -87,6 +95,12 @@ glm::mat4 Model::getRotation()
 
 //Method that returns the translation matrix
 glm::mat4 Model::getTranslation() 
+{
+	return glm::translate(glm::mat4(1.0f), translate_vec);
+}
+
+//Method that returns the translation matrix
+glm::mat4 Model::getReposition()
 {
 	return glm::translate(glm::mat4(1.0f), translate_vec);
 }
