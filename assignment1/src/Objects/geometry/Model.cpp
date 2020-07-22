@@ -101,8 +101,10 @@ glm::mat4 Model::getRotation()
 //Method that returns the shear matrix
 glm::mat4 Model::getShear() 
 {
+	//return glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //forward/backwards
 	// glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
-	return glm::shearY3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z);
+	return glm::shearY3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //from side to side
+	
 }
 
 //Method that returns the translation matrix
