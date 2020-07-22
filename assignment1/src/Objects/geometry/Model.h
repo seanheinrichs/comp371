@@ -18,7 +18,7 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include <glm/glm.hpp>
 #include "polygon.h"
 #include <glm/gtc/type_ptr.hpp>
-
+#include <glm/gtx/transform2.hpp> 
 
 class Model : public Polygon, public Binder
 {
@@ -33,10 +33,12 @@ public:
 	void addRotation(float radians, glm::vec3 axis);
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
+	void addShear(glm::vec3 translate);
 	glm::mat4 getRotation();
 	glm::mat4 getTranslation();
 	glm::mat4 getTranslationSphere();
 	glm::mat4 getScale();
+	glm::mat4 getShear();
 	glm::mat4 getModelMatrix();
 	glm::mat4 getModelMatrixSphere();
 	virtual float* getVertexArray();
@@ -61,6 +63,7 @@ public:
 	glm::vec3 translate_vec;
 	glm::vec3 translate_vec_sphere;
 	glm::vec3 scale_vec;
+	glm::vec3 shear_vec;
 	float rotate_angle;
 
 };

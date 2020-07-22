@@ -29,6 +29,7 @@ Model::Model(bool position, bool texture, bool color)
 	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	shear_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
 }
 
@@ -41,6 +42,7 @@ Model::Model()
 	origin = glm::vec3(0.f);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	shear_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
 }
 
@@ -51,6 +53,15 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 	rotate_vec.y += axis.y;
 	rotate_vec.z += axis.z;
 	rotate_angle += degrees;
+}
+
+//adds shears to model
+void Model::addShear(glm::vec3 axis) 
+{
+	shear_vec.x += axis.x;
+	shear_vec.y += axis.y;
+	shear_vec.z += axis.z;
+
 }
 
 //Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
@@ -87,6 +98,13 @@ glm::mat4 Model::getRotation()
 	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec);
 }
 
+//Method that returns the shear matrix
+glm::mat4 Model::getShear() 
+{
+	// glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
+	return glm::shearY3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z);
+}
+
 //Method that returns the translation matrix
 glm::mat4 Model::getTranslation() 
 {
@@ -115,7 +133,7 @@ glm::mat4 Model::getModelMatrix()
 	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
 		return getTranslation() *  getScale();
 	else
-		return getTranslation() * getRotation() * getScale();
+		return getTranslation() * getRotation() * getScale() * getShear();
 }
 
 //Method that calculates the transformation matrix of the model to add the sphere on top

@@ -30,7 +30,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <../../A1/comp371/assignment1/src/stb_image.h>
-
+#include <glm/gtx/transform2.hpp> //for shear
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
 
@@ -235,45 +235,6 @@ int main(void)
 
 	shaderProgram.use();
 
-
-	// Load it into a VBO
-	/*
-	GLuint vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-
-	GLuint uvbuffer;
-	glGenBuffers(1, &uvbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
-
-	//obj loader
-	// 1rst attribute buffer : vertices
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glVertexAttribPointer(
-		0,                  // attribute
-		3,                  // size
-		GL_FLOAT,           // type
-		GL_FALSE,           // normalized?
-		0,                  // stride
-		(void*)0            // array buffer offset
-	);
-
-	// 2nd attribute buffer : UVs
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glVertexAttribPointer(
-		1,                                // attribute
-		2,                                // size
-		GL_FLOAT,                         // type
-		GL_FALSE,                         // normalized?
-		0,                                // stride
-		(void*)0                          // array buffer offset
-	);
-	*/
-
 	//TEXTURES
 	unsigned int texture;
 	glGenTextures(1, &texture);
@@ -365,6 +326,7 @@ int main(void)
 		model = wayne->getModelMatrix();
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
+		model = glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(GL_LINES, 0, sphere->getVAVertexCount()));
 
@@ -400,40 +362,6 @@ int main(void)
 		glDrawArrays(GL_LINES, 0, 6);
 		glLineWidth(1.0f);
 
-		/*
-		model = glm::mat4(1.0f);
-		shaderProgram.setInt("fill", 4);
-		float offset = 5.5f;
-		model = ben->getModelMatrix();
-		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
-		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		glDrawArrays(GL_LINES, 0, vertices.size());
-
-		model = sean->getModelMatrix();
-		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
-		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		glDrawArrays(GL_LINES, 0, vertices.size());
-
-		model = wayne->getModelMatrix();
-		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
-		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		glDrawArrays(GL_LINES, 0, vertices.size());
-
-		model = isa->getModelMatrix();
-		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
-		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		glDrawArrays(GL_LINES, 0, vertices.size());
-
-		model = ziming->getModelMatrix();
-		model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
-		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
-		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		glDrawArrays(GL_LINES, 0, vertices.size());
-		*/
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -449,6 +377,7 @@ int main(void)
 	glfwTerminate();
 	return 0;
 }
+
 
 // Event handling functions
 void processInput(GLFWwindow *window, Model** models)
@@ -612,6 +541,17 @@ void processInput(GLFWwindow *window, Model** models)
 		models[selected]->addRotation(-0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
+	// Press 'P' to shear
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShear(glm::vec3(0.0f, 0.02f, 0.02f));
+	}
+
+	// Press 'P' to shear
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShear(glm::vec3(0.0f, -0.02f, -0.02f));
+	}
 	// [Scale]
 	
 	// Press 'U' to scale UP the model
