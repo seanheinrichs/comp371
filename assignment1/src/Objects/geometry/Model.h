@@ -18,6 +18,7 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include <glm/glm.hpp>
 #include "polygon.h"
 #include <glm/gtc/type_ptr.hpp>
+#include "../../opengl_a/Shader.h"
 
 
 class Model : public Polygon, public Binder
@@ -27,7 +28,7 @@ public:
 	virtual void transform(glm::mat4 transmat);
 	std::vector<Polygon*> polygons;
 	void addPolygon(Polygon* poly);
-	Model(bool position = true, bool texture = false, bool color = false, bool normal = false);
+	Model(bool position = true, bool texture = false, bool color = false, bool normal = false, std::string name = "default", Shader* shader = nullptr, int textureIndex = -1);
 	Model();
 
 	void addRotation(float radians, glm::vec3 axis);
@@ -47,6 +48,12 @@ public:
 	virtual int getVertexByteSize();
 	virtual Vertex getSampleVertex();
 	virtual std::map<std::string, glm::vec3> getMinMax();
+
+	std::string name;
+	Shader* shader;
+	int textureIndex;
+
+	void draw(int mode);
 
 
 	void translateToOrigin();

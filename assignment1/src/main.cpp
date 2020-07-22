@@ -1,4 +1,3 @@
-
 /*
 	COMP 371 - Section CC
 	Practical Assignment #1
@@ -26,9 +25,10 @@
 #include "Objects/Camera.h"
 #include "modeling/OurModels.cpp"
 #include "utils/GL_Error.h"
-#include "Opengl_a/Texture.h"
-#include "Opengl_a/Shader.h"
 
+//#include "Opengl_a/Texture.h"
+#include "Opengl_a/Shader.h"
+#include "Common.h"
 
 #include <GL/glew.h>    
 #include <GLFW/glfw3.h> 
@@ -39,8 +39,11 @@
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
 
 
+
+
 /* Function Declarations */
-void processInput(GLFWwindow *window, Model** models);
+void processInput(GLFWwindow *window, ModelContainer** models);
+void setModelColor(int modelIndex, Shader* modelShader);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 
 /* Global Constants */
@@ -67,11 +70,13 @@ int selected = 0;
 // Lighting Locations
 glm::vec3 bensLightPos(0.0f, 3.0f, 5.0f);
 
-void setModelColor(int modelIndex, Shader* modelShader);
-
+/* External linkage for global varibles */
+GLenum* g_texLocations = new GLenum[32];
+Texture* g_textures = new Texture[32];
 
 int main(void)
 {
+	
 	/* Initialize GLFW */
 	if (!glfwInit())
 	{
@@ -102,6 +107,52 @@ int main(void)
 		return -1;
 	}
 
+	g_texLocations[0] = GL_TEXTURE0;
+	g_texLocations[1] = GL_TEXTURE1;
+	g_texLocations[2] = GL_TEXTURE2;
+	g_texLocations[3] = GL_TEXTURE3;
+	g_texLocations[4] = GL_TEXTURE4;
+	g_texLocations[5] = GL_TEXTURE5;
+	g_texLocations[6] = GL_TEXTURE6;
+	g_texLocations[7] = GL_TEXTURE7;
+	g_texLocations[8] = GL_TEXTURE8;
+	g_texLocations[9] = GL_TEXTURE9;
+	g_texLocations[10] = GL_TEXTURE10;
+	g_texLocations[11] = GL_TEXTURE11;
+	g_texLocations[12] = GL_TEXTURE12;
+	g_texLocations[13] = GL_TEXTURE13;
+	g_texLocations[14] = GL_TEXTURE14;
+	g_texLocations[15] = GL_TEXTURE15;
+	g_texLocations[16] = GL_TEXTURE16;
+	g_texLocations[17] = GL_TEXTURE17;
+	g_texLocations[18] = GL_TEXTURE18;
+	g_texLocations[19] = GL_TEXTURE19;
+	g_texLocations[20] = GL_TEXTURE20;
+	g_texLocations[21] = GL_TEXTURE21;
+	g_texLocations[22] = GL_TEXTURE22;
+	g_texLocations[23] = GL_TEXTURE23;
+	g_texLocations[24] = GL_TEXTURE24;
+	g_texLocations[25] = GL_TEXTURE25;
+	g_texLocations[26] = GL_TEXTURE26;
+	g_texLocations[27] = GL_TEXTURE27;
+	g_texLocations[28] = GL_TEXTURE28;
+	g_texLocations[29] = GL_TEXTURE29;
+	g_texLocations[30] = GL_TEXTURE30;
+	g_texLocations[31] = GL_TEXTURE31;
+
+
+	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
+	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
+	g_textures[2] = Texture("comp371/assignment1/src/Resources/chrome.png");
+	g_textures[3] = Texture("comp371/assignment1/src/Resources/speaker_holes.png");
+	g_textures[4] = Texture("comp371/assignment1/src/Resources/shiny_metal.png");
+	g_textures[5] = Texture("comp371/assignment1/src/Resources/box1.png");
+	g_textures[6] = Texture("comp371/assignment1/src/Resources/box2.png");
+	g_textures[7] = Texture("comp371/assignment1/src/Resources/box3.png");
+	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
+	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
+
+
 	//enable blending for correct texture rendering effects
 	GLCall(glEnable(GL_BLEND));
 	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -119,11 +170,10 @@ int main(void)
 	Shader modelShader("comp371/assignment1/src/Shaders/modelShader.vertex", "comp371/assignment1/src/Shaders/modelShader.fragment");
 	Shader lightShader("comp371/assignment1/src/Shaders/lightShader.vertex", "comp371/assignment1/src/Shaders/lightShader.fragment");
 
-	// [Models]
+	ModelContainer* ben = new ModelContainer();
+	createBensModel(ben, &modelShader);
+	ben->bindArrayBuffer();
 
-	Model* ben = new Model(true, false, false, true);
-	createBensModel(ben);
-	ben->bindArrayBuffer(true, ben);
 
 	Model* sean = new Model(true, false, false, true);
 	createSeansModel(sean);
@@ -144,6 +194,7 @@ int main(void)
 	Model* light = new Model(true, false, false, true);
 	createLightModel(light);
 	light->bindArrayBuffer(true, light);
+
 
 	// [Grid]
 
@@ -182,29 +233,22 @@ int main(void)
 
 	*/
 
-	unsigned int modelLoc = glGetUniformLocation(modelShader.ID, "model");
-	unsigned int viewLoc = glGetUniformLocation(modelShader.ID, "view");
-	unsigned int projectionLoc = glGetUniformLocation(modelShader.ID, "projection");
+
+
 
 	// Uniform Declarations
 
-	Model** models = new Model*[5];
+	ModelContainer** models = new ModelContainer*[5];
 	models[0] = ben;
-	models[1] = sean;
-	models[2] = isa;
-	models[3] = ziming;
-	models[4] = wayne;
+	//models[1] = sean;
+	//models[2] = isa;
+	//models[3] = ziming;
+	//models[4] = wayne;
 
-
-	ben->translateToOrigin();
-	sean->translateToOrigin();
-	isa->translateToOrigin();
-	wayne->translateToOrigin();
-	ziming->translateToOrigin();
-	light->translateToOrigin();
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, -1.0f));
+
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
@@ -221,30 +265,13 @@ int main(void)
 	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	light->addTranslation(bensLightPos);
 
-	/*
-	Texture metal1("comp371/assignment1/src/Resources/bmv_2");
-	metal1.bind(0);
-
-	Texture metal2("comp371/assignment1/src/Resources/cast_iron.png");
-	metal2.bind(1);
-
-	Texture metal3("comp371/assignment1/src/Resources/chrome.png");
-	metal3.bind(2);
-
-	Texture metal4("comp371/assignment1/src/Resources/speaker_holes.png");
-	metal1.bind(3);
-
-	Texture metal5("comp371/assignment1/src/Resources/shiny_metal.png");
-	metal1.bind(4);
-	*/
 	
-	
-
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
 
 		modelShader.use();
+
 		// Set frame for Camera (taken from LearnOpenGL)
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -256,6 +283,7 @@ int main(void)
 		// Render
 		GLCall(glClearColor(0.5f, 0.5f, 0.5f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
 
 		// Start Using Model Shader
 		modelShader.use();
@@ -275,47 +303,57 @@ int main(void)
 		glm::mat4 view = camera.calculateViewMatrix();
 		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
+
 		modelShader.setMat4("view", view);
+		//modelShader.setInt("fill", 4);
+
 
 	
 
 		// [Models]
 
-		ben->bind();
-		//modelShader.setInt("u_Texture", 0);
-		setModelColor(0, &modelShader);
-		model = ben->getModelMatrix();
-		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
+		//metal1.bind(GL_TEXTURE0);
+		ben->draw(MODE);
+		//shaderProgram.setInt("u_Texture", 4);
+		//selected == 0 ? shaderProgram.setInt("fill", 4) : shaderProgram.setInt("fill", 2);
+		//model = ben->getModelMatrix();
+		//shaderProgram.setMat4("model", model);
+		//GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 
+		/*
+		metal2.bind(GL_TEXTURE0);
 		sean->bind();
-		//modelShader.setInt("u_Texture", 2); 
-		setModelColor(1, &modelShader);
+		shaderProgram.setInt("u_Texture", 1);
+		selected == 1 ? shaderProgram.setInt("fill", 4) : shaderProgram.setInt("fill", 2);                            
 		model = sean->getModelMatrix();
-		modelShader.setMat4("model", model);
+		shaderProgram.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
 		
+		metal3.bind(GL_TEXTURE0 + 4 * 2);
 		isa->bind();
-		//modelShader.setInt("u_Texture", 3);
-		setModelColor(2, &modelShader);
+		shaderProgram.setInt("u_Texture", 2);
+		selected == 2 ? shaderProgram.setInt("fill", 4) : shaderProgram.setInt("fill", 2);                                    
 		model = isa->getModelMatrix();
-		modelShader.setMat4("model", model);
+		shaderProgram.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
 		
+		metal1.bind(GL_TEXTURE0 + 4 * 3);
 		ziming->bind();
-		//modelShader.setInt("u_Texture", 4);
-		setModelColor(3, &modelShader);
+		shaderProgram.setInt("u_Texture", 3);
+		selected == 3 ? shaderProgram.setInt("fill", 4) : shaderProgram.setInt("fill", 2);                            
 		model = ziming->getModelMatrix();
-		modelShader.setMat4("model", model);
+		shaderProgram.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
 		
+		metal1.bind(GL_TEXTURE0 + 4 * 4);
 		wayne->bind();
-		//modelShader.setInt("u_Texture", 5);
-		setModelColor(4, &modelShader);
-		modelShader.setMat4("model", wayne->getModelMatrix());
+		shaderProgram.setInt("u_Texture", 4);
+		selected == 4 ? shaderProgram.setInt("fill", 4) : shaderProgram.setInt("fill", 2);                        
+		shaderProgram.setMat4("model", wayne->getModelMatrix());
 		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
 
-		//modelShader.use();
+		*/
+
 
 		// [Grid Mesh]
 
@@ -330,6 +368,7 @@ int main(void)
 		// [Grid Floor]
 
 		GLCall(glBindVertexArray(grid_VAOs[1]));
+
 		modelShader.setInt("fill", 1);
 		model = glm::mat4(1.0f);
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -382,7 +421,7 @@ int main(void)
 }
 
 // Event handling functions
-void processInput(GLFWwindow *window, Model** models)
+void processInput(GLFWwindow *window, ModelContainer** models)
 {
 
 	float cameraSpeed = 1.0 * deltaTime;
@@ -557,6 +596,7 @@ void setModelColor(int modelIndex, Shader* modelShader)
 {
 	selected == modelIndex ? modelShader->setVec3("modelColor", 0.6f, 0.0f, 0.8f) : modelShader->setVec3("modelColor", 0.75f, 0.75f, 0.75f);
 }
+
 
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 {

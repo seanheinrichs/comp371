@@ -12,13 +12,13 @@ Texture::Texture(const std::string& path) : filePath(path), localBuffer(nullptr)
 
 	//flip image for orientation to reflect opengl's
 	stbi_set_flip_vertically_on_load(1);
-	localBuffer = stbi_load(path.c_str(), &width, &height, &BPP, 0);
+	localBuffer = stbi_load(path.c_str(), &width, &height, &BPP, 4);
 
 	if(localBuffer == NULL)
 		std::cout << "failed to load image" << std::endl;
 
 	GLCall(glGenTextures(1, &renderer_id));
-	GLCall(glActiveTexture(GL_TEXTURE0));
+	//GLCall(glActiveTexture(GL_TEXTURE0));
 	GLCall(glBindTexture(GL_TEXTURE_2D, renderer_id));
 	
 
@@ -42,6 +42,8 @@ Texture::Texture(const std::string& path) : filePath(path), localBuffer(nullptr)
 
 }
 
+Texture::Texture() : filePath(""), localBuffer(nullptr), width(0), height(0), BPP(0) {}
+
 Texture::~Texture() 
 {
 
@@ -50,7 +52,7 @@ Texture::~Texture()
 
 void Texture::bind(unsigned int slot) const 
 {
-	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
+	GLCall(glActiveTexture(slot ));
 	GLCall(glBindTexture(GL_TEXTURE_2D, renderer_id));
 
 }

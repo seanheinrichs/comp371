@@ -17,11 +17,18 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include "Model.h"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
+#include "../../Common.h"
+#include <GL/glew.h> 
+#include "../../utils/GL_Error.h"
+#include "../../Opengl_a/Texture.h"
 
 
 //Model constructor, setting up position, texture and color components
-Model::Model(bool position, bool texture, bool color, bool normal)
+Model::Model(bool position, bool texture, bool color, bool normal, std::string name, Shader* shader, int textureIndex)
 {
+	Model::textureIndex = textureIndex;
+	Model::shader = shader;
+	Model::name = name;
 	Model::position = position;
 	Model::texture = texture;
 	Model::color = color;
@@ -36,6 +43,9 @@ Model::Model(bool position, bool texture, bool color, bool normal)
 //default constructor
 Model::Model() 
 {
+	Model::textureIndex = 0;
+	Model::shader = nullptr;
+	Model::name = "default";
 	Model::position = true;
 	Model::texture = false;
 	Model::color = false;
@@ -63,6 +73,12 @@ void Model::setBoolean(bool position, bool texture, bool color, bool normal)
 //Method that updates the values of the x-y-z components of the rotation vector used to calculate the model transformation matrix
 void Model::addRotation(float degrees, glm::vec3 axis) 
 {
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addRotation(degrees, axis);
+	}
+
 	rotate_vec.x += axis.x;
 	rotate_vec.y += axis.y;
 	rotate_vec.z += axis.z;
@@ -72,6 +88,12 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 //Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
 void Model::addScale(glm::vec3 scale)
 {
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addScale(scale);
+	}
+
 	if (scale_vec.x >= 0.0 && scale_vec.y >= 0.0 && scale_vec.z >= 0.0) {
 		scale_vec.x += scale.x;
 		scale_vec.y += scale.y;
@@ -88,6 +110,12 @@ void Model::addScale(glm::vec3 scale)
 //Method that updates the values of the x-y-z components of the translation vector used to calculate the model transformation matrix
 void Model::addTranslation(glm::vec3 translate)
 {
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addTranslation(translate);
+	}
+
 	Model::translate_vec.x += translate.x;
 	Model::translate_vec.y += translate.y;
 	Model::translate_vec.z += translate.z;
@@ -110,6 +138,7 @@ glm::mat4 Model::getRotation()
 //Method that returns the translation matrix
 glm::mat4 Model::getTranslation() 
 {
+
 	return glm::translate(glm::mat4(1.0f), translate_vec);
 }
 
@@ -269,4 +298,25 @@ void Model::translateToOrigin()
 	temp.z = -(map["min"].z + map["max"].z) / 2;
 
 	transform(glm::translate(glm::mat4(1.0f), temp));
+}
+
+//extern Texture* g_textures;
+//extern GLenum* g_texLocations;
+
+
+void Model::draw(int mode /*, GLenum* g_textures, int* g_texLocations*/)
+{
+	if (shader == nullptr)
+		throw "shader not defined in this model. Please define it before callinf draw()";
+	else 
+	{
+		shader->use();
+		g_textures[textureIndex].bind(g_texLocations[textureIndex]);
+		this->bind();
+		shader->setInt("u_Texture", textureIndex);
+		shader->setMat4("model", this->getModelMatrix());
+		GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
+	}
+	
+
 }

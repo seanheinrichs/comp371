@@ -11,6 +11,7 @@ public:
 	int width, height, BPP;
 
 	Texture(const std::string& path);
+	Texture();
 	~Texture();
 
 	void bind(unsigned int slot = 0) const;
