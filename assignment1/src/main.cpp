@@ -4,7 +4,7 @@
 	Written By:
 		Benjamin Therien (40034572)
 		Sean Heinrichs (40075789)
-		Wayne St Amand (40074423)
+		Wayne Huras (40074423)
 		Isabelle Gourchette (40008121)
 		Ziming Wang (40041601)
 	Due:  July 27th, 2020
@@ -40,10 +40,16 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 void setModelColor(int modelIndex, Shader* modelShader);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 void setupTextureMapping();
+void setModelColor(int modelIndex, Shader * modelShader);
+void RenderScene(Shader &shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne);
+void RenderGrid(Shader &shader, unsigned int grid_VAOs[], Grid mainGrid);
+void RenderAxes(Shader &shader, unsigned int grid_VAOs[], Model *light);
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
 const unsigned int WINDOW_HEIGHT = 768;
+const unsigned int SHADOW_WIDTH = 1024;
+const unsigned int SHADOW_HEIGHT = 1024;
 
 /* Camera Setup */
 Camera camera = Camera(glm::vec3(0.0f, 0.3f, 2.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -108,14 +114,16 @@ int main(void)
 
 	//Enable Culling
 	GLCall(glEnable(GL_CULL_FACE));
-	GLCall(glCullFace(GL_FRONT));
-	GLCall(glFrontFace(GL_CW));
+	GLCall(glCullFace(GL_BACK));
+	GLCall(glFrontFace(GL_CCW));
 
 	// Build and Compile Shader Program 
 	Shader modelShader("comp371/assignment1/src/Shaders/modelShader.vertex", "comp371/assignment1/src/Shaders/modelShader.fragment");
 	Shader lightShader("comp371/assignment1/src/Shaders/lightShader.vertex", "comp371/assignment1/src/Shaders/lightShader.fragment");
-	setupTextureMapping();
+	Shader depthShader("comp371/assignment1/src/Shaders/shadow_mapping_depth.vertex", "comp371/assignment1/src/Shaders/shadow_mapping_depth.fragment");
 
+	setupTextureMapping();
+	
 	// [Models]
 
 	ModelContainer* ben = new ModelContainer();
@@ -217,11 +225,14 @@ int main(void)
 
 	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	light->addTranslation(glm::vec3(0.0f, 3.0f, -1.0f));
-	
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
-		modelShader.use();
+		// Camera mats 
+		glm::mat4 model = glm::mat4(1.0);
+		glm::mat4 projection = glm::mat4(1.0);
+		glm::mat4 view = glm::mat4(1.0);
 
 		// Set frame for Camera (taken from LearnOpenGL)
 		float currentFrame = glfwGetTime();
@@ -253,13 +264,10 @@ int main(void)
 		modelShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 
 		// Recompute Camera Pipeline
-		glm::mat4 model;
 		modelShader.setMat4("model", model);
-		
-		glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 		modelShader.setMat4("projection", projection);
-		
-		glm::mat4 view = camera.calculateViewMatrix();
+		view = camera.calculateViewMatrix();
 		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		modelShader.setMat4("view", view);
@@ -283,6 +291,58 @@ int main(void)
 		modelShader.setInt("material.diffuse", 10);
 		modelShader.setMat4("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// 1. render depth of scene to texture (from light's perspective)
+		// --------------------------------------------------------------
+
+		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightSpaceMatrix;
+		float near_plane = 0.1f, far_plane = 100.0f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		lightView = glm::lookAt(bensLightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
+		// render scene from light's point of view
+		depthShader.use();
+		depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			// Rendering Models and Grid with depthShader
+			RenderScene(depthShader, ben, sean, isa, ziming, wayne);
+			RenderGrid(depthShader,grid_VAOs, mainGrid);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+		// reset viewport
+		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// 2. render scene as normal using the generated depth/shadow map  
+		// --------------------------------------------------------------
+
+		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		modelShader.use();
+		projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+		view = camera.calculateViewMatrix();
+		modelShader.setMat4("projection", projection);
+		modelShader.setMat4("view", view);
+		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
+		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
+		// set light uniforms
+		modelShader.setVec3("viewPos", camera.position);
+		modelShader.setVec3("lightPos", bensLightPos);
+		modelShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+		// Rendering Models and Grid with modelShader
+		RenderScene(modelShader, ben, sean, isa, ziming, wayne);
+		RenderGrid(modelShader, grid_VAOs, mainGrid);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+
+		// [Objects Not Affected by Light Source]
 
 		// Start Using Lighting Shader
 		lightShader.use();
@@ -314,6 +374,9 @@ int main(void)
 				GLCall(glDrawArrays(GL_TRIANGLES, 0, pointLights[i]->getModel()->getVAVertexCount()));
 			}
 		}
+
+		// Rendering 5x5 XYZ Axes
+		RenderAxes(lightShader, grid_VAOs, light);
 
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
@@ -618,4 +681,68 @@ void setupTextureMapping()
 	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
 	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
 	g_textures[10] = Texture("comp371/assignment1/src/Resources/grid_floor.jpg");
+}
+
+void RenderScene(Shader &shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne)
+{
+	glm::mat4 model = glm::mat4(1.0);
+	
+	// [Models]
+
+	ben->draw(MODE);
+	sean->draw(MODE);
+	isa->draw(MODE);
+	ziming->draw(MODE);
+	wayne->draw(MODE);
+	
+}
+
+void RenderGrid(Shader &shader, unsigned int grid_VAOs[], Grid mainGrid)
+{
+	glm::mat4 model = glm::mat4(1.0);
+
+	// [Grid Mesh]
+
+	glBindVertexArray(grid_VAOs[0]);
+	shader.setVec3("modelColor", 1.0f, 1.0f, 0.0f);
+	model = glm::mat4(1.0f);
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+	shader.setMat4("model", model);
+	glDrawArrays(GL_LINES, 0, mainGrid.meshVertices.size());
+
+	// [Grid Floor]
+
+	glBindVertexArray(grid_VAOs[1]);
+	shader.setVec3("modelColor", 0.2f, 0.3f, 0.3f);
+	model = glm::mat4(1.0f);
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
+	shader.setMat4("model", model);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void RenderAxes(Shader &shader, unsigned int grid_VAOs[], Model *light)
+{
+	glm::mat4 model = glm::mat4(1.0);
+
+	// [Coordinate Axis]
+
+	glLineWidth(5.0f);
+	glBindVertexArray(grid_VAOs[2]);
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 0.05f, 0.0f));
+	shader.setMat4("model", model);
+	shader.setInt("fill", 0);
+	glDrawArrays(GL_LINES, 0, 6);
+	glLineWidth(1.0f);
+
+	model = glm::mat4(1.0f);
+	light->bind();
+	model = light->getModelMatrix();
+	shader.setMat4("model", model);
+	shader.setInt("fill", -1);
+	glDrawArrays(GL_TRIANGLES, 0, light->getVAVertexCount());
+
 }
