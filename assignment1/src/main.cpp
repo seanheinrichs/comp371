@@ -36,7 +36,7 @@
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
 
 /* Function Declarations */
-void processInput(GLFWwindow *window, ModelContainer** models);
+void processInput(GLFWwindow *window, ModelContainer** models, PointLight** pointLights);
 void setModelColor(int modelIndex, Shader* modelShader);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 void setupTextureMapping();
@@ -58,9 +58,10 @@ float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
 
-//globals used for selecting render mode and models
+// Globals
 GLenum MODE = GL_TRIANGLES;
 int selected = 0;
+glm::vec3 activeLightSource(0.0f, 3.0f, 0.0f);
 
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
@@ -143,11 +144,11 @@ int main(void)
 
 	// [Point Light]
 
-	PointLight* bensPL = new PointLight(light, glm::vec3(0.0f, 3.0f, 0.0f));
-	PointLight* seansPL = new PointLight(light, glm::vec3(3.5f, 3.0f, -4.0f));
-	PointLight* waynesPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, -4.0f));
-	PointLight* isasPL = new PointLight(light, glm::vec3(3.5f, 3.0f, 4.0f));
-	PointLight* zimingsPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, 4.0f));
+	PointLight* bensPL = new PointLight(light, glm::vec3(0.0f, 3.0f, 0.0f), true);
+	PointLight* seansPL = new PointLight(light, glm::vec3(3.5f, 3.0f, -4.0f), false);
+	PointLight* waynesPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, -4.0f), false);
+	PointLight* isasPL = new PointLight(light, glm::vec3(3.5f, 3.0f, 4.0f), false);
+	PointLight* zimingsPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, 4.0f), false);
 
 	// [Grid]
 
@@ -188,9 +189,9 @@ int main(void)
 	PointLight** pointLights = new PointLight*[5];
 	pointLights[0] = bensPL;
 	pointLights[1] = seansPL;
-	pointLights[2] = waynesPL;
-	pointLights[3] = isasPL;
-	pointLights[4] = zimingsPL;
+	pointLights[2] = isasPL;
+	pointLights[3] = zimingsPL;
+	pointLights[4] = waynesPL;
 
 	ModelContainer** models = new ModelContainer*[5];
 	models[0] = ben;
@@ -228,7 +229,7 @@ int main(void)
 		lastFrame = currentFrame;
 
 		// Event Handling
-		processInput(window, models);
+		processInput(window, models, pointLights);
 
 		// Render
 		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
@@ -241,7 +242,10 @@ int main(void)
 		// Set Light Properties
 		for (int i = 0; i < 5; i++)
 		{
-			pointLights[i]->setShaderValues(&modelShader, i);
+			if (pointLights[i]->getActive())
+			{
+				pointLights[i]->setShaderValues(&modelShader);
+			}
 		}
 
 		// Material Properties
@@ -299,13 +303,16 @@ int main(void)
 		lightShader.setInt("fill", -1);
 		for (int i = 0; i < 5; i++)
 		{
-			pointLights[i]->getModel()->bind();
-			model = pointLights[i]->getModel()->getModelMatrix();
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, pointLights[i]->getPosition());
-			model = glm::scale(model, glm::vec3(0.1f));
-			lightShader.setMat4("model", model);
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, pointLights[i]->getModel()->getVAVertexCount()));
+			if (pointLights[i]->getActive())
+			{
+				pointLights[i]->getModel()->bind();
+				model = pointLights[i]->getModel()->getModelMatrix();
+				model = glm::mat4(1.0f);
+				model = glm::translate(model, pointLights[i]->getPosition());
+				model = glm::scale(model, glm::vec3(0.1f));
+				lightShader.setMat4("model", model);
+				GLCall(glDrawArrays(GL_TRIANGLES, 0, pointLights[i]->getModel()->getVAVertexCount()));
+			}
 		}
 
 		// Swap Buffers and Poll for Events
@@ -327,7 +334,7 @@ int main(void)
 }
 
 // Event handling functions
-void processInput(GLFWwindow *window, ModelContainer** models)
+void processInput(GLFWwindow *window, ModelContainer** models, PointLight** pointLights)
 {
 
 	float cameraSpeed = 1.0 * deltaTime;
@@ -417,30 +424,80 @@ void processInput(GLFWwindow *window, ModelContainer** models)
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && (selected != 0 ))
 	{
 		selected = 0;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 	
 	// Press "2" to select MODEL 1 (A 7)
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && (selected != 1))
 	{
 		selected = 1;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 	
 	// Press "3" to select MODEL 2 (A 0)
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && (selected != 2))
 	{
 		selected = 2;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 	
 	// Press "4" to select MODEL 3 (M 4)
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && (selected != 3))
 	{
 		selected = 3;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 	
 	// Press "5" to select MODEL 4 (Y 7)
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && (selected != 4))
 	{
 		selected = 4;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 
 	// [Translation]

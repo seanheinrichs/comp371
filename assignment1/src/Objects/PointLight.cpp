@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-PointLight::PointLight(Model * model, glm::vec3 startingPos)
+PointLight::PointLight(Model * model, glm::vec3 startingPos, bool active)
 {
 	PointLight::model = model;
 
@@ -17,9 +17,11 @@ PointLight::PointLight(Model * model, glm::vec3 startingPos)
 	PointLight::constant = 1.0f;
 	PointLight::linear = 0.35f;
 	PointLight::quadratic = 0.44f;
+
+	PointLight::active = active;
 }
 
-PointLight::PointLight(Model * model, glm::vec3 startingPos, glm::vec3 col, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float line, float quad)
+PointLight::PointLight(Model * model, glm::vec3 startingPos, glm::vec3 col, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float line, float quad, bool active)
 {
 	PointLight::model = model;
 
@@ -33,19 +35,19 @@ PointLight::PointLight(Model * model, glm::vec3 startingPos, glm::vec3 col, glm:
 	PointLight::constant = 1.0f;
 	PointLight::linear = line;
 	PointLight::quadratic = quad;
+
+	PointLight::active = active;
 }
 
 PointLight::~PointLight() {};
 
-void PointLight::setShaderValues(Shader * shader, int lampIndex)
+void PointLight::setShaderValues(Shader * shader)
 {
-	std::string shaderIndex = "pointLights[" + std::to_string(lampIndex) + "]";
-
-	shader->setVec3(shaderIndex + ".position", position);
-	shader->setVec3(shaderIndex + ".ambient", ambient.x, ambient.y, ambient.z);
-	shader->setVec3(shaderIndex + ".diffuse", diffuse.x, diffuse.y, diffuse.z);
-	shader->setVec3(shaderIndex + ".specular", specular.x, specular.y, specular.z);
-	shader->setFloat(shaderIndex + ".constant", constant);
-	shader->setFloat(shaderIndex + ".linear", linear);
-	shader->setFloat(shaderIndex + ".quadratic", quadratic);
+	shader->setVec3("pointLight.position", position);
+	shader->setVec3("pointLight.ambient", ambient.x, ambient.y, ambient.z);
+	shader->setVec3("pointLight.diffuse", diffuse.x, diffuse.y, diffuse.z);
+	shader->setVec3("pointLight.specular", specular.x, specular.y, specular.z);
+	shader->setFloat("pointLight.constant", constant);
+	shader->setFloat("pointLight.linear", linear);
+	shader->setFloat("pointLight.quadratic", quadratic);
 }
