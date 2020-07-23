@@ -10,6 +10,21 @@
 	Due:  July 9th, 2020
 */
 
+
+/*
+Info for spheres
+place Assets/Models/planet.obj is same directory as solutions file
+add
+_SCL_SECURE_NO_WARNINGS
+_CRT_SECURE_NO_WARNINGS
+in properties/ C/C++ / Prepocessor / Proprocessor Definitions
+Info for shear:
+in main: #include <glm/gtx/transform2.hpp>
+*/
+
+#define _SCL_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -25,6 +40,7 @@
 #include "Objects/Camera.h"
 #include "modeling/OurModels.cpp"
 #include "utils/GL_Error.h"
+#include "utils/objloader.cpp"
 
 //#include "Opengl_a/Texture.h"
 #include "Opengl_a/Shader.h"
@@ -34,6 +50,7 @@
 #include <GLFW/glfw3.h> 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform2.hpp>
 
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
@@ -174,6 +191,16 @@ int main(void)
 
 	// [Models]
 
+		//obj loader
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> uvs; //not used yet?
+	std::vector<glm::vec3> normals; // not used?
+	bool res = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
+
+	Model * sphereModel = new Model(true, false, false, false, "sphere");
+	createShape(sphereModel, vertices, uvs, normals);
+	sphereModel->bindArrayBuffer(true, sphereModel);
+
 	ModelContainer* ben = new ModelContainer();
 	createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
@@ -311,10 +338,24 @@ int main(void)
 		modelShader.setMat4("view", view);
 
 
+
+		ben->draw(MODE);
+
+		//ben sphere
+		sphereModel->bind();
+		//	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
+		model = ben->getModelMatrix();
+		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+		model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
+		modelShader.setMat4("model", model);
+		GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+
+
+
 		// [Models]
 
 		//metal1.bind(GL_TEXTURE0);
-		ben->draw(MODE);
+		
 		//modelShader.setInt("u_Texture", 4);
 		//selected == 0 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);
 		//model = ben->getModelMatrix();
@@ -412,6 +453,7 @@ int main(void)
 	isa->deallocate();
 	ziming->deallocate();
 	light->deallocate();
+	sphereModel->deallocate();
 
 	// Terminate Program 
 	glfwTerminate();
@@ -588,6 +630,19 @@ void processInput(GLFWwindow *window, ModelContainer** models)
 	{
 		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
 	}
+
+	// Press 'P' to shear
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShear(glm::vec3(0.0f, 0.02f, -0.02f));
+	}
+
+	// Press 'O' to shear
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShear(glm::vec3(0.0f, -0.02f, 0.02f));
+	}
+	// [Scale]
 }
 
 void setModelColor(int modelIndex, Shader* modelShader)
