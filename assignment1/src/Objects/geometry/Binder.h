@@ -19,7 +19,6 @@ public:
 	Binder();
 	void bind();
 	void unbind();
-	void setBooleans(bool position, bool texture, bool color, bool normal);
 
 	unsigned int vao, vbo;
 	bool position, texture, color, normal;

@@ -100,6 +100,9 @@ int main(void)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
+	
+
+
 	// Initialize GLEW 
 	if (glewInit() != GLEW_OK)
 	{
@@ -140,7 +143,6 @@ int main(void)
 	g_texLocations[30] = GL_TEXTURE30;
 	g_texLocations[31] = GL_TEXTURE31;
 
-
 	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
 	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
 	g_textures[2] = Texture("comp371/assignment1/src/Resources/chrome.png");
@@ -165,10 +167,12 @@ int main(void)
 	GLCall(glCullFace(GL_FRONT));
 	GLCall(glFrontFace(GL_CW));
 
-	// [Models]
 
+	// Build and Compile Shader Program 
 	Shader modelShader("comp371/assignment1/src/Shaders/modelShader.vertex", "comp371/assignment1/src/Shaders/modelShader.fragment");
 	Shader lightShader("comp371/assignment1/src/Shaders/lightShader.vertex", "comp371/assignment1/src/Shaders/lightShader.fragment");
+
+	// [Models]
 
 	ModelContainer* ben = new ModelContainer();
 	createBensModel(ben, &modelShader);
@@ -235,7 +239,6 @@ int main(void)
 
 
 
-
 	// Uniform Declarations
 
 	ModelContainer** models = new ModelContainer*[5];
@@ -262,8 +265,10 @@ int main(void)
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
 
+
 	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	light->addTranslation(bensLightPos);
+
 
 	
 	// Main Loop 
@@ -303,53 +308,49 @@ int main(void)
 		glm::mat4 view = camera.calculateViewMatrix();
 		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
-
 		modelShader.setMat4("view", view);
-		//modelShader.setInt("fill", 4);
 
-
-	
 
 		// [Models]
 
 		//metal1.bind(GL_TEXTURE0);
 		ben->draw(MODE);
-		//shaderProgram.setInt("u_Texture", 4);
-		//selected == 0 ? shaderProgram.setInt("fill", 4) : shaderProgram.setInt("fill", 2);
+		//modelShader.setInt("u_Texture", 4);
+		//selected == 0 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);
 		//model = ben->getModelMatrix();
-		//shaderProgram.setMat4("model", model);
+		//modelShader.setMat4("model", model);
 		//GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 
 		/*
 		metal2.bind(GL_TEXTURE0);
 		sean->bind();
-		shaderProgram.setInt("u_Texture", 1);
-		selected == 1 ? shaderProgram.setInt("fill", 4) : shaderProgram.setInt("fill", 2);                            
+		modelShader.setInt("u_Texture", 1);
+		selected == 1 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                            
 		model = sean->getModelMatrix();
-		shaderProgram.setMat4("model", model);
+		modelShader.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
 		
 		metal3.bind(GL_TEXTURE0 + 4 * 2);
 		isa->bind();
-		shaderProgram.setInt("u_Texture", 2);
-		selected == 2 ? shaderProgram.setInt("fill", 4) : shaderProgram.setInt("fill", 2);                                    
+		modelShader.setInt("u_Texture", 2);
+		selected == 2 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                                    
 		model = isa->getModelMatrix();
-		shaderProgram.setMat4("model", model);
+		modelShader.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
 		
 		metal1.bind(GL_TEXTURE0 + 4 * 3);
 		ziming->bind();
-		shaderProgram.setInt("u_Texture", 3);
-		selected == 3 ? shaderProgram.setInt("fill", 4) : shaderProgram.setInt("fill", 2);                            
+		modelShader.setInt("u_Texture", 3);
+		selected == 3 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                            
 		model = ziming->getModelMatrix();
-		shaderProgram.setMat4("model", model);
+		modelShader.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
 		
 		metal1.bind(GL_TEXTURE0 + 4 * 4);
 		wayne->bind();
-		shaderProgram.setInt("u_Texture", 4);
-		selected == 4 ? shaderProgram.setInt("fill", 4) : shaderProgram.setInt("fill", 2);                        
-		shaderProgram.setMat4("model", wayne->getModelMatrix());
+		modelShader.setInt("u_Texture", 4);
+		selected == 4 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                        
+		modelShader.setMat4("model", wayne->getModelMatrix());
 		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
 
 		*/
@@ -358,7 +359,6 @@ int main(void)
 		// [Grid Mesh]
 
 		GLCall(glBindVertexArray(grid_VAOs[0]));
-		modelShader.setInt("fill", 0);
 		model = glm::mat4(1.0f);
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
@@ -368,8 +368,6 @@ int main(void)
 		// [Grid Floor]
 
 		GLCall(glBindVertexArray(grid_VAOs[1]));
-
-		modelShader.setInt("fill", 1);
 		model = glm::mat4(1.0f);
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));

@@ -65,13 +65,7 @@ Binder::Binder(bool position, bool texture, bool color, bool normal)
 	Binder::normal = normal;
 }
 
-void Binder::setBooleans(bool position, bool texture, bool color, bool normal)
-{
-	Binder::position = position;
-	Binder::texture = texture;
-	Binder::color = color;
-	Binder::normal = normal;
-}
+
 
 /*
 * Description: bind a vertex array for a certain component
