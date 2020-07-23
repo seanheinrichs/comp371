@@ -9,14 +9,12 @@ void ModelContainer::bindArrayBuffer()
 	{
 		(*it)->bindArrayBuffer(true, (*it));
 	}
-
 }
 
 void ModelContainer::addModel(Model* model) 
 {
 	models.push_back(model);
 }
-
 
 ModelContainer::ModelContainer() 
 {

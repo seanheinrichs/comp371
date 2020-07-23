@@ -31,6 +31,4 @@ public:
 	glm::vec3 translate_vec;
 	glm::vec3 scale_vec;
 	float rotate_angle;
-
-
 };
