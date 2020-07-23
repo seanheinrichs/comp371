@@ -17,12 +17,18 @@
 #include <filesystem>
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
-#define STB_IMAGE_IMPLEMENTATION
+//#define STB_IMAGE_IMPLEMENTATION
+//#include "utils/stb_image.h"
 
 #include "Objects/geometry/Polygon.h"
 #include "Objects/Grid.hpp"
 #include "Objects/Camera.h"
-#include "OurModels.cpp"
+#include "modeling/OurModels.cpp"
+#include "utils/GL_Error.h"
+
+//#include "Opengl_a/Texture.h"
+#include "Opengl_a/Shader.h"
+#include "Common.h"
 
 #include <GL/glew.h>    
 #include <GLFW/glfw3.h> 
@@ -32,38 +38,13 @@
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
 
-/* USED FOR DEBUGGING - Every OpenGL function call we use should be wrapped in a GLCall() 
-
-The following 20 lines of code were taken from this video: 
-https://www.youtube.com/watch?v=FBbPWSOQ0-w&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=10
-
-*/
-#define ASSERT(x) if (!(x)) __debugbreak();
-#define GLCall(x) GLClearError();\
-	x;\
-	ASSERT(GLLogCall(#x, __FILE__, __LINE__))
 
 
-static void GLClearError() {
-	while (glGetError() != GL_NO_ERROR);
-}
-
-static bool GLLogCall(const char* function, const char* file, int line)
-{
-	while (GLenum error = glGetError())
-	{
-		std::cout << "[openGL error] (" << error << ") " << function <<
-			" " << file << ":" << std::endl;
-		return false;
-	}
-	return true;
-}
 
 /* Function Declarations */
-void processInput(GLFWwindow *window, Model** models);
+void processInput(GLFWwindow *window, ModelContainer** models);
+void setModelColor(int modelIndex, Shader* modelShader);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
-void setModelColor(int modelIndex, Shader * modelShader);
-float RandomFloat(float a, float b);
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
@@ -82,15 +63,20 @@ float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
 
-// Lighting Locations
-glm::vec3 bensLightPos(0.0f, 3.0f, 5.0f);
-
 //globals used for selecting render mode and models
 GLenum MODE = GL_TRIANGLES;
 int selected = 0;
 
+// Lighting Locations
+glm::vec3 bensLightPos(0.0f, 3.0f, 5.0f);
+
+/* External linkage for global varibles */
+GLenum* g_texLocations = new GLenum[32];
+Texture* g_textures = new Texture[32];
+
 int main(void)
 {
+	
 	/* Initialize GLFW */
 	if (!glfwInit())
 	{
@@ -114,12 +100,64 @@ int main(void)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
+	
+
+
 	// Initialize GLEW 
 	if (glewInit() != GLEW_OK)
 	{
 		std::cout << "Failed to initialize GLEW" << std::endl;
 		return -1;
 	}
+
+	g_texLocations[0] = GL_TEXTURE0;
+	g_texLocations[1] = GL_TEXTURE1;
+	g_texLocations[2] = GL_TEXTURE2;
+	g_texLocations[3] = GL_TEXTURE3;
+	g_texLocations[4] = GL_TEXTURE4;
+	g_texLocations[5] = GL_TEXTURE5;
+	g_texLocations[6] = GL_TEXTURE6;
+	g_texLocations[7] = GL_TEXTURE7;
+	g_texLocations[8] = GL_TEXTURE8;
+	g_texLocations[9] = GL_TEXTURE9;
+	g_texLocations[10] = GL_TEXTURE10;
+	g_texLocations[11] = GL_TEXTURE11;
+	g_texLocations[12] = GL_TEXTURE12;
+	g_texLocations[13] = GL_TEXTURE13;
+	g_texLocations[14] = GL_TEXTURE14;
+	g_texLocations[15] = GL_TEXTURE15;
+	g_texLocations[16] = GL_TEXTURE16;
+	g_texLocations[17] = GL_TEXTURE17;
+	g_texLocations[18] = GL_TEXTURE18;
+	g_texLocations[19] = GL_TEXTURE19;
+	g_texLocations[20] = GL_TEXTURE20;
+	g_texLocations[21] = GL_TEXTURE21;
+	g_texLocations[22] = GL_TEXTURE22;
+	g_texLocations[23] = GL_TEXTURE23;
+	g_texLocations[24] = GL_TEXTURE24;
+	g_texLocations[25] = GL_TEXTURE25;
+	g_texLocations[26] = GL_TEXTURE26;
+	g_texLocations[27] = GL_TEXTURE27;
+	g_texLocations[28] = GL_TEXTURE28;
+	g_texLocations[29] = GL_TEXTURE29;
+	g_texLocations[30] = GL_TEXTURE30;
+	g_texLocations[31] = GL_TEXTURE31;
+
+	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
+	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
+	g_textures[2] = Texture("comp371/assignment1/src/Resources/chrome.png");
+	g_textures[3] = Texture("comp371/assignment1/src/Resources/speaker_holes.png");
+	g_textures[4] = Texture("comp371/assignment1/src/Resources/shiny_metal.png");
+	g_textures[5] = Texture("comp371/assignment1/src/Resources/box1.png");
+	g_textures[6] = Texture("comp371/assignment1/src/Resources/box2.png");
+	g_textures[7] = Texture("comp371/assignment1/src/Resources/box3.png");
+	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
+	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
+
+
+	//enable blending for correct texture rendering effects
+	GLCall(glEnable(GL_BLEND));
+	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
 	// Enable depth test for 3D rendering 
 	GLCall(glEnable(GL_DEPTH_TEST));
@@ -129,15 +167,17 @@ int main(void)
 	GLCall(glCullFace(GL_FRONT));
 	GLCall(glFrontFace(GL_CW));
 
-	// Build and Compile Shader Program (set defaults)
+
+	// Build and Compile Shader Program 
 	Shader modelShader("comp371/assignment1/src/Shaders/modelShader.vertex", "comp371/assignment1/src/Shaders/modelShader.fragment");
 	Shader lightShader("comp371/assignment1/src/Shaders/lightShader.vertex", "comp371/assignment1/src/Shaders/lightShader.fragment");
 
 	// [Models]
 
-	Model* ben = new Model(true, false, false, true);
-	createBensModel(ben);
-	ben->bindArrayBuffer(true, ben);
+	ModelContainer* ben = new ModelContainer();
+	createBensModel(ben, &modelShader);
+	ben->bindArrayBuffer();
+
 
 	Model* sean = new Model(true, false, false, true);
 	createSeansModel(sean);
@@ -159,6 +199,7 @@ int main(void)
 	createLightModel(light);
 	light->bindArrayBuffer(true, light);
 
+
 	// [Grid]
 
 	Grid mainGrid = Grid();
@@ -169,11 +210,11 @@ int main(void)
 	GLCall(glGenBuffers(1, &grid_EBO));
 
 	// [Grid Mesh] 
-	//GLCall(glBindVertexArray(grid_VAOs[0]));
-	//GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]));
-	//GLCall(glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW));
-	//GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
-	//GLCall(glEnableVertexAttribArray(0));
+	GLCall(glBindVertexArray(grid_VAOs[0]));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW));
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
+	GLCall(glEnableVertexAttribArray(0));
 
 	// [Grid Floor] 
 	GLCall(glBindVertexArray(grid_VAOs[1]));
@@ -181,12 +222,11 @@ int main(void)
 	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW));
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grid_EBO));
 	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mainGrid.floorIndices), mainGrid.floorIndices, GL_STATIC_DRAW));
-	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0));
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
 	GLCall(glEnableVertexAttribArray(0));
-	GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))));
-	GLCall(glEnableVertexAttribArray(1));
 
 	// [Coordinate Axis]
+	/*
 	GLCall(glBindVertexArray(grid_VAOs[2]));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[2]));
 	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.axisVertices), mainGrid.axisVertices, GL_STATIC_DRAW));
@@ -195,23 +235,24 @@ int main(void)
 	GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))));
 	GLCall(glEnableVertexAttribArray(1));
 
-	Model** models = new Model*[5];
-	models[0] = ben;
-	models[1] = sean;
-	models[2] = isa;
-	models[3] = ziming;
-	models[4] = wayne;
+	*/
 
-	ben->translateToOrigin();
-	sean->translateToOrigin();
-	isa->translateToOrigin();
-	wayne->translateToOrigin();
-	ziming->translateToOrigin();
-	light->translateToOrigin();
-	
+
+
+	// Uniform Declarations
+
+	ModelContainer** models = new ModelContainer*[5];
+	models[0] = ben;
+	//models[1] = sean;
+	//models[2] = isa;
+	//models[3] = ziming;
+	//models[4] = wayne;
+
+
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, -1.0f));
-	
+
+
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
 
@@ -220,16 +261,22 @@ int main(void)
 
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
-	
+
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
+
 
 	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	light->addTranslation(bensLightPos);
 
+
+	
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
+
+		modelShader.use();
+
 		// Set frame for Camera (taken from LearnOpenGL)
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -239,8 +286,9 @@ int main(void)
 		processInput(window, models);
 
 		// Render
-		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+		GLCall(glClearColor(0.5f, 0.5f, 0.5f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
 
 		// Start Using Model Shader
 		modelShader.use();
@@ -251,51 +299,66 @@ int main(void)
 		// Recompute Camera Pipeline
 		glm::mat4 model;
 		modelShader.setMat4("model", model);
+		
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 		modelShader.setMat4("projection", projection);
+		
 
 		glm::mat4 view = camera.calculateViewMatrix();
 		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		modelShader.setMat4("view", view);
 
+
 		// [Models]
 
-		ben->bind();
-		setModelColor(0, &modelShader);
-		model = ben->getModelMatrix();
-		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
+		//metal1.bind(GL_TEXTURE0);
+		ben->draw(MODE);
+		//modelShader.setInt("u_Texture", 4);
+		//selected == 0 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);
+		//model = ben->getModelMatrix();
+		//modelShader.setMat4("model", model);
+		//GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 
+		/*
+		metal2.bind(GL_TEXTURE0);
 		sean->bind();
-		setModelColor(1, &modelShader);
+		modelShader.setInt("u_Texture", 1);
+		selected == 1 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                            
 		model = sean->getModelMatrix();
 		modelShader.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
 		
+		metal3.bind(GL_TEXTURE0 + 4 * 2);
 		isa->bind();
-		setModelColor(2, &modelShader);
+		modelShader.setInt("u_Texture", 2);
+		selected == 2 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                                    
 		model = isa->getModelMatrix();
 		modelShader.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
 		
+		metal1.bind(GL_TEXTURE0 + 4 * 3);
 		ziming->bind();
-		setModelColor(3, &modelShader);
+		modelShader.setInt("u_Texture", 3);
+		selected == 3 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                            
 		model = ziming->getModelMatrix();
-		modelShader.setMat4("model", model);;
+		modelShader.setMat4("model", model);
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
 		
+		metal1.bind(GL_TEXTURE0 + 4 * 4);
 		wayne->bind();
-		setModelColor(4, &modelShader);
-		model = wayne->getModelMatrix();
-		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount() ));
-		
+		modelShader.setInt("u_Texture", 4);
+		selected == 4 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                        
+		modelShader.setMat4("model", wayne->getModelMatrix());
+		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
+
+		*/
+
+
 		// [Grid Mesh]
-		
+
 		GLCall(glBindVertexArray(grid_VAOs[0]));
-		modelShader.setVec3("modelColor", 1.0f, 1.0f, 0.0f);
 		model = glm::mat4(1.0f);
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
@@ -303,23 +366,21 @@ int main(void)
 		glDrawArrays(GL_LINES, 0, mainGrid.meshVertices.size());
 
 		// [Grid Floor]
-		
+
 		GLCall(glBindVertexArray(grid_VAOs[1]));
-		modelShader.setVec3("modelColor", 0.2f, 0.3f, 0.3f);
 		model = glm::mat4(1.0f);
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
 		modelShader.setMat4("model", model);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		
-		// [Objects Not Affected by Light Source]
 
 		// Start Using Lighting Shader
 		lightShader.use();
 		lightShader.setMat4("projection", projection);
 		lightShader.setMat4("view", view);
 
+		/*
 		// [Coordinate Axis]
 		glLineWidth(5.0f);
 		GLCall(glBindVertexArray(grid_VAOs[2]));
@@ -329,6 +390,8 @@ int main(void)
 		lightShader.setInt("fill", 0);
 		glDrawArrays(GL_LINES, 0, 6);
 		glLineWidth(1.0f);
+
+		*/
 
 		model = glm::mat4(1.0f);
 		light->bind();
@@ -355,13 +418,8 @@ int main(void)
 	return 0;
 }
 
-void setModelColor(int modelIndex, Shader* modelShader)
-{
-	selected == modelIndex ? modelShader->setVec3("modelColor", 0.6f, 0.0f, 0.8f) : modelShader->setVec3("modelColor", 0.75f, 0.75f, 0.75f);
-}
-
 // Event handling functions
-void processInput(GLFWwindow *window, Model** models)
+void processInput(GLFWwindow *window, ModelContainer** models)
 {
 
 	float cameraSpeed = 1.0 * deltaTime;
@@ -530,40 +588,13 @@ void processInput(GLFWwindow *window, Model** models)
 	{
 		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
 	}
-
-	// Press 'SPACE' to re-position the model at a random location on the grid
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		float a = -5.0f;
-		float b = 5.0f;
-		float x = RandomFloat(a, b);
-		float z = RandomFloat(a, b);
-		models[selected]->Reposition(glm::vec3(x, 0.0f, z));
-	}
-
-	// Press 'BACKSPACE' to reset to original position
-	if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
-	{
-		if (selected == 0) {
-			models[selected]->Reposition(glm::vec3(0.0f, 0.0f, -1.0f));
-		}
-		else if (selected == 1) {
-			models[selected]->Reposition(glm::vec3(3.5f, 0.0f, -4.0f));
-		}
-		else if (selected == 2) {
-			models[selected]->Reposition(glm::vec3(3.5f, 0.0f, 4.0f));
-		}
-		else if (selected == 3) {
-			models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, 4.0f));
-		}
-		else if (selected == 4) {
-			models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, -4.0f));
-		}
-		else {
-
-		}
-	}
 }
+
+void setModelColor(int modelIndex, Shader* modelShader)
+{
+	selected == modelIndex ? modelShader->setVec3("modelColor", 0.6f, 0.0f, 0.8f) : modelShader->setVec3("modelColor", 0.75f, 0.75f, 0.75f);
+}
+
 
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 {
@@ -596,13 +627,5 @@ void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 	{
 		camera.zoomCamera(yOffset);
 	}
-}
-
-//Method to generate random float between a & b
-float RandomFloat(float a, float b) {
-	float random = ((float)rand()) / (float)RAND_MAX;
-	float diff = b - a;
-	float r = random * diff;
-	return a + r;
 }
 

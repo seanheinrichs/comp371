@@ -1,5 +1,7 @@
-#include "Objects/geometry/Cube.h"
-#include "Objects/geometry/Model.h"
+#include "../Objects/geometry/Cube.h"
+#include "../Objects/geometry/Model.h"
+#include "../Objects/geometry/ModelContainer.h"
+#include "../Opengl_a/Shader.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 /* Static methods to create our Models */
@@ -134,10 +136,13 @@ static void createWaynesModel(Model * model)
 	model->transform(mat);
 }
 
-static void createBensModel(Model* model)
+
+
+/* Static methods to create our Models */
+static void createBensModel(ModelContainer* modelContainer, Shader* shader)
 {
 
-	Model* three = new Model(true, false, false, true);
+	Model* three = new Model(true, true, false, false, "3", shader, 0);
 
 	three->addPolygon(new Cube(glm::vec3(6.0f, 3.5f, 0.0f)));
 	three->addPolygon(new Cube(glm::vec3(6.5f, 3.5f, 0.0f)));
@@ -167,15 +172,15 @@ static void createBensModel(Model* model)
 	cb->transform(scale);
 	cb1->transform(scale);
 	cb2->transform(transform);
-	Model* N = new Model(true, false, false, true);
+	Model* N = new Model(true, true, false, false, "n", shader, 7);
 	N->addPolygon(cb);
 	N->addPolygon(cb1);
 	N->addPolygon(cb2);
 	N->transform(glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 0.0f, 0.0f)));
 
 
-	model->addPolygon(N);
-	model->addPolygon(three);
+	modelContainer->addModel(N);
+	modelContainer->addModel(three);
 }
 
 static void createIsabellesModel(Model * model)

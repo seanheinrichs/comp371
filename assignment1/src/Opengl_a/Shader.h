@@ -19,6 +19,11 @@ public:
 
 	/* Constructor */
 	Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
+
+	std::string readShaderCode(const char* path);
+	unsigned int compileShader(const char* code, std::string type);
+
+
 	
 	/* Functions */
 	void use();

@@ -23,6 +23,7 @@ class Polygon
 		virtual int getVertexByteSize() = 0;
 		virtual void setVertexController(bool position, bool texture, bool color, bool normal) = 0;
 		virtual Vertex getSampleVertex() { return Vertex(); }
+		virtual void setBoolean(bool position, bool texture, bool color, bool normal) {}
 		virtual std::map<std::string, glm::vec3> getMinMax()
 		{
 			std::map<std::string, glm::vec3> map;
@@ -32,3 +33,7 @@ class Polygon
 		};
 		virtual float* getVertexArray() = 0;
 };
+
+
+
+
