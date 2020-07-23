@@ -11,7 +11,7 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	glm::mat4 rotate;
 	
 	// [Create A Model]
-	Model* A = new Model(true, true, false, false, "a", shader, 5);
+	Model* A = new Model(true, true, false, true, "a", shader, 5);
 	
 	Cube* cb1 = new Cube(glm::vec3(-1.0, 0.5, 0.0));
 	Cube* cb2 = new Cube(glm::vec3(-2.0, 2.5, 0.0));
@@ -29,7 +29,7 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	A->addPolygon(cb4);
 	
 	// [Create 7 Model]
-	Model* seven = new Model(true, true, false, false, "7", shader, 0);
+	Model* seven = new Model(true, true, false, true, "7", shader, 0);
 
 	Cube * cb5 = new Cube(glm::vec3(1.0f, 2.0f, 0.0f));
 	Cube * cb6 = new Cube(glm::vec3(2.0f, 4.5f, 0.0f));
@@ -60,7 +60,7 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 {
 	// [Create Y Model]
-	Model* Y = new Model(true, true, false, false, "y", shader, 6);
+	Model* Y = new Model(true, true, false, true, "y", shader, 6);
 
 	Cube *cb1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
 	glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.5f, 0.5f, 0.0f));
@@ -112,7 +112,7 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 	Y->addPolygon(cb6);
 
 	// [Create 7 Model]
-	Model* seven = new Model(true, true, false, false, "7", shader, 1);
+	Model* seven = new Model(true, true, false, true, "7", shader, 1);
 
 	Cube *cb7 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(1.90f, 2.25f, 0.0f));
@@ -159,7 +159,7 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 
 static void createBensModel(ModelContainer* modelContainer, Shader* shader)
 {
-	Model* three = new Model(true, true, false, false, "3", shader, 2);
+	Model* three = new Model(true, true, false, true, "3", shader, 2);
 
 	three->addPolygon(new Cube(glm::vec3(6.0f, 3.5f, 0.0f)));
 	three->addPolygon(new Cube(glm::vec3(6.5f, 3.5f, 0.0f)));
@@ -187,7 +187,7 @@ static void createBensModel(ModelContainer* modelContainer, Shader* shader)
 	cb->transform(scale);
 	cb1->transform(scale);
 	cb2->transform(transform);
-	Model* N = new Model(true, true, false, false, "n", shader, 7);
+	Model* N = new Model(true, true, false, true, "n", shader, 7);
 	N->addPolygon(cb);
 	N->addPolygon(cb1);
 	N->addPolygon(cb2);
@@ -203,7 +203,7 @@ static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 	glm::mat4 rotate;
 	
 	// [Create A Model]
-	Model* A = new Model(true, true, false, false, "a", shader, 8);
+	Model* A = new Model(true, true, false, true, "a", shader, 8);
 
 	Cube * cube1 = new Cube(glm::vec3(-1.0f, 0.5f, 0.0f));
 	Cube * cube2 = new Cube(glm::vec3(-2.0f, 2.5f, 0.0f));
@@ -220,7 +220,7 @@ static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 	A->addPolygon(cube4);
 
 	// [Create 0 Model]
-	Model* zero = new Model(true, true, false, false, "0", shader, 3);
+	Model* zero = new Model(true, true, false, true, "0", shader, 3);
 
 	Cube * cube5 = new Cube(glm::vec3(1.0f , 0.5f, 0.0f));
 	Cube * cube6 = new Cube(glm::vec3(2.0f, 0.5f, 0.0f));
@@ -251,7 +251,7 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 	glm::mat4 rotate;
 	
 	// [Create M Model]
-	Model* M = new Model(true, true, false, false, "m", shader, 9);
+	Model* M = new Model(true, true, false, true, "m", shader, 9);
 
 	Cube * cb1 = new Cube(glm::vec3(-5.0f, 0.5f, 0.0f));
 	Cube * cb2 = new Cube(glm::vec3(-4.0f, 3.5f, 0.0f));
@@ -272,7 +272,7 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 	M->addPolygon(cb5);
 
 	// [Create 4 Model]
-	Model* four = new Model(true, true, false, false, "4", shader, 4);
+	Model* four = new Model(true, true, false, true, "4", shader, 4);
 
 	Cube * cb6 = new Cube(glm::vec3(1.0f, 0.83f, 0.0f)); 
 	Cube * cb7 = new Cube(glm::vec3(2.0f, 1.5f, 0.0f));
@@ -302,8 +302,13 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 	modelContainer->addModel(four);
 }
 
-static void createLightModel(Model * model) {
+static void createLampModel(ModelContainer* modelContainer, Shader* shader) {
+	Model* light1 = new Model(true, true, false, false, "light", shader,  -1);
+	
 	Cube * cb1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
 
-	model->addPolygon(cb1);
+	light1->addPolygon(cb1);
+
+	// Add to model container
+	modelContainer->addModel(light1);
 }

@@ -14,7 +14,6 @@ Texture::Texture(const std::string& path) : filePath(path), localBuffer(nullptr)
 		std::cout << "failed to load image" << std::endl;
 
 	GLCall(glGenTextures(1, &renderer_id));
-	//GLCall(glActiveTexture(GL_TEXTURE0));
 	GLCall(glBindTexture(GL_TEXTURE_2D, renderer_id));
 	
 

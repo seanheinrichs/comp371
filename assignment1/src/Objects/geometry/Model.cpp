@@ -300,10 +300,6 @@ void Model::translateToOrigin()
 	transform(glm::translate(glm::mat4(1.0f), temp));
 }
 
-//extern Texture* g_textures;
-//extern GLenum* g_texLocations;
-
-
 void Model::draw(int mode /*, GLenum* g_textures, int* g_texLocations*/)
 {
 	if (shader == nullptr)
@@ -311,9 +307,16 @@ void Model::draw(int mode /*, GLenum* g_textures, int* g_texLocations*/)
 	else 
 	{
 		shader->use();
-		g_textures[textureIndex].bind(g_texLocations[textureIndex]);
 		this->bind();
-		shader->setInt("u_Texture", textureIndex);
+		if (textureIndex == -1)
+		{
+			shader->setInt("fill", textureIndex);
+		}
+		else
+		{
+			g_textures[textureIndex].bind(g_texLocations[textureIndex]);
+			shader->setInt("material.diffuse", textureIndex);
+		}
 		shader->setMat4("model", this->getModelMatrix());
 		GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
 	}

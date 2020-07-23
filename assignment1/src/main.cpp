@@ -61,9 +61,6 @@ float rY = 0.0f;
 GLenum MODE = GL_TRIANGLES;
 int selected = 0;
 
-// Lighting Locations
-glm::vec3 bensLightPos(0.0f, 3.0f, 5.0f);
-
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
 Texture* g_textures = new Texture[32];
@@ -112,7 +109,6 @@ int main(void)
 	GLCall(glCullFace(GL_FRONT));
 	GLCall(glFrontFace(GL_CW));
 
-
 	// Build and Compile Shader Program 
 	Shader modelShader("comp371/assignment1/src/Shaders/modelShader.vertex", "comp371/assignment1/src/Shaders/modelShader.fragment");
 	Shader lightShader("comp371/assignment1/src/Shaders/lightShader.vertex", "comp371/assignment1/src/Shaders/lightShader.fragment");
@@ -140,9 +136,9 @@ int main(void)
 	createWaynesModel(wayne, &modelShader);
 	wayne->bindArrayBuffer();
 
-	Model* light = new Model(true, false, false, true);
-	createLightModel(light);
-	light->bindArrayBuffer(true, light);
+	ModelContainer* lamps = new ModelContainer();
+	createLampModel(lamps, &lightShader);
+	lamps->bindArrayBuffer();
 
 	// [Grid]
 
@@ -164,17 +160,15 @@ int main(void)
 	GLCall(glBindVertexArray(grid_VAOs[1]));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[1]));
 	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW));
-	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grid_EBO));
-	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mainGrid.floorIndices), mainGrid.floorIndices, GL_STATIC_DRAW));
 	// Position
 	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0));
 	GLCall(glEnableVertexAttribArray(0));
-	// Texture
+	// Textures
 	GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))));
-	GLCall(glEnableVertexAttribArray(1))
+	GLCall(glEnableVertexAttribArray(1));
 	// Normals
-	GLCall(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))));
-	GLCall(glEnableVertexAttribArray(2))
+	GLCall(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(2));
 
 	// [Coordinate Axis]
 	/*
@@ -209,8 +203,8 @@ int main(void)
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
 
-	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	light->addTranslation(bensLightPos);
+	lamps->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	lamps->addTranslation(glm::vec3(0.0f, 3.0f, -1.0f));
 	
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -226,14 +220,22 @@ int main(void)
 		processInput(window, models);
 
 		// Render
-		GLCall(glClearColor(0.5f, 0.5f, 0.5f, 1.0f));
+		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		// Start Using Model Shader
 		modelShader.use();
-		modelShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		modelShader.setVec3("lightPos", bensLightPos);
+		modelShader.setVec3("light.position", 0.0f, 3.0f, 0.0f);
 		modelShader.setVec3("viewPos", camera.position);
+
+		// Set Light Properties
+		modelShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		modelShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		modelShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+		// Material Properties
+		modelShader.setFloat("material.shininess", 64.0f);
+		modelShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 
 		// Recompute Camera Pipeline
 		glm::mat4 model;
@@ -263,15 +265,15 @@ int main(void)
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
 		g_textures[10].bind(g_texLocations[10]);
-		modelShader.setInt("u_Texture", 10);
+		modelShader.setInt("material.diffuse", 10);
 		modelShader.setMat4("model", model);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		// Start Using Lighting Shader
 		lightShader.use();
 		lightShader.setMat4("projection", projection);
 		lightShader.setMat4("view", view);
-
+		
 		// [Coordinate Axis]
 		//glLineWidth(5.0f);
 		//GLCall(glBindVertexArray(grid_VAOs[2]));
@@ -282,12 +284,7 @@ int main(void)
 		//glDrawArrays(GL_LINES, 0, 6);
 		//glLineWidth(1.0f);
 		
-		model = glm::mat4(1.0f);
-		light->bind();
-		model = light->getModelMatrix();
-		lightShader.setMat4("model", model);
-		lightShader.setInt("fill", -1);
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, light->getVAVertexCount()));
+		lamps->draw(MODE);
 
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
@@ -300,7 +297,7 @@ int main(void)
 	wayne->deallocate();
 	isa->deallocate();
 	ziming->deallocate();
-	light->deallocate();
+	lamps->deallocate();
 
 	// Terminate Program 
 	glfwTerminate();
