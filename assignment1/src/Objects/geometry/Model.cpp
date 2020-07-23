@@ -314,20 +314,6 @@ void Model::draw(int mode /*, GLenum* g_textures, int* g_texLocations*/)
 		}
 		else
 		{
-			if (textureIndex == 2)
-			{
-				shader->setFloat("material.shininess", 128.0f);
-			}
-			else {
-				shader->setFloat("material.shininess", 2.0f);
-			}
-			if (textureIndex == 7)
-			{
-				shader->setFloat("material.shininess", 32.0f);
-			}
-			else {
-				shader->setFloat("material.shininess", 2.0f);
-			}
 			g_textures[textureIndex].bind(g_texLocations[textureIndex]);
 			shader->setInt("material.diffuse", textureIndex);
 		}
