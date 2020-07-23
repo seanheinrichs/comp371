@@ -20,6 +20,17 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
+/*
+Info for spheres 
+place Assets/Models/planet.obj is same directory as solutions file
+add 
+_SCL_SECURE_NO_WARNINGS
+_CRT_SECURE_NO_WARNINGS
+in properties/ C/C++ / Prepocessor / Proprocessor Definitions
+
+Ingo for shear:
+in main: #include <glm/gtx/transform2.hpp> 
+*/
 #include "Objects/geometry/Polygon.h"
 #include "Objects/Grid.hpp"
 #include "Objects/Camera.h"
@@ -131,17 +142,13 @@ int main(void)
 
 	// [Models]
 	//obj loader
-	// Read our .obj file
 	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec2> uvs;
-	std::vector<glm::vec3> normals; // Won't be used at the moment.
+	std::vector<glm::vec2> uvs; //not used yet?
+	std::vector<glm::vec3> normals; // not used?
 	bool res = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals); 
 
 	Model * sphereModel = new Model(true, false, false);
-	//createSphere(sphere, vertices, uvs, normals);
-	Shape * sphere = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), vertices, uvs, normals);
-	sphereModel->addPolygon(sphere);
-
+	createShape(sphereModel, vertices, uvs, normals);
 	sphereModel->bindArrayBuffer(true, sphereModel);
 
 	Model * ben = new Model(true, false, false);
@@ -209,14 +216,12 @@ int main(void)
 	models[2] = isa;
 	models[3] = ziming;
 	models[4] = wayne;
-	//models[5] = sphere;
 
 	ben->translateToOrigin();
 	sean->translateToOrigin();
 	isa->translateToOrigin();
 	wayne->translateToOrigin();
 	ziming->translateToOrigin();
-	//sphere->translateToOrigin();
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, -1.0f));
@@ -232,9 +237,6 @@ int main(void)
 	
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
-	
-	//sphere->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	//sphere->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
 
 	shaderProgram.use();
 
@@ -301,16 +303,13 @@ int main(void)
 		model = ben->getModelMatrix(true);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));	
 		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
-
+		//ben sphere
 		sphereModel->bind();
 		model = ben->getModelMatrix(false);
-		//model = ben->getTranslation()* ben->getRotation()* ben->getScale() ;
-	
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
-		//model = glm::shearX3D(glm::mat4(1.0f), 0.0f, 0.0f);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		GLCall(glDrawArrays(GL_LINES, 0, sphere->getVAVertexCount()));
+		GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 		
 		//SEAN
 		sean->bind();
@@ -318,14 +317,13 @@ int main(void)
 		model = sean->getModelMatrix(true);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
-		
+		//sean sphere
 		sphereModel->bind();
 		model = sean->getModelMatrix(false);
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
-		//model = glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		GLCall(glDrawArrays(GL_LINES, 0, sphere->getVAVertexCount()));
+		GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 
 		//Iz
@@ -334,14 +332,13 @@ int main(void)
 		model = isa->getModelMatrix(true);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
-		
+		//iz sphere
 		sphereModel->bind();
 		model = isa->getModelMatrix(false);
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
-		//model = glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		GLCall(glDrawArrays(GL_LINES, 0, sphere->getVAVertexCount()));
+		GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 
 		//Ziming
@@ -350,14 +347,13 @@ int main(void)
 		model = ziming->getModelMatrix(true);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
-		
+		//zimming sphere
 		sphereModel->bind();
 		model = ziming->getModelMatrix(false);
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
-		//model = glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		GLCall(glDrawArrays(GL_LINES, 0, sphere->getVAVertexCount()));
+		GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 		//Wayne
 		wayne->bind();
@@ -365,15 +361,13 @@ int main(void)
 		model = wayne->getModelMatrix(true);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
-
+		//wayne sphere
 		sphereModel->bind();
-		selected == 0 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);
 		model = wayne->getModelMatrix(false);
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
-		//model = glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
-		GLCall(glDrawArrays(GL_LINES, 0, sphere->getVAVertexCount()));
+		GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 		
 		
 		// [Grid Mesh]
@@ -610,15 +604,6 @@ void processInput(GLFWwindow *window, Model** models)
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 	{
 		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
-	}
-
-	// Press 'J' to scale DOWN the model
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		float randX = rand() % 3 + (-3.0);
-		float randY = rand() % 3 + (-3.0);
-		float randZ = rand() % 3;
-		models[selected]->addTranslation(glm::vec3(randX, randY, randZ));
 	}
 }
 

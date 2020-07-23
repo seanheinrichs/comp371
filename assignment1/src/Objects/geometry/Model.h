@@ -37,10 +37,9 @@ public:
 
 	glm::mat4 getRotation();
 	glm::mat4 getTranslation();
-	glm::mat4 getTranslationSphere();
 	glm::mat4 getScale();
 	glm::mat4 getShear();
-	glm::mat4 getModelMatrix(bool state);
+	glm::mat4 getModelMatrix(bool state); //state = true when to include shear, false when not
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();
 	virtual int getVAByteSize();
@@ -61,7 +60,6 @@ public:
 	bool position, color, texture;
 	glm::vec3 rotate_vec;
 	glm::vec3 translate_vec;
-	glm::vec3 translate_vec_sphere;
 	glm::vec3 scale_vec;
 	glm::vec3 shear_vec;
 	float rotate_angle;

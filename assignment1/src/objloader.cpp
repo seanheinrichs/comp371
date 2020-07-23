@@ -86,6 +86,7 @@ inline bool loadOBJ(
 					uv = false;
 				}
 			}
+			//where the right order/associate between the vertices and their proper normals and uvs
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
 			vertexIndices.push_back(vertexIndex[2]);
@@ -106,27 +107,25 @@ inline bool loadOBJ(
 		}
 
 	}
-	//std::cout << "Vertex indices: " << vertexIndices.size() << std::endl;
-	//std::cout << "UV indices: " << uvIndices.size() << std::endl;
-	//std::cout << "Normal indices: " << normalIndices.size() << std::endl;
+
 	// For each vertex of each triangle
 	for (unsigned int i = 0; i < vertexIndices.size(); i++) {
 		if (uvIndices.size() != 0) {
 			if (i < uvIndices.size()) {
-				unsigned int uvIndex = abs(uvIndices[i]);
+				unsigned int uvIndex = abs(uvIndices[i]); //fetch right index of UV
 				glm::vec2 uv = temp_uvs[uvIndex - 1];
 				out_uvs.push_back(uv);
 			}
 		}
 		if (normalIndices.size() != 0) {
 			if (i < normalIndices.size()) {
-				unsigned int normalIndex = abs(normalIndices[i]);
+				unsigned int normalIndex = abs(normalIndices[i]); //fetch right index of normal
 				glm::vec3 normal = temp_normals[normalIndex - 1];
 				out_normals.push_back(normal);
 			}
 		}
 
-		unsigned int vertexIndex = abs(vertexIndices[i]);
+		unsigned int vertexIndex = abs(vertexIndices[i]); //fetch right index of vertex
 		glm::vec3 vertex = temp_vertices[vertexIndex - 1];
 		out_vertices.push_back(vertex);
 	}

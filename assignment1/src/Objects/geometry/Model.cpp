@@ -86,10 +86,6 @@ void Model::addTranslation(glm::vec3 translate)
 	Model::translate_vec.x += translate.x;
 	Model::translate_vec.y += translate.y;
 	Model::translate_vec.z += translate.z;
-
-	Model::translate_vec_sphere.x = Model::translate_vec.x;
-	Model::translate_vec_sphere.x = Model::translate_vec.y + 2.0f;
-	Model::translate_vec_sphere.x = Model::translate_vec.z ;
 }
 
 //Method that returns the rotation matrix
@@ -102,7 +98,6 @@ glm::mat4 Model::getRotation()
 glm::mat4 Model::getShear() 
 {
 	//return glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //forward/backwards
-	// glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
 	return glm::shearY3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //from side to side
 	
 }
@@ -111,16 +106,6 @@ glm::mat4 Model::getShear()
 glm::mat4 Model::getTranslation() 
 {
 	return glm::translate(glm::mat4(1.0f), translate_vec);
-}
-
-//Method that returns the translation matrix
-glm::mat4 Model::getTranslationSphere()
-{
-
-	Model::translate_vec_sphere.x = Model::translate_vec.x;
-	Model::translate_vec_sphere.x = Model::translate_vec.y + 2.0f;
-	Model::translate_vec_sphere.x = Model::translate_vec.z;
-	return glm::translate(glm::mat4(1.0f), translate_vec_sphere);
 }
 
 //Method that returns the scale matrix
