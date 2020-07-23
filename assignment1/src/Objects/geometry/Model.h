@@ -34,13 +34,13 @@ public:
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
 	void addShear(glm::vec3 translate);
+
 	glm::mat4 getRotation();
 	glm::mat4 getTranslation();
 	glm::mat4 getTranslationSphere();
 	glm::mat4 getScale();
 	glm::mat4 getShear();
-	glm::mat4 getModelMatrix();
-	glm::mat4 getModelMatrixSphere();
+	glm::mat4 getModelMatrix(bool state);
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();
 	virtual int getVAByteSize();

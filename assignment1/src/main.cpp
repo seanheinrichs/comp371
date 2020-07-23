@@ -135,7 +135,7 @@ int main(void)
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals; // Won't be used at the moment.
-	bool res = loadOBJ("../../Assets/Models/planet.obj", vertices, uvs, normals); 
+	bool res = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals); 
 
 	Model * sphereModel = new Model(true, false, false);
 	//createSphere(sphere, vertices, uvs, normals);
@@ -298,27 +298,29 @@ int main(void)
 		//BEN
 		ben->bind();
 		selected == 0 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);
-		model = ben->getModelMatrix();
+		model = ben->getModelMatrix(true);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));	
 		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 
 		sphereModel->bind();
-		model = ben->getModelMatrix();
+		model = ben->getModelMatrix(false);
+		//model = ben->getTranslation()* ben->getRotation()* ben->getScale() ;
+	
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
-		//model = glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
+		//model = glm::shearX3D(glm::mat4(1.0f), 0.0f, 0.0f);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(GL_LINES, 0, sphere->getVAVertexCount()));
-
+		
 		//SEAN
 		sean->bind();
 		selected == 1 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);                            
-		model = sean->getModelMatrix();
+		model = sean->getModelMatrix(true);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
 		
 		sphereModel->bind();
-		model = sean->getModelMatrix();
+		model = sean->getModelMatrix(false);
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
 		//model = glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
@@ -329,12 +331,12 @@ int main(void)
 		//Iz
 		isa->bind();
 		selected == 2 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);                                    
-		model = isa->getModelMatrix();
+		model = isa->getModelMatrix(true);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
 		
 		sphereModel->bind();
-		model = isa->getModelMatrix();
+		model = isa->getModelMatrix(false);
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
 		//model = glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
@@ -345,12 +347,12 @@ int main(void)
 		//Ziming
 		ziming->bind();
 		selected == 3 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);                            
-		model = ziming->getModelMatrix();
+		model = ziming->getModelMatrix(true);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
 		
 		sphereModel->bind();
-		model = ziming->getModelMatrix();
+		model = ziming->getModelMatrix(false);
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
 		//model = glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
@@ -360,20 +362,20 @@ int main(void)
 		//Wayne
 		wayne->bind();
 		selected == 4 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);                                 	
-		model = wayne->getModelMatrix();
+		model = wayne->getModelMatrix(true);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
 
 		sphereModel->bind();
 		selected == 0 ? shaderProgram.setInt("fill", 3) : shaderProgram.setInt("fill", 2);
-		model = wayne->getModelMatrix();
+		model = wayne->getModelMatrix(false);
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
 		//model = glm::shearX3D(glm::mat4(1.0f), 0.5f, 0.0f);
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(GL_LINES, 0, sphere->getVAVertexCount()));
-
-
+		
+		
 		// [Grid Mesh]
 
 		GLCall(glBindVertexArray(grid_VAOs[0]));
@@ -587,10 +589,11 @@ void processInput(GLFWwindow *window, Model** models)
 	// Press 'P' to shear
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
+
 		models[selected]->addShear(glm::vec3(0.0f, 0.02f, -0.02f));
 	}
 
-	// Press 'P' to shear
+	// Press 'O' to shear
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		models[selected]->addShear(glm::vec3(0.0f, -0.02f, 0.02f));

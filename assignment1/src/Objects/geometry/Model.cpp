@@ -130,25 +130,20 @@ glm::mat4 Model::getScale()
 }
 
 //Method that calculates the transformation matrix of the model
-glm::mat4 Model::getModelMatrix()
+glm::mat4 Model::getModelMatrix(bool state)
 {
-	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
-		return getTranslation() *  getScale();
-	else
-		return getTranslation() * getRotation() * getScale() * getShear();
-}
-
-//Method that calculates the transformation matrix of the model to add the sphere on top
-glm::mat4 Model::getModelMatrixSphere()
-{
-	float offset = 2.0f;
-	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0) {
-	return getTranslationSphere() *  getScale();
-	}else {
-
-		return getTranslationSphere() * getRotation() * getScale();
+	if (state) {
+		if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
+			return getTranslation() *  getScale();
+		else
+			return getTranslation() * getRotation() * getScale() * getShear();;
 	}
-		
+	else {
+		if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
+			return getTranslation() *  getScale();
+		else
+			return getTranslation() * getRotation() * getScale();
+	}
 }
 
 //Method that adds a polygon object to the list of polygons that this model is composed of
