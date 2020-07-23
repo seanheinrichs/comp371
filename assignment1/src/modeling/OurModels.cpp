@@ -302,13 +302,8 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 	modelContainer->addModel(four);
 }
 
-static void createLampModel(ModelContainer* modelContainer, Shader* shader) {
-	Model* light1 = new Model(true, true, false, false, "light", shader,  -1);
-	
+static void createLightModel(Model * model) {
 	Cube * cb1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
 
-	light1->addPolygon(cb1);
-
-	// Add to model container
-	modelContainer->addModel(light1);
+	model->addPolygon(cb1);
 }
