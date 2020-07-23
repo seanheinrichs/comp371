@@ -7,12 +7,12 @@ class PointLight
 {
 public:
 	// Constructors & Destructors
-	PointLight(Model * lampModel, glm::vec3 startingPos);
-	PointLight(Model * lampModel, glm::vec3 startingPos, glm::vec3 col, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float line, float quad);
+	PointLight(Model * lampModel, glm::vec3 startingPos, bool active);
+	PointLight(Model * lampModel, glm::vec3 startingPos, glm::vec3 col, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float line, float quad, bool active);
 	~PointLight();
 
 	// Functions
-	void setShaderValues(Shader * shader, int lampIndex);
+	void setShaderValues(Shader * shader);
 
 	// Accessors
 	Model* getModel() const { return model; };
@@ -24,6 +24,10 @@ public:
 	float getConstant() const { return constant; };
 	float getLinear() const { return linear; };
 	float getQuadratic() const { return quadratic; };
+	bool getActive() const { return active; };
+
+	// Mutators
+	void setActive(bool value) { active = value; };
 
 private:
 	Model * model;
@@ -40,4 +44,6 @@ private:
 	float constant;
 	float linear;
 	float quadratic;
+
+	bool active;
 };
