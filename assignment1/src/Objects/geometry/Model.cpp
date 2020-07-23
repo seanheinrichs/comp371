@@ -30,6 +30,7 @@ Model::Model(bool position, bool texture, bool color)
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	shear_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	translate_vec_sphere= glm::vec3(0.0f, 5.0f, 0.0f);
 	rotate_angle = 0.0;
 }
 
@@ -42,6 +43,7 @@ Model::Model()
 	origin = glm::vec3(0.f);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	translate_vec_sphere = glm::vec3(0.0f, 5.0f, 0.0f);
 	shear_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
 }
@@ -88,6 +90,13 @@ void Model::addTranslation(glm::vec3 translate)
 	Model::translate_vec.z += translate.z;
 }
 
+void Model::addTranslationSphere(glm::vec3 translate)
+{
+	Model::translate_vec_sphere.x += translate.x;
+	Model::translate_vec_sphere.y += translate.y;
+	Model::translate_vec_sphere.z += translate.z;
+}
+
 //Method that returns the rotation matrix
 glm::mat4 Model::getRotation() 
 {
@@ -106,6 +115,12 @@ glm::mat4 Model::getShear()
 glm::mat4 Model::getTranslation() 
 {
 	return glm::translate(glm::mat4(1.0f), translate_vec);
+}
+
+//Method that returns the translation matrix
+glm::mat4 Model::getTranslationSphere()
+{
+	return glm::translate(glm::mat4(1.0f), translate_vec_sphere);
 }
 
 //Method that returns the scale matrix

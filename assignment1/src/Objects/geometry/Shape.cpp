@@ -27,8 +27,6 @@ Shape::Shape(glm::vec3 origin_a,
 	translate_fromOrigin();
 }
 
-
-
 void Shape::setUpLoadedObj(
 	std::vector<glm::vec3> & in_vertices,
 	std::vector<glm::vec2> & in_uvs,
@@ -37,14 +35,13 @@ void Shape::setUpLoadedObj(
 	vc = new VertexController(true, false, false);
 	for (int i = 0; i < in_vertices.size(); i++)
 	{
-
 		Vertex * v = new Vertex();
 		v->addVertexComponent(VertexComponent(POSITION, in_vertices.at(i)));
 		vc->appendVertex(*v);
 		//v.addVertexComponent(VertexComponent(NORMAL, in_normals.at(i)));
 	}
-
 }
+
 //Method that sets up the vertices that build a single Shape
 void Shape::setupCube()
 {

@@ -33,13 +33,15 @@ public:
 	void addRotation(float radians, glm::vec3 axis);
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
+	void addTranslationSphere(glm::vec3 translate);
 	void addShear(glm::vec3 translate);
 
 	glm::mat4 getRotation();
 	glm::mat4 getTranslation();
+	glm::mat4 getTranslationSphere();
 	glm::mat4 getScale();
 	glm::mat4 getShear();
-	glm::mat4 getModelMatrix(bool state); //state = true when to include shear, false when not
+	glm::mat4 getModelMatrix(bool state);//sate = true when include shear in calculation
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();
 	virtual int getVAByteSize();
@@ -60,8 +62,10 @@ public:
 	bool position, color, texture;
 	glm::vec3 rotate_vec;
 	glm::vec3 translate_vec;
+	glm::vec3 translate_vec_sphere;
 	glm::vec3 scale_vec;
 	glm::vec3 shear_vec;
+
 	float rotate_angle;
 
 };

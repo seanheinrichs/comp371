@@ -28,7 +28,7 @@ _SCL_SECURE_NO_WARNINGS
 _CRT_SECURE_NO_WARNINGS
 in properties/ C/C++ / Prepocessor / Proprocessor Definitions
 
-Ingo for shear:
+Info for shear:
 in main: #include <glm/gtx/transform2.hpp> 
 */
 #include "Objects/geometry/Polygon.h"
@@ -305,8 +305,9 @@ int main(void)
 		GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
 		//ben sphere
 		sphereModel->bind();
+	//	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
 		model = ben->getModelMatrix(false);
-		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f));
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
 		GLCall(glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)));
 		GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
@@ -583,13 +584,14 @@ void processInput(GLFWwindow *window, Model** models)
 	// Press 'P' to shear
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-
+		models[selected]->addTranslationSphere(glm::vec3(0.02f, 0.0f, 0.0f));
 		models[selected]->addShear(glm::vec3(0.0f, 0.02f, -0.02f));
 	}
 
 	// Press 'O' to shear
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
+		models[selected]->addTranslationSphere(glm::vec3(-0.02f,0.0f,0.0f));
 		models[selected]->addShear(glm::vec3(0.0f, -0.02f, 0.02f));
 	}
 	// [Scale]
