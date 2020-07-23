@@ -1,13 +1,13 @@
 /*
 	COMP 371 - Section CC
-	Practical Assignment #1
+	Practical Assignment #2
 	Written By:
 		Benjamin Therien (40034572)
 		Sean Heinrichs (40075789)
 		Wayne St Amand (40074423)
 		Isabelle Gourchette (40008121)
 		Ziming Wang (40041601)
-	Due:  July 9th, 2020
+	Due:  July 27th, 2020
 */
 
 #include <iostream>
@@ -17,16 +17,12 @@
 #include <filesystem>
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
-//#define STB_IMAGE_IMPLEMENTATION
-//#include "utils/stb_image.h"
 
 #include "Objects/geometry/Polygon.h"
 #include "Objects/Grid.hpp"
 #include "Objects/Camera.h"
 #include "modeling/OurModels.cpp"
 #include "utils/GL_Error.h"
-
-//#include "Opengl_a/Texture.h"
 #include "Opengl_a/Shader.h"
 #include "Common.h"
 
@@ -38,13 +34,11 @@
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
 
-
-
-
 /* Function Declarations */
 void processInput(GLFWwindow *window, ModelContainer** models);
 void setModelColor(int modelIndex, Shader* modelShader);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
+void setupTextureMapping();
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
@@ -76,7 +70,6 @@ Texture* g_textures = new Texture[32];
 
 int main(void)
 {
-	
 	/* Initialize GLFW */
 	if (!glfwInit())
 	{
@@ -100,60 +93,12 @@ int main(void)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
-	
-
-
 	// Initialize GLEW 
 	if (glewInit() != GLEW_OK)
 	{
 		std::cout << "Failed to initialize GLEW" << std::endl;
 		return -1;
 	}
-
-	g_texLocations[0] = GL_TEXTURE0;
-	g_texLocations[1] = GL_TEXTURE1;
-	g_texLocations[2] = GL_TEXTURE2;
-	g_texLocations[3] = GL_TEXTURE3;
-	g_texLocations[4] = GL_TEXTURE4;
-	g_texLocations[5] = GL_TEXTURE5;
-	g_texLocations[6] = GL_TEXTURE6;
-	g_texLocations[7] = GL_TEXTURE7;
-	g_texLocations[8] = GL_TEXTURE8;
-	g_texLocations[9] = GL_TEXTURE9;
-	g_texLocations[10] = GL_TEXTURE10;
-	g_texLocations[11] = GL_TEXTURE11;
-	g_texLocations[12] = GL_TEXTURE12;
-	g_texLocations[13] = GL_TEXTURE13;
-	g_texLocations[14] = GL_TEXTURE14;
-	g_texLocations[15] = GL_TEXTURE15;
-	g_texLocations[16] = GL_TEXTURE16;
-	g_texLocations[17] = GL_TEXTURE17;
-	g_texLocations[18] = GL_TEXTURE18;
-	g_texLocations[19] = GL_TEXTURE19;
-	g_texLocations[20] = GL_TEXTURE20;
-	g_texLocations[21] = GL_TEXTURE21;
-	g_texLocations[22] = GL_TEXTURE22;
-	g_texLocations[23] = GL_TEXTURE23;
-	g_texLocations[24] = GL_TEXTURE24;
-	g_texLocations[25] = GL_TEXTURE25;
-	g_texLocations[26] = GL_TEXTURE26;
-	g_texLocations[27] = GL_TEXTURE27;
-	g_texLocations[28] = GL_TEXTURE28;
-	g_texLocations[29] = GL_TEXTURE29;
-	g_texLocations[30] = GL_TEXTURE30;
-	g_texLocations[31] = GL_TEXTURE31;
-
-	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
-	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
-	g_textures[2] = Texture("comp371/assignment1/src/Resources/chrome.png");
-	g_textures[3] = Texture("comp371/assignment1/src/Resources/speaker_holes.png");
-	g_textures[4] = Texture("comp371/assignment1/src/Resources/shiny_metal.png");
-	g_textures[5] = Texture("comp371/assignment1/src/Resources/box1.png");
-	g_textures[6] = Texture("comp371/assignment1/src/Resources/box2.png");
-	g_textures[7] = Texture("comp371/assignment1/src/Resources/box3.png");
-	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
-	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
-
 
 	//enable blending for correct texture rendering effects
 	GLCall(glEnable(GL_BLEND));
@@ -171,6 +116,7 @@ int main(void)
 	// Build and Compile Shader Program 
 	Shader modelShader("comp371/assignment1/src/Shaders/modelShader.vertex", "comp371/assignment1/src/Shaders/modelShader.fragment");
 	Shader lightShader("comp371/assignment1/src/Shaders/lightShader.vertex", "comp371/assignment1/src/Shaders/lightShader.fragment");
+	setupTextureMapping();
 
 	// [Models]
 
@@ -178,27 +124,25 @@ int main(void)
 	createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
 
+	ModelContainer* sean = new ModelContainer();
+	createSeansModel(sean, &modelShader);
+	sean->bindArrayBuffer();
 
-	Model* sean = new Model(true, false, false, true);
-	createSeansModel(sean);
-	sean->bindArrayBuffer(true, sean);
+	ModelContainer* isa = new ModelContainer();
+	createIsabellesModel(isa, &modelShader);
+	isa->bindArrayBuffer();
 
-	Model* wayne = new Model(true, false, false, true);
-	createWaynesModel(wayne);
-	wayne->bindArrayBuffer(true, wayne);
+	ModelContainer* ziming = new ModelContainer();
+	createZimingsModel(ziming, &modelShader);
+	ziming->bindArrayBuffer();
 
-	Model* isa = new Model(true, false, false, true);
-	createIsabellesModel(isa);
-	isa->bindArrayBuffer(true, isa);
-
-	Model* ziming = new Model(true, false, false, true);
-	createZimingsModel(ziming);
-	ziming->bindArrayBuffer(true, ziming);
+	ModelContainer* wayne = new ModelContainer();
+	createWaynesModel(wayne, &modelShader);
+	wayne->bindArrayBuffer();
 
 	Model* light = new Model(true, false, false, true);
 	createLightModel(light);
 	light->bindArrayBuffer(true, light);
-
 
 	// [Grid]
 
@@ -222,8 +166,15 @@ int main(void)
 	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW));
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grid_EBO));
 	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mainGrid.floorIndices), mainGrid.floorIndices, GL_STATIC_DRAW));
-	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
+	// Position
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0));
 	GLCall(glEnableVertexAttribArray(0));
+	// Texture
+	GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(1))
+	// Normals
+	GLCall(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(2))
 
 	// [Coordinate Axis]
 	/*
@@ -234,24 +185,17 @@ int main(void)
 	GLCall(glEnableVertexAttribArray(0));
 	GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))));
 	GLCall(glEnableVertexAttribArray(1));
-
 	*/
-
-
-
-	// Uniform Declarations
 
 	ModelContainer** models = new ModelContainer*[5];
 	models[0] = ben;
-	//models[1] = sean;
-	//models[2] = isa;
-	//models[3] = ziming;
-	//models[4] = wayne;
-
+	models[1] = sean;
+	models[2] = isa;
+	models[3] = ziming;
+	models[4] = wayne;
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, -1.0f));
-
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
@@ -265,16 +209,12 @@ int main(void)
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
 
-
 	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	light->addTranslation(bensLightPos);
-
-
 	
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
-
 		modelShader.use();
 
 		// Set frame for Camera (taken from LearnOpenGL)
@@ -289,7 +229,6 @@ int main(void)
 		GLCall(glClearColor(0.5f, 0.5f, 0.5f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-
 		// Start Using Model Shader
 		modelShader.use();
 		modelShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
@@ -300,70 +239,21 @@ int main(void)
 		glm::mat4 model;
 		modelShader.setMat4("model", model);
 		
-
 		glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 		modelShader.setMat4("projection", projection);
 		
-
 		glm::mat4 view = camera.calculateViewMatrix();
 		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		modelShader.setMat4("view", view);
 
-
 		// [Models]
 
-		//metal1.bind(GL_TEXTURE0);
 		ben->draw(MODE);
-		//modelShader.setInt("u_Texture", 4);
-		//selected == 0 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);
-		//model = ben->getModelMatrix();
-		//modelShader.setMat4("model", model);
-		//GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
-
-		/*
-		metal2.bind(GL_TEXTURE0);
-		sean->bind();
-		modelShader.setInt("u_Texture", 1);
-		selected == 1 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                            
-		model = sean->getModelMatrix();
-		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
-		
-		metal3.bind(GL_TEXTURE0 + 4 * 2);
-		isa->bind();
-		modelShader.setInt("u_Texture", 2);
-		selected == 2 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                                    
-		model = isa->getModelMatrix();
-		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
-		
-		metal1.bind(GL_TEXTURE0 + 4 * 3);
-		ziming->bind();
-		modelShader.setInt("u_Texture", 3);
-		selected == 3 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                            
-		model = ziming->getModelMatrix();
-		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
-		
-		metal1.bind(GL_TEXTURE0 + 4 * 4);
-		wayne->bind();
-		modelShader.setInt("u_Texture", 4);
-		selected == 4 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                        
-		modelShader.setMat4("model", wayne->getModelMatrix());
-		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
-
-		*/
-
-
-		// [Grid Mesh]
-
-		GLCall(glBindVertexArray(grid_VAOs[0]));
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
-		modelShader.setMat4("model", model);
-		glDrawArrays(GL_LINES, 0, mainGrid.meshVertices.size());
+		sean->draw(MODE);
+		isa->draw(MODE);
+		ziming->draw(MODE);
+		wayne->draw(MODE);
 
 		// [Grid Floor]
 
@@ -372,6 +262,8 @@ int main(void)
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
+		g_textures[10].bind(g_texLocations[10]);
+		modelShader.setInt("u_Texture", 10);
 		modelShader.setMat4("model", model);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -380,19 +272,16 @@ int main(void)
 		lightShader.setMat4("projection", projection);
 		lightShader.setMat4("view", view);
 
-		/*
 		// [Coordinate Axis]
-		glLineWidth(5.0f);
-		GLCall(glBindVertexArray(grid_VAOs[2]));
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.05f, 0.0f));
-		lightShader.setMat4("model", model);
-		lightShader.setInt("fill", 0);
-		glDrawArrays(GL_LINES, 0, 6);
-		glLineWidth(1.0f);
-
-		*/
-
+		//glLineWidth(5.0f);
+		//GLCall(glBindVertexArray(grid_VAOs[2]));
+		//model = glm::mat4(1.0f);
+		//model = glm::translate(model, glm::vec3(0.0f, 0.05f, 0.0f));
+		//lightShader.setMat4("model", model);
+		//lightShader.setInt("fill", 0);
+		//glDrawArrays(GL_LINES, 0, 6);
+		//glLineWidth(1.0f);
+		
 		model = glm::mat4(1.0f);
 		light->bind();
 		model = light->getModelMatrix();
@@ -595,7 +484,6 @@ void setModelColor(int modelIndex, Shader* modelShader)
 	selected == modelIndex ? modelShader->setVec3("modelColor", 0.6f, 0.0f, 0.8f) : modelShader->setVec3("modelColor", 0.75f, 0.75f, 0.75f);
 }
 
-
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 {
 	const float SENSITIVITY = 0.05f;
@@ -629,3 +517,29 @@ void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 	}
 }
 
+void setupTextureMapping()
+{
+	g_texLocations[0] = GL_TEXTURE0;
+	g_texLocations[1] = GL_TEXTURE1;
+	g_texLocations[2] = GL_TEXTURE2;
+	g_texLocations[3] = GL_TEXTURE3;
+	g_texLocations[4] = GL_TEXTURE4;
+	g_texLocations[5] = GL_TEXTURE5;
+	g_texLocations[6] = GL_TEXTURE6;
+	g_texLocations[7] = GL_TEXTURE7;
+	g_texLocations[8] = GL_TEXTURE8;
+	g_texLocations[9] = GL_TEXTURE9;
+	g_texLocations[10] = GL_TEXTURE10;
+
+	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
+	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
+	g_textures[2] = Texture("comp371/assignment1/src/Resources/chrome.png");
+	g_textures[3] = Texture("comp371/assignment1/src/Resources/speaker_holes.png");
+	g_textures[4] = Texture("comp371/assignment1/src/Resources/shiny_metal.png");
+	g_textures[5] = Texture("comp371/assignment1/src/Resources/box1.png");
+	g_textures[6] = Texture("comp371/assignment1/src/Resources/box2.png");
+	g_textures[7] = Texture("comp371/assignment1/src/Resources/box3.png");
+	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
+	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
+	g_textures[10] = Texture("comp371/assignment1/src/Resources/grid_floor.jpg");
+}
