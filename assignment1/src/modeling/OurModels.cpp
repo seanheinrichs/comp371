@@ -117,8 +117,6 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 	transform = translate * rotate * scale;
 	cb6->transform(transform);
 
-	
-
 	Y->addPolygon(cb1);
 	Y->addPolygon(cb2);
 	Y->addPolygon(cb3);

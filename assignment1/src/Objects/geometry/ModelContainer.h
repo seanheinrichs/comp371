@@ -15,6 +15,7 @@ public:
 	void bindArrayBuffer();
 	void deallocate();
 	
+	void Reposition(glm::vec3 position);
 	void addRotation(float radians, glm::vec3 axis);
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
