@@ -83,6 +83,7 @@ glm::mat4 lightView(1.0f);
 GLenum MODE = GL_TRIANGLES;
 int selected = 0;
 glm::vec3 activeLightSource(0.0f, 3.0f, 0.0f);
+int useTextures = 1;
 
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
@@ -279,6 +280,7 @@ int main(void)
 
 		// Start Using Model Shader
 		modelShader.use();
+		modelShader.setInt("useTextures",useTextures);
 		modelShader.setVec3("viewPos", camera.position);
 
 		// Set Light Properties
@@ -577,6 +579,17 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 	{
 		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
+	}
+
+	// Press 'J' to scale DOWN the model
+	if ((useTextures != 1) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useTextures = 1;
+	}
+
+	if ((useTextures != 0) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useTextures = 0;
 	}
 }
 
