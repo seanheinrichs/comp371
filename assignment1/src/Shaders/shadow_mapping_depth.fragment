@@ -1,0 +1,7 @@
+#version 440 core
+
+void main()
+{             
+    //gl_FragDepth = gl_FragCoord.z;
+    //gl_FragDepth += gl_FrontFacing ? 0.1 : 0.0;
+}
