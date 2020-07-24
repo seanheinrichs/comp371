@@ -49,21 +49,17 @@ public:
 	virtual Vertex getSampleVertex();
 	virtual std::map<std::string, glm::vec3> getMinMax();
 
+	void draw(int mode, Shader* shaderProg);
+	void translateToOrigin();
+	void setBoolean(bool position, bool texture, bool color, bool normal);
+
 	std::string name;
 	Shader* shader;
 	int textureIndex;
 
-	void draw(int mode);
-
-
-	void translateToOrigin();
-
 	glm::vec3 origin;
 	int vaComponentCount;
 	int vaByteSize;
-
-	void setBoolean(bool position, bool texture, bool color, bool normal);
-
 
 	//vertex components
 	bool position, color, texture, normal;
