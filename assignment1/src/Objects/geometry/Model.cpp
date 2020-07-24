@@ -21,6 +21,7 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include <GL/glew.h> 
 #include "../../utils/GL_Error.h"
 #include "../../Opengl_a/Texture.h"
+#include <glm/gtx/transform2.hpp>
 
 
 //Model constructor, setting up position, texture and color components
@@ -121,6 +122,21 @@ void Model::addTranslation(glm::vec3 translate)
 	Model::translate_vec.z += translate.z;
 }
 
+//adds shears to model
+void Model::addShear(glm::vec3 shear)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addShear(shear);
+	}
+
+	shear_vec.x += shear.x;
+	shear_vec.y += shear.y;
+	shear_vec.z += shear.z;
+
+}
+
 //Method that updates the position of the model
 void Model::Reposition(glm::vec3 position)
 {
@@ -154,14 +170,24 @@ glm::mat4 Model::getScale()
 	return glm::scale(glm::mat4(1.0f), scale_vec);
 }
 
+glm::mat4 Model::getShear()
+{
+	//return glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //forward/backwards
+	return glm::shearY3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z)*glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //from side to side
+
+}
+
 //Method that calculates the transformation matrix of the model
-glm::mat4 Model::getModelMatrix()
+glm::mat4 Model::getModelMatrix(bool shear)
 {
 	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
 		return getTranslation() *  getScale();
 	else
-		return getTranslation() * getRotation() * getScale();
+		return 
+		(shear ? glm::inverse(getShear()) : glm::mat4(1.0f)) * getTranslation() * getRotation() * getScale() ;
 }
+
+
 
 //Method that adds a polygon object to the list of polygons that this model is composed of
 void Model::addPolygon(Polygon* poly) 

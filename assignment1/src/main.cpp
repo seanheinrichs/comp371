@@ -10,6 +10,21 @@
 	Due:  July 27th, 2020
 */
 
+
+/*
+Info for spheres
+place Assets/Models/planet.obj is same directory as solutions file
+add
+_SCL_SECURE_NO_WARNINGS
+_CRT_SECURE_NO_WARNINGS
+in properties/ C/C++ / Prepocessor / Proprocessor Definitions
+Info for shear:
+in main: #include <glm/gtx/transform2.hpp>
+*/
+
+#define _SCL_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -24,6 +39,7 @@
 #include "Objects/PointLight.h"
 #include "modeling/OurModels.cpp"
 #include "utils/GL_Error.h"
+#include "utils/objloader.cpp"
 #include "Opengl_a/Shader.h"
 #include "Common.h"
 
@@ -31,6 +47,7 @@
 #include <GLFW/glfw3.h> 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform2.hpp>
 
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
@@ -41,11 +58,11 @@ void setModelColor(int modelIndex, Shader* modelShader);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 void setupTextureMapping();
 void setModelColor(int modelIndex, Shader * modelShader);
-void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne);
+void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel);
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
 void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light);
-void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid);
-void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid);
+void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
+void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
@@ -138,6 +155,16 @@ int main(void)
 	setupTextureMapping();
 	
 	// [Models]
+
+		//obj loader
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> uvs; //not used yet?
+	std::vector<glm::vec3> normals; // not used?
+	bool res = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
+
+	Model * sphereModel = new Model(true, false, false, false, "sphere");
+	createShape(sphereModel, vertices, uvs, normals);
+	sphereModel->bindArrayBuffer(true, sphereModel);
 
 	ModelContainer* ben = new ModelContainer();
 	createBensModel(ben, &modelShader);
@@ -301,15 +328,17 @@ int main(void)
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		modelShader.setMat4("view", view);
 
+
+
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
-		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, grid_VAOs, mainGrid);
+		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphere, grid_VAOs, mainGrid);
 		
 		// Reset Viewport
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
-		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, grid_VAOs, mainGrid);
+		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne,sphere, grid_VAOs, mainGrid);
 
 		// [Objects Not Affected by Light Source]
 
@@ -349,6 +378,7 @@ int main(void)
 	isa->deallocate();
 	ziming->deallocate();
 	light->deallocate();
+	sphereModel->deallocate();
 
 	// Terminate Program 
 	glfwTerminate();
@@ -576,6 +606,20 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
 	}
 
+	// Press 'P' to shear
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShear(glm::vec3(0.0f, 0.02f,0.0f));
+		//models[selected]->addScale(glm::vec3(0.01f, 0.0f, 0.0f));
+	}
+
+	// Press 'O' to shear
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShear(glm::vec3(0.0f, -0.02f,0.0f));
+		//models[selected]->addScale(glm::vec3(-0.01f, 0.0f, 0.0f));
+	}
+  
 	// Press 'X' to turn textures OFF
 	if ((useTextures != 1) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
@@ -587,6 +631,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	{
 		useTextures = 0;
 	}
+  
 }
 
 void setModelColor(int modelIndex, Shader* modelShader)
@@ -678,8 +723,17 @@ void setupTextureMapping()
 	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
 }
 
-void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne)
+void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel)
 {
+  //ben sphere
+  sphereModel->bind();
+  //	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
+  model = ben->getModelMatrix();
+  model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+  model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
+  modelShader.setMat4("model", model);
+  GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+  
 	ben->draw(MODE, shader);
 	sean->draw(MODE, shader);
 	isa->draw(MODE, shader);
@@ -721,7 +775,7 @@ void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light)
 	glLineWidth(1.0f);
 }
 
-void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid)
+void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel unsigned int grid_VAOs[], Grid mainGrid)
 {
 	// Render Depth of Scene to Texture (from the light's perspective)
 	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
@@ -736,12 +790,12 @@ void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
 	// Rendering Models and Grid with the DepthShader
-	RenderScene(shader, ben, sean, isa, ziming, wayne);
+	RenderScene(shader, ben, sean, isa, ziming, wayne, sphereModel);
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid)
+void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel unsigned int grid_VAOs[], Grid mainGrid)
 {
 	// Render Scene as Normal using the Generated Depth/Shadow map  
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -756,7 +810,7 @@ void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean,
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 	
 	// Rendering Models and Grid with modelShader
-	RenderScene(shader, ben, sean, isa, ziming, wayne);
+	RenderScene(shader, ben, sean, isa, ziming, wayne, sphereModel);
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, depthMap);

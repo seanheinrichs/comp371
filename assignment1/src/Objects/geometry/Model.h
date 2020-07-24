@@ -32,6 +32,7 @@ public:
 	Model();
 
 	void addRotation(float radians, glm::vec3 axis);
+	void addShear(glm::vec3 axis);
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
 	void Reposition(glm::vec3 position);
@@ -39,7 +40,9 @@ public:
 	glm::mat4 getTranslation();
 	glm::mat4 getReposition();
 	glm::mat4 getScale();
-	glm::mat4 getModelMatrix();
+	glm::mat4 getModelMatrix(bool shear = false);
+	glm::mat4 getShear(); 
+
 
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();
@@ -60,9 +63,12 @@ public:
 	glm::vec3 origin;
 	int vaComponentCount;
 	int vaByteSize;
+	float offset = 1.0f;
+
 
 	//vertex components
 	bool position, color, texture, normal;
+	glm::vec3 shear_vec;
 	glm::vec3 rotate_vec;
 	glm::vec3 translate_vec;
 	glm::vec3 scale_vec;

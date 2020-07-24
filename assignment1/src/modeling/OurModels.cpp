@@ -1,22 +1,31 @@
-#include "../Objects/geometry/Cube.h"
+#include "../Objects/geometry/Shape.h"
 #include "../Objects/geometry/Model.h"
 #include "../Objects/geometry/ModelContainer.h"
+#include "../Objects/geometry/Shape.h"
 #include "../Opengl_a/Shader.h"
 #include <glm/gtc/matrix_transform.hpp>
+
+
+static void createShape(Model * model,
+	std::vector<glm::vec3> & in_vertices,
+	std::vector<glm::vec2> & in_uvs,
+	std::vector<glm::vec3> & in_normals) {
+	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), in_vertices, in_uvs, in_normals);
+	model->addPolygon(loadedShape);
+}
 
 /* Static methods to create our Models */
 static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 {
-	glm::mat4 scale;
+  glm::mat4 scale;
 	glm::mat4 rotate;
 	
 	// [Create A Model]
 	Model* A = new Model(true, true, false, true, "a", shader, 5);
-	
-	Cube* cb1 = new Cube(glm::vec3(-1.0, 0.5, 0.0));
-	Cube* cb2 = new Cube(glm::vec3(-2.0, 2.5, 0.0));
-	Cube* cb3 = new Cube(glm::vec3(-2.0, 4.5, 0.0));
-	Cube* cb4 = new Cube(glm::vec3(-3.0, 0.5, 0.0));
+	Shape* cb1 = new Shape(glm::vec3(-1.0, 0.5, 0.0));
+	Shape* cb2 = new Shape(glm::vec3(-2.0, 2.5, 0.0));
+	Shape* cb3 = new Shape(glm::vec3(-2.0, 4.5, 0.0));
+	Shape* cb4 = new Shape(glm::vec3(-3.0, 0.5, 0.0));
 
 	// Create 1x4 columns
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 5.0f, 1.0f));
@@ -31,9 +40,9 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	// [Create 7 Model]
 	Model* seven = new Model(true, true, false, true, "7", shader, 0);
 
-	Cube * cb5 = new Cube(glm::vec3(1.0f, 2.0f, 0.0f));
-	Cube * cb6 = new Cube(glm::vec3(2.0f, 4.5f, 0.0f));
-	Cube * cb7 = new Cube(glm::vec3(3.0f, 0.5f, 0.0f));
+	Shape * cb5 = new Shape(glm::vec3(1.0f, 2.0f, 0.0f));
+	Shape * cb6 = new Shape(glm::vec3(2.0f, 4.5f, 0.0f));
+	Shape * cb7 = new Shape(glm::vec3(3.0f, 0.5f, 0.0f));
 
 	// Create 1x4 column
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 5.0f, 1.0f));
@@ -59,50 +68,56 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 
 static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 {
+	
+
 	// [Create Y Model]
 	Model* Y = new Model(true, true, false, true, "y", shader, 6);
+  
+  // Y model
+	Shape *cb1 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
 
-	Cube *cb1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
 	glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.5f, 0.5f, 0.0f));
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 1.0f, 1.0f));
 	glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
 	glm::mat4 transform = translate * rotate * scale;
 	cb1->transform(transform);
 
-	Cube *cb2 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	Shape *cb2 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.5f, 1.5f, 0.0f));
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 3.0f, 1.0f));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
 	transform = translate * rotate * scale;
 	cb2->transform(transform);
 
-	Cube *cb3 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	Shape *cb3 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.85f, 3.5f, 0.0f));
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f, 1.0f, 1.0f));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(65.0f), glm::vec3(0.0f, 0.0f, 1.0));
 	transform = translate * rotate * scale;
 	cb3->transform(transform);
 
-	Cube *cb4 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	Shape *cb4 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-4.15f, 3.5f, 0.0f));
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f, 1.0f, 1.0f));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-65.0f), glm::vec3(0.0f, 0.0f, 1.0));
 	transform = translate * rotate * scale;
 	cb4->transform(transform);
 
-	Cube *cb5 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	Shape *cb5 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-4.75f, 5.0f, 0.0f));
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 1.0f, 1.0f));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
 	transform = translate * rotate * scale;
 	cb5->transform(transform);
 
-	Cube *cb6 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	Shape *cb6 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25f, 5.0f, 0.0f));
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 1.0f, 1.0f));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
 	transform = translate * rotate * scale;
 	cb6->transform(transform);
+
+	
 
 	Y->addPolygon(cb1);
 	Y->addPolygon(cb2);
@@ -113,8 +128,10 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 
 	// [Create 7 Model]
 	Model* seven = new Model(true, true, false, true, "7", shader, 1);
+  
+  // 7 model
+	Shape *cb7 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
 
-	Cube *cb7 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(1.90f, 2.25f, 0.0f));
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 4.5f, 1.0f));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
@@ -128,14 +145,14 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 	transform = skew * translate * rotate * scale;
 	cb7->transform(transform);
 
-	Cube *cb8 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	Shape *cb8 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.5f, 5.0f, 0.0f));
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 1.0f, 1.0f));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
 	transform = translate * rotate * scale;
 	cb8->transform(transform);
 
-	Cube *cb9 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	Shape *cb9 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 4.5f, 0.0f));
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 2.0f, 1.0f));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
@@ -161,23 +178,23 @@ static void createBensModel(ModelContainer* modelContainer, Shader* shader)
 {
 	Model* three = new Model(true, true, false, true, "3", shader, 2);
 
-	three->addPolygon(new Cube(glm::vec3(6.0f, 3.5f, 0.0f)));
-	three->addPolygon(new Cube(glm::vec3(6.5f, 3.5f, 0.0f)));
-	three->addPolygon(new Cube(glm::vec3(7.0f, 3.5f, 0.0f)));
-	three->addPolygon(new Cube(glm::vec3(6.0f, 2.0f, 0.0f)));
-	three->addPolygon(new Cube(glm::vec3(6.5f, 2.0f, 0.0f)));
-	three->addPolygon(new Cube(glm::vec3(7.0f, 2.0f, 0.0f)));
-	three->addPolygon(new Cube(glm::vec3(6.0f, 0.5f, 0.0f)));
-	three->addPolygon(new Cube(glm::vec3(6.5f, 0.5f, 0.0f)));
-	three->addPolygon(new Cube(glm::vec3(7.0f, 0.5f, 0.0f)));
-
-	three->addPolygon(new Cube(glm::vec3(7.5f, 1.0f, 0.0f)));
-	three->addPolygon(new Cube(glm::vec3(7.5f, 3.0f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(6.0f, 3.5f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(6.5f, 3.5f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(7.0f, 3.5f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(6.0f, 2.0f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(6.5f, 2.0f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(7.0f, 2.0f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(6.0f, 0.5f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(6.5f, 0.5f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(7.0f, 0.5f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(7.5f, 1.0f, 0.0f)));
+	three->addPolygon(new Shape(glm::vec3(7.5f, 3.0f, 0.0f)));
 	three->transform(glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.0f, 0.0f)));
 
-	Cube *cb = new Cube(glm::vec3(9.125f, 0.5f, 0.0f));
-	Cube *cb1 = new Cube(glm::vec3(6.825f, 0.5f, 0.0f));
-	Cube *cb2 = new Cube(glm::vec3(1.0f, 0.0f, 0.0f));
+	Shape *cb = new Shape(glm::vec3(9.125f, 0.5f, 0.0f));
+	Shape *cb1 = new Shape(glm::vec3(6.825f, 0.5f, 0.0f));
+	Shape *cb2 = new Shape(glm::vec3(1.0f, 0.0f, 0.0f));
+
 	
 	glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(7.2f, 1.5f, 0.0f));
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 4.0f, 1.0f));
@@ -199,41 +216,41 @@ static void createBensModel(ModelContainer* modelContainer, Shader* shader)
 
 static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 {
-	glm::mat4 scale;
+  glm::mat4 scale;
 	glm::mat4 rotate;
 	
 	// [Create A Model]
 	Model* A = new Model(true, true, false, true, "a", shader, 8);
-
-	Cube * cube1 = new Cube(glm::vec3(-1.0f, 0.5f, 0.0f));
-	Cube * cube2 = new Cube(glm::vec3(-2.0f, 2.5f, 0.0f));
-	Cube * cube3 = new Cube(glm::vec3(-3.0f, 0.5f, 0.0f));
-	Cube * cube4 = new Cube(glm::vec3(-2.0f, 4.5f, 0.0f));
+	//A
+	Shape * Shape1 = new Shape(glm::vec3(-1.0f, 0.5f, 0.0f));
+	Shape * Shape2 = new Shape(glm::vec3(-2.0f, 2.5f, 0.0f));
+	Shape * Shape3 = new Shape(glm::vec3(-3.0f, 0.5f, 0.0f));
+	Shape * Shape4 = new Shape(glm::vec3(-2.0f, 4.5f, 0.0f));
 
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 5.0f, 1.0f));
-	cube1->transform(scale);
-	cube3->transform(scale);
-
-	A->addPolygon(cube1);
-	A->addPolygon(cube2);
-	A->addPolygon(cube3);
-	A->addPolygon(cube4);
-
-	// [Create 0 Model]
+	Shape1->transform(scale);
+	Shape3->transform(scale);
+	A->addPolygon(Shape1);
+	A->addPolygon(Shape2);
+	A->addPolygon(Shape3);
+	A->addPolygon(Shape4);
+  
+  	// [Create 0 Model]
 	Model* zero = new Model(true, true, false, true, "0", shader, 3);
 
-	Cube * cube5 = new Cube(glm::vec3(1.0f , 0.5f, 0.0f));
-	Cube * cube6 = new Cube(glm::vec3(2.0f, 0.5f, 0.0f));
-	Cube * cube7 = new Cube(glm::vec3(3.0f, 0.5f, 0.0f));
-	Cube * cube8 = new Cube(glm::vec3(2.0f, 4.5f, 0.0f));
+	//0
+	Shape * Shape5 = new Shape(glm::vec3(1.0f , 0.5f, 0.0f));
+	Shape * Shape6 = new Shape(glm::vec3(2.0f, 0.5f, 0.0f));
+	Shape * Shape7 = new Shape(glm::vec3(3.0f, 0.5f, 0.0f));
+	Shape * Shape8 = new Shape(glm::vec3(2.0f, 4.5f, 0.0f));
 
-	cube5->transform(scale);
-	cube7->transform(scale);
+	Shape5->transform(scale);
+	Shape7->transform(scale);
+	zero->addPolygon(Shape5);
+	zero->addPolygon(Shape6);
+	zero->addPolygon(Shape7);
+	zero->addPolygon(Shape8);
 
-	zero->addPolygon(cube5);
-	zero->addPolygon(cube6);
-	zero->addPolygon(cube7);
-	zero->addPolygon(cube8);
 
 	// Set initial position
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -247,17 +264,18 @@ static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 
 static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 {
+
 	glm::mat4 scale;
 	glm::mat4 rotate;
 	
 	// [Create M Model]
 	Model* M = new Model(true, true, false, true, "m", shader, 9);
 
-	Cube * cb1 = new Cube(glm::vec3(-5.0f, 0.5f, 0.0f));
-	Cube * cb2 = new Cube(glm::vec3(-4.0f, 3.5f, 0.0f));
-	Cube * cb3 = new Cube(glm::vec3(-3.0f, 0.5f, 0.0f));
-	Cube * cb4 = new Cube(glm::vec3(-2.0f, 3.5f, 0.0f));
-	Cube * cb5 = new Cube(glm::vec3(-1.0f, 0.5f, 0.0f));
+	Shape * cb1 = new Shape(glm::vec3(-5.0f, 0.5f, 0.0f));
+	Shape * cb2 = new Shape(glm::vec3(-4.0f, 3.5f, 0.0f));
+	Shape * cb3 = new Shape(glm::vec3(-3.0f, 0.5f, 0.0f));
+	Shape * cb4 = new Shape(glm::vec3(-2.0f, 3.5f, 0.0f));
+	Shape * cb5 = new Shape(glm::vec3(-1.0f, 0.5f, 0.0f));
 
 	// Create 1x4 columns
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 4.0f, 1.0f));
@@ -274,10 +292,13 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 	// [Create 4 Model]
 	Model* four = new Model(true, true, false, true, "4", shader, 4);
 
-	Cube * cb6 = new Cube(glm::vec3(1.0f, 0.83f, 0.0f)); 
-	Cube * cb7 = new Cube(glm::vec3(2.0f, 1.5f, 0.0f));
-	Cube * cb8 = new Cube(glm::vec3(3.0f, 0.5f, 0.0f)); 
-	Cube * cb9 = new Cube(glm::vec3(4.0f, 1.5f, 0.0f));
+	Shape * cb6 = new 
+    
+    
+    (glm::vec3(1.0f, 0.83f, 0.0f)); 
+	Shape * cb7 = new Shape(glm::vec3(2.0f, 1.5f, 0.0f));
+	Shape * cb8 = new Shape(glm::vec3(3.0f, 0.5f, 0.0f)); 
+	Shape * cb9 = new Shape(glm::vec3(4.0f, 1.5f, 0.0f));
 
 	// Create 1x3 columns
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 3.0f, 1.0f));
@@ -303,7 +324,7 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 }
 
 static void createLightModel(Model * model) {
-	Cube * cb1 = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+	Shape * cb1 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	model->addPolygon(cb1);
 }

@@ -1,6 +1,7 @@
 #include "ModelContainer.h"
 #include <vector>
 #include <string>
+#include <glm/gtx/transform2.hpp>
 
 
 void ModelContainer::bindArrayBuffer()
@@ -111,6 +112,52 @@ void ModelContainer::addScale(glm::vec3 scale, std::string name)
 
 }
 
+glm::mat4 ModelContainer::getShear()
+{
+	//return glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //forward/backwards
+	return glm::shearX3D(glm::mat4(-1.0f), shear_vec.y, shear_vec.z); //from side to side
+
+}
+
+//Method that calculates the transformation matrix of the model
+glm::mat4 ModelContainer::getModelMatrix(bool shear)
+{
+	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
+		return getTranslation() *  getScale();
+	else
+		return (shear ? getShear() : glm::mat4(1.0f)) * getTranslation() * getRotation() * getScale();
+}
+
+//adds shears to model
+void ModelContainer::addShear(glm::vec3 shear)
+{
+
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->addShear(shear);
+	}
+
+	shear_vec.x += shear.x;
+	shear_vec.y += shear.y;
+	shear_vec.z += shear.z;
+
+}
+
+void ModelContainer::addShear(glm::vec3 shear, std::string name)
+{
+
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		if ((**it).name == name)
+		{
+			(*it)->addShear(shear);
+			break;
+		}
+	}
+
+
+}
+
 //Method that updates the values of the x-y-z components of the translation vector used to calculate the model transformation matrix
 void ModelContainer::addTranslation(glm::vec3 translate)
 {
@@ -153,14 +200,5 @@ glm::mat4 ModelContainer::getTranslation()
 glm::mat4 ModelContainer::getScale()
 {
 	return glm::scale(glm::mat4(1.0f), scale_vec);
-}
-
-//Method that calculates the transformation matrix of the model
-glm::mat4 ModelContainer::getModelMatrix()
-{
-	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
-		return getTranslation() *  getScale();
-	else
-		return getTranslation() * getRotation() * getScale();
 }
 
