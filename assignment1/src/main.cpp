@@ -83,6 +83,8 @@ glm::vec3 activeLightSource(0.0f, 3.0f, -0.1f);
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
 Texture* g_textures = new Texture[32];
+float *g_shininess = new float[32];
+glm::vec3 *g_specularStrength = new glm::vec3[32];
 
 int main(void)
 {
@@ -164,7 +166,7 @@ int main(void)
 	// [Point Light]
 
 	PointLight* bensPL = new PointLight(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
-	PointLight* seansPL = new PointLight(light, glm::vec3(4.5f, 3.0f, -5.0f), false);
+	PointLight* seansPL = new PointLight(light, glm::vec3(3.5f, 3.0f, -4.0f), false);
 	PointLight* waynesPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, -4.0f), false);
 	PointLight* isasPL = new PointLight(light, glm::vec3(3.5f, 3.0f, 4.0f), false);
 	PointLight* zimingsPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, 4.0f), false);
@@ -286,10 +288,6 @@ int main(void)
 				pointLights[i]->setShaderValues(&modelShader);
 			}
 		}
-
-		// Material Properties
-		modelShader.setFloat("material.shininess", 64.0f);
-		modelShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 
 		// Recompute Camera Pipeline
 		glm::mat4 model;
@@ -654,6 +652,30 @@ void setupTextureMapping()
 	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
 	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
 	g_textures[10] = Texture("comp371/assignment1/src/Resources/grid_floor.jpg");
+
+	g_shininess[0] = 2.0f;
+	g_shininess[1] = 2.0f;
+	g_shininess[2] = 2.0f;
+	g_shininess[3] = 2.0f;
+	g_shininess[4] = 2.0f;
+	g_shininess[5] = 256.0f;
+	g_shininess[6] = 256.0f;
+	g_shininess[7] = 256.0f;
+	g_shininess[8] = 256.0f;
+	g_shininess[9] = 256.0f;
+	g_shininess[10] = 64.0f;
+
+	g_specularStrength[0] = glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[1] =	glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[2] =	glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[3] =	glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[4] =	glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[5] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[6] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[7] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[8] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[9] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
 }
 
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne)
@@ -675,6 +697,8 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 	model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
 	g_textures[10].bind(g_texLocations[10]);
+	shader->setFloat("material.shininess", g_shininess[10]);
+	shader->setVec3("material.specular", g_specularStrength[10]);
 	shader->setInt("material.diffuse", 10);
 	shader->setMat4("model", model);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
