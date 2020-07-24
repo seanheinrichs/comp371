@@ -341,6 +341,6 @@ void Model::draw(int mode, Shader* shaderProg)
 		shaderProg->setVec3("material.specular", g_specularStrength[textureIndex]);
 		shaderProg->setInt("material.diffuse", textureIndex);
 	}
-	shaderProg->setMat4("model", this->getModelMatrix());
+	shaderProg->setMat4("model", this->getModelMatrix(true));
 	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
 }
