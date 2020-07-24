@@ -686,14 +686,6 @@ void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light)
 	shader->setInt("fill", 0);
 	glDrawArrays(GL_LINES, 0, 6);
 	glLineWidth(1.0f);
-
-	model = glm::mat4(1.0f);
-	light->bind();
-	model = light->getModelMatrix();
-	shader->setMat4("model", model);
-	shader->setInt("fill", -1);
-	glDrawArrays(GL_TRIANGLES, 0, light->getVAVertexCount());
-
 }
 
 void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid)
