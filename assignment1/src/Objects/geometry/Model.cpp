@@ -311,6 +311,8 @@ void Model::draw(int mode, Shader* shaderProg)
 	else
 	{
 		g_textures[textureIndex].bind(g_texLocations[textureIndex]);
+		shaderProg->setFloat("material.shininess", g_shininess[textureIndex]);
+		shaderProg->setVec3("material.specular", g_specularStrength[textureIndex]);
 		shaderProg->setInt("material.diffuse", textureIndex);
 	}
 	shaderProg->setMat4("model", this->getModelMatrix());

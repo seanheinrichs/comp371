@@ -15,8 +15,8 @@ PointLight::PointLight(Model * model, glm::vec3 startingPos, bool active)
 	PointLight::specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	PointLight::constant = 1.0f;
-	PointLight::linear = 0.07f;
-	PointLight::quadratic = 0.017f;
+	PointLight::linear = 0.045f;
+	PointLight::quadratic = 0.0075f;
 
 	PointLight::active = active;
 }
