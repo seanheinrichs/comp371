@@ -661,9 +661,6 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 		else if (selected == 4) {
 			models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, -4.0f));
 		}
-		else {
-
-		}
 	}
 }
 
