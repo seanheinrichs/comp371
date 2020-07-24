@@ -580,6 +580,18 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 		models[selected]->addTranslation(glm::vec3(0.0f, -0.1f, 0.0f));
 	}
 
+	// Press "SHIFT + S" to move the selected model DOWN
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, -0.1f));
+	}
+
+	// Press "SHIFT + S" to move the selected model DOWN
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, 0.1f));
+	}
+
 	// [Rotation]
 	
 	// Press 'A' to rotate the model to the left 5 degrees about y-axis
