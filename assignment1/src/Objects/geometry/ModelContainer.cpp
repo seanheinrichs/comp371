@@ -202,3 +202,11 @@ glm::mat4 ModelContainer::getScale()
 	return glm::scale(glm::mat4(1.0f), scale_vec);
 }
 
+//Method that updates the position of the model
+void ModelContainer::Reposition(glm::vec3 position)
+{
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->Reposition(position);
+	}
+}

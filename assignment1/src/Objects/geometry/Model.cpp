@@ -158,12 +158,6 @@ glm::mat4 Model::getTranslation()
 	return glm::translate(glm::mat4(1.0f), translate_vec);
 }
 
-//Method that returns the translation matrix
-glm::mat4 Model::getReposition()
-{
-	return glm::translate(glm::mat4(1.0f), translate_vec);
-}
-
 //Method that returns the scale matrix
 glm::mat4 Model::getScale() 
 {
