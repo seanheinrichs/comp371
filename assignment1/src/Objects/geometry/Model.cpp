@@ -173,7 +173,7 @@ glm::mat4 Model::getScale()
 glm::mat4 Model::getShear()
 {
 	//return glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //forward/backwards
-	return glm::shearY3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //from side to side
+	return glm::shearY3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z)*glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //from side to side
 
 }
 
@@ -183,7 +183,8 @@ glm::mat4 Model::getModelMatrix(bool shear)
 	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
 		return getTranslation() *  getScale();
 	else
-		return (shear ? getShear() : glm::mat4(1.0f)) * getTranslation() * getRotation() * getScale() ;
+		return 
+		(shear ? glm::inverse(getShear()) : glm::mat4(1.0f)) * getTranslation() * getRotation() * getScale() ;
 }
 
 

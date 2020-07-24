@@ -117,7 +117,7 @@ void ModelContainer::addScale(glm::vec3 scale, std::string name)
 glm::mat4 ModelContainer::getShear()
 {
 	//return glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //forward/backwards
-	return glm::shearY3D(glm::mat4(-1.0f), shear_vec.y, shear_vec.z); //from side to side
+	return glm::shearX3D(glm::mat4(-1.0f), shear_vec.y, shear_vec.z); //from side to side
 
 }
 

@@ -64,7 +64,7 @@ public:
 	glm::vec3 origin;
 	int vaComponentCount;
 	int vaByteSize;
-
+	float offset = 1.0f;
 	void setBoolean(bool position, bool texture, bool color, bool normal);
 
 
