@@ -66,11 +66,6 @@ float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
 
-// Variables used for camera 
-glm::mat4 model(1.0f);
-glm::mat4 projection(1.0f);
-glm::mat4 view(1.0f);
-
 // Variables used for light and shadows
 unsigned int depthMapFBO;
 unsigned int depthMap;
@@ -82,8 +77,8 @@ glm::mat4 lightView(1.0f);
 //globals used for selecting render mode and models
 GLenum MODE = GL_TRIANGLES;
 int selected = 0;
-glm::vec3 activeLightSource(0.0f, 3.0f, 0.0f);
 int useTextures = 1;
+glm::vec3 activeLightSource(0.0f, 3.0f, -0.1f);
 
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
@@ -168,8 +163,8 @@ int main(void)
 
 	// [Point Light]
 
-	PointLight* bensPL = new PointLight(light, glm::vec3(0.0f, 3.0f, 0.0f), true);
-	PointLight* seansPL = new PointLight(light, glm::vec3(3.5f, 3.0f, -4.0f), false);
+	PointLight* bensPL = new PointLight(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
+	PointLight* seansPL = new PointLight(light, glm::vec3(4.5f, 3.0f, -5.0f), false);
 	PointLight* waynesPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, -4.0f), false);
 	PointLight* isasPL = new PointLight(light, glm::vec3(3.5f, 3.0f, 4.0f), false);
 	PointLight* zimingsPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, 4.0f), false);
@@ -225,7 +220,7 @@ int main(void)
 	models[4] = wayne;
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	ben->addTranslation(glm::vec3(0.0f, 0.0f, -1.0f));
+	ben->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
@@ -297,14 +292,16 @@ int main(void)
 		modelShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 
 		// Recompute Camera Pipeline
+		glm::mat4 model;
 		modelShader.setMat4("model", model);
-		projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+
+		glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 		modelShader.setMat4("projection", projection);
-		view = camera.calculateViewMatrix();
+
+		glm::mat4 view = camera.calculateViewMatrix();
 		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		modelShader.setMat4("view", view);
-
 
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
 		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, grid_VAOs, mainGrid);
@@ -581,12 +578,13 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
 	}
 
-	// Press 'J' to scale DOWN the model
+	// Press 'X' to turn textures OFF
 	if ((useTextures != 1) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useTextures = 1;
 	}
 
+	// Press 'SHIFT + X' to turn textures ON
 	if ((useTextures != 0) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useTextures = 0;
@@ -669,32 +667,30 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 {
-	glm::mat4 model = glm::mat4(1.0);
-
 	// [Grid Floor]
 
 	GLCall(glBindVertexArray(grid_VAOs[1]));
-	model = glm::mat4(1.0f);
+	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
 	g_textures[10].bind(g_texLocations[10]);
 	shader->setInt("material.diffuse", 10);
 	shader->setMat4("model", model);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 }
 
 void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light)
 {
-	glm::mat4 model = glm::mat4(1.0);
-
 	// [Coordinate Axis]
 
 	glLineWidth(5.0f);
 	glBindVertexArray(grid_VAOs[2]);
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 0.05f, 0.0f));
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 0.05f, 1.0f));
 	shader->setMat4("model", model);
 	shader->setInt("fill", 0);
 	glDrawArrays(GL_LINES, 0, 6);
@@ -703,41 +699,38 @@ void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light)
 
 void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid)
 {
-	// 1. render depth of scene to texture (from light's perspective)
+	// Render Depth of Scene to Texture (from the light's perspective)
 	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 	lightView = glm::lookAt(activeLightSource, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 	lightSpaceMatrix = lightProjection * lightView;
+	
 	// Start Using Depth Shader
 	shader->use();
 	shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	// Rendering Models and Grid with depthShader
+	
+	// Rendering Models and Grid with the DepthShader
 	RenderScene(shader, ben, sean, isa, ziming, wayne);
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 }
 
 void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid)
 {
-	// 2. render scene as normal using the generated depth/shadow map  
+	// Render Scene as Normal using the Generated Depth/Shadow map  
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	// Set the Light Uniforms
 	shader->use();
-	projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-	view = camera.calculateViewMatrix();
-	shader->setMat4("projection", projection);
-	shader->setMat4("view", view);
-	view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
-	view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
-	// set light uniforms
 	shader->setVec3("viewPos", camera.position);
 	shader->setVec3("lightPos", activeLightSource);
 	shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
+	
 	// Rendering Models and Grid with modelShader
 	RenderScene(shader, ben, sean, isa, ziming, wayne);
 	RenderGrid(shader, grid_VAOs, mainGrid);
