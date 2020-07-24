@@ -331,14 +331,14 @@ int main(void)
 
 
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
-		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphere, grid_VAOs, mainGrid);
+		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
 		
 		// Reset Viewport
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
-		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne,sphere, grid_VAOs, mainGrid);
+		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
 
 		// [Objects Not Affected by Light Source]
 
@@ -728,10 +728,10 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
   //ben sphere
   sphereModel->bind();
   //	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
-  model = ben->getModelMatrix();
+  glm:: mat4 model = ben->getModelMatrix();
   model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
   model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
-  modelShader.setMat4("model", model);
+  shader->setMat4("model", model);
   GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
   
 	ben->draw(MODE, shader);
@@ -775,7 +775,7 @@ void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light)
 	glLineWidth(1.0f);
 }
 
-void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel unsigned int grid_VAOs[], Grid mainGrid)
+void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid)
 {
 	// Render Depth of Scene to Texture (from the light's perspective)
 	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
@@ -795,7 +795,7 @@ void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel unsigned int grid_VAOs[], Grid mainGrid)
+void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid)
 {
 	// Render Scene as Normal using the Generated Depth/Shadow map  
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);

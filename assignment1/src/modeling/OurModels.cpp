@@ -292,10 +292,7 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 	// [Create 4 Model]
 	Model* four = new Model(true, true, false, true, "4", shader, 4);
 
-	Shape * cb6 = new 
-    
-    
-    (glm::vec3(1.0f, 0.83f, 0.0f)); 
+	Shape * cb6 = new Shape(glm::vec3(1.0f, 0.83f, 0.0f)); 
 	Shape * cb7 = new Shape(glm::vec3(2.0f, 1.5f, 0.0f));
 	Shape * cb8 = new Shape(glm::vec3(3.0f, 0.5f, 0.0f)); 
 	Shape * cb9 = new Shape(glm::vec3(4.0f, 1.5f, 0.0f));
