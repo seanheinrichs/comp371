@@ -195,7 +195,7 @@ int main(void)
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs; //not used yet?
 	std::vector<glm::vec3> normals; // not used?
-	bool res = loadOBJ("../Assets/Models/test_Y.obj", vertices, uvs, normals);
+	bool res = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
 
 	Model * sphereModel = new Model(true, false, false, false, "sphere");
 	createShape(sphereModel, vertices, uvs, normals);
@@ -346,9 +346,9 @@ int main(void)
 		//	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
 		model = ben->getModelMatrix();
 		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
-		model = glm::translate(model, glm::vec3(10.0f, 4.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
 		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
+		GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 
 
