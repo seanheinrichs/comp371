@@ -34,11 +34,11 @@ Model* ModelContainer::getModelByName(std::string name)
 	return nullptr;
 }
 
-void ModelContainer::draw(int mode)
+void ModelContainer::draw(int mode, Shader* shaderProg)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
 	{
-		(*it)->draw(mode);
+		(*it)->draw(mode, shaderProg);
 	}
 }
 

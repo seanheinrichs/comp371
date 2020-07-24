@@ -300,26 +300,19 @@ void Model::translateToOrigin()
 	transform(glm::translate(glm::mat4(1.0f), temp));
 }
 
-void Model::draw(int mode /*, GLenum* g_textures, int* g_texLocations*/)
+void Model::draw(int mode, Shader* shaderProg)
 {
-	if (shader == nullptr)
-		throw "shader not defined in this model. Please define it before callinf draw()";
-	else 
+	shaderProg->use();
+	this->bind();
+	if (textureIndex == -1)
 	{
-		shader->use();
-		this->bind();
-		if (textureIndex == -1)
-		{
-			shader->setInt("fill", textureIndex);
-		}
-		else
-		{
-			g_textures[textureIndex].bind(g_texLocations[textureIndex]);
-			shader->setInt("material.diffuse", textureIndex);
-		}
-		shader->setMat4("model", this->getModelMatrix());
-		GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
+		shaderProg->setInt("fill", textureIndex);
 	}
-	
-
+	else
+	{
+		g_textures[textureIndex].bind(g_texLocations[textureIndex]);
+		shaderProg->setInt("material.diffuse", textureIndex);
+	}
+	shaderProg->setMat4("model", this->getModelMatrix());
+	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
 }

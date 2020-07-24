@@ -11,7 +11,7 @@ public:
 
 	Model* getModelByName(std::string name);
 	void addModel(Model* model);
-	void draw(int mode);
+	void draw(int mode, Shader* shaderProg);
 	void bindArrayBuffer();
 	void deallocate();
 	
@@ -25,7 +25,6 @@ public:
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
 	glm::mat4 getModelMatrix();
-
 
 	glm::vec3 rotate_vec;
 	glm::vec3 translate_vec;
