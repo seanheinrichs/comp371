@@ -655,15 +655,53 @@ void setupTextureMapping()
 void RenderScene(Shader &shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne)
 {
 	glm::mat4 model = glm::mat4(1.0);
-	
-	// [Models]
 
-	ben->draw(MODE);
-	sean->draw(MODE);
-	isa->draw(MODE);
-	ziming->draw(MODE);
-	wayne->draw(MODE);
-	
+	// [Models]
+	ben->getModelByName("n")->bind();
+	model = ben->getModelMatrix();
+	shader.setMat4("model", model);
+	GLCall(glDrawArrays(MODE, 0, ben->getModelByName("n")->getVAVertexCount()));
+	ben->getModelByName("3")->bind();
+	model = ben->getModelMatrix();
+	shader.setMat4("model", model);
+	GLCall(glDrawArrays(MODE, 0, ben->getModelByName("3")->getVAVertexCount()));
+
+	sean->getModelByName("a")->bind();
+	model = sean->getModelMatrix();
+	shader.setMat4("model", model);
+	GLCall(glDrawArrays(MODE, 0, sean->getModelByName("a")->getVAVertexCount()));
+	sean->getModelByName("7")->bind();
+	model = sean->getModelMatrix();
+	shader.setMat4("model", model);
+	GLCall(glDrawArrays(MODE, 0, sean->getModelByName("7")->getVAVertexCount()));
+
+	isa->getModelByName("a")->bind();
+	model = isa->getModelMatrix();
+	shader.setMat4("model", model);
+	GLCall(glDrawArrays(MODE, 0, isa->getModelByName("a")->getVAVertexCount()));
+	isa->getModelByName("0")->bind();
+	model = isa->getModelMatrix();
+	shader.setMat4("model", model);
+	GLCall(glDrawArrays(MODE, 0, isa->getModelByName("0")->getVAVertexCount()));
+
+	ziming->getModelByName("m")->bind();
+	model = ziming->getModelMatrix();
+	shader.setMat4("model", model);
+	GLCall(glDrawArrays(MODE, 0, ziming->getModelByName("m")->getVAVertexCount()));
+	ziming->getModelByName("4")->bind();
+	model = ziming->getModelMatrix();
+	shader.setMat4("model", model);
+	GLCall(glDrawArrays(MODE, 0, ziming->getModelByName("4")->getVAVertexCount()));
+
+	wayne->getModelByName("y")->bind();
+	model = wayne->getModelMatrix();
+	shader.setMat4("model", model);
+	GLCall(glDrawArrays(MODE, 0, wayne->getModelByName("y")->getVAVertexCount()));
+	wayne->getModelByName("7")->bind();
+	model = wayne->getModelMatrix();
+	shader.setMat4("model", model);
+	GLCall(glDrawArrays(MODE, 0, wayne->getModelByName("7")->getVAVertexCount()));
+
 }
 
 void RenderGrid(Shader &shader, unsigned int grid_VAOs[], Grid mainGrid)
@@ -735,11 +773,11 @@ void ShadowSecondPass(Shader &shader, ModelContainer *ben, ModelContainer *sean,
 	shader.setVec3("viewPos", camera.position);
 	shader.setVec3("lightPos", activeLightSource);
 	shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 	// Rendering Models and Grid with modelShader
 	RenderScene(shader, ben, sean, isa, ziming, wayne);
 	RenderGrid(shader, grid_VAOs, mainGrid);
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 }
