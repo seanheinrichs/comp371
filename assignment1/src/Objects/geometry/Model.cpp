@@ -326,23 +326,21 @@ void Model::translateToOrigin()
 	transform(glm::translate(glm::mat4(1.0f), temp));
 }
 
-//extern Texture* g_textures;
-//extern GLenum* g_texLocations;
-
-
-void Model::draw(int mode /*, GLenum* g_textures, int* g_texLocations*/)
+void Model::draw(int mode, Shader* shaderProg)
 {
-	if (shader == nullptr)
-		throw "shader not defined in this model. Please define it before callinf draw()";
-	else 
+	shaderProg->use();
+	this->bind();
+	if (textureIndex == -1)
 	{
-		shader->use();
-		g_textures[textureIndex].bind(g_texLocations[textureIndex]);
-		this->bind();
-		shader->setInt("u_Texture", textureIndex);
-		shader->setMat4("model", this->getModelMatrix(true));
-		GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
+		shaderProg->setInt("fill", textureIndex);
 	}
-	
-
+	else
+	{
+		g_textures[textureIndex].bind(g_texLocations[textureIndex]);
+		shaderProg->setFloat("material.shininess", g_shininess[textureIndex]);
+		shaderProg->setVec3("material.specular", g_specularStrength[textureIndex]);
+		shaderProg->setInt("material.diffuse", textureIndex);
+	}
+	shaderProg->setMat4("model", this->getModelMatrix());
+	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
 }

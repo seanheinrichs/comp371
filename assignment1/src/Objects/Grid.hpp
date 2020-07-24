@@ -10,17 +10,15 @@ public:
 	/* Attributes */
 	std::vector<glm::vec3> meshVertices;
 
-	float floorVertices[24] = {
-		 // Positions       // Normals
-		 0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-	};
-
-	unsigned int floorIndices[6] = {
-		0, 1, 3,
-		1, 2, 3
+	float floorVertices[48] = {
+		// Positions        Textures    Normals        
+		 0.5f,  0.5f, 0.0f, 5.0f, 5.0f, 0.0f, 0.0f, -1.0f,
+		 0.5f, -0.5f, 0.0f, 5.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+		-0.5f,  0.5f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, -1.0f,
+											  	
+		 0.5f, -0.5f, 0.0f, 5.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+		-0.5f,  0.5f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, -1.0f
 	};
 
 	float axisVertices[36] = {

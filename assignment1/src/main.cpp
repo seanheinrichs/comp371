@@ -1,13 +1,13 @@
 /*
 	COMP 371 - Section CC
-	Practical Assignment #1
+	Practical Assignment #2
 	Written By:
 		Benjamin Therien (40034572)
 		Sean Heinrichs (40075789)
-		Wayne St Amand (40074423)
+		Wayne Huras (40074423)
 		Isabelle Gourchette (40008121)
 		Ziming Wang (40041601)
-	Due:  July 9th, 2020
+	Due:  July 27th, 2020
 */
 
 
@@ -32,17 +32,14 @@ in main: #include <glm/gtx/transform2.hpp>
 #include <filesystem>
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
-//#define STB_IMAGE_IMPLEMENTATION
-//#include "utils/stb_image.h"
 
 #include "Objects/geometry/Polygon.h"
 #include "Objects/Grid.hpp"
 #include "Objects/Camera.h"
+#include "Objects/PointLight.h"
 #include "modeling/OurModels.cpp"
 #include "utils/GL_Error.h"
 #include "utils/objloader.cpp"
-
-//#include "Opengl_a/Texture.h"
 #include "Opengl_a/Shader.h"
 #include "Common.h"
 
@@ -55,17 +52,23 @@ in main: #include <glm/gtx/transform2.hpp>
 #define GLFW_REFRESH_RATE 60
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
 
-
-
-
 /* Function Declarations */
-void processInput(GLFWwindow *window, ModelContainer** models);
+void processInput(GLFWwindow *window, ModelContainer** models, PointLight** pointLights);
 void setModelColor(int modelIndex, Shader* modelShader);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
+void setupTextureMapping();
+void setModelColor(int modelIndex, Shader * modelShader);
+void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel);
+void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
+void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light);
+void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
+void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
 
 /* Global Constants */
 const unsigned int WINDOW_WIDTH = 1024;
 const unsigned int WINDOW_HEIGHT = 768;
+const unsigned int SHADOW_WIDTH = 1024;
+const unsigned int SHADOW_HEIGHT = 1024;
 
 /* Camera Setup */
 Camera camera = Camera(glm::vec3(0.0f, 0.3f, 2.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -80,20 +83,28 @@ float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
 
+// Variables used for light and shadows
+unsigned int depthMapFBO;
+unsigned int depthMap;
+float near_plane = 0.1f, far_plane = 100.0f;
+glm::mat4 lightSpaceMatrix(1.0f);
+glm::mat4 lightProjection(1.0f);
+glm::mat4 lightView(1.0f);
+
 //globals used for selecting render mode and models
 GLenum MODE = GL_TRIANGLES;
 int selected = 0;
-
-// Lighting Locations
-glm::vec3 bensLightPos(0.0f, 3.0f, 5.0f);
+int useTextures = 1;
+glm::vec3 activeLightSource(0.0f, 3.0f, -0.1f);
 
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
 Texture* g_textures = new Texture[32];
+float *g_shininess = new float[32];
+glm::vec3 *g_specularStrength = new glm::vec3[32];
 
 int main(void)
 {
-	
 	/* Initialize GLFW */
 	if (!glfwInit())
 	{
@@ -117,60 +128,12 @@ int main(void)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
-	
-
-
 	// Initialize GLEW 
 	if (glewInit() != GLEW_OK)
 	{
 		std::cout << "Failed to initialize GLEW" << std::endl;
 		return -1;
 	}
-
-	g_texLocations[0] = GL_TEXTURE0;
-	g_texLocations[1] = GL_TEXTURE1;
-	g_texLocations[2] = GL_TEXTURE2;
-	g_texLocations[3] = GL_TEXTURE3;
-	g_texLocations[4] = GL_TEXTURE4;
-	g_texLocations[5] = GL_TEXTURE5;
-	g_texLocations[6] = GL_TEXTURE6;
-	g_texLocations[7] = GL_TEXTURE7;
-	g_texLocations[8] = GL_TEXTURE8;
-	g_texLocations[9] = GL_TEXTURE9;
-	g_texLocations[10] = GL_TEXTURE10;
-	g_texLocations[11] = GL_TEXTURE11;
-	g_texLocations[12] = GL_TEXTURE12;
-	g_texLocations[13] = GL_TEXTURE13;
-	g_texLocations[14] = GL_TEXTURE14;
-	g_texLocations[15] = GL_TEXTURE15;
-	g_texLocations[16] = GL_TEXTURE16;
-	g_texLocations[17] = GL_TEXTURE17;
-	g_texLocations[18] = GL_TEXTURE18;
-	g_texLocations[19] = GL_TEXTURE19;
-	g_texLocations[20] = GL_TEXTURE20;
-	g_texLocations[21] = GL_TEXTURE21;
-	g_texLocations[22] = GL_TEXTURE22;
-	g_texLocations[23] = GL_TEXTURE23;
-	g_texLocations[24] = GL_TEXTURE24;
-	g_texLocations[25] = GL_TEXTURE25;
-	g_texLocations[26] = GL_TEXTURE26;
-	g_texLocations[27] = GL_TEXTURE27;
-	g_texLocations[28] = GL_TEXTURE28;
-	g_texLocations[29] = GL_TEXTURE29;
-	g_texLocations[30] = GL_TEXTURE30;
-	g_texLocations[31] = GL_TEXTURE31;
-
-	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
-	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
-	g_textures[2] = Texture("comp371/assignment1/src/Resources/chrome.png");
-	g_textures[3] = Texture("comp371/assignment1/src/Resources/speaker_holes.png");
-	g_textures[4] = Texture("comp371/assignment1/src/Resources/shiny_metal.png");
-	g_textures[5] = Texture("comp371/assignment1/src/Resources/box1.png");
-	g_textures[6] = Texture("comp371/assignment1/src/Resources/box2.png");
-	g_textures[7] = Texture("comp371/assignment1/src/Resources/box3.png");
-	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
-	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
-
 
 	//enable blending for correct texture rendering effects
 	GLCall(glEnable(GL_BLEND));
@@ -181,14 +144,16 @@ int main(void)
 
 	//Enable Culling
 	GLCall(glEnable(GL_CULL_FACE));
-	GLCall(glCullFace(GL_FRONT));
-	GLCall(glFrontFace(GL_CW));
-
+	GLCall(glCullFace(GL_BACK));
+	GLCall(glFrontFace(GL_CCW));
 
 	// Build and Compile Shader Program 
 	Shader modelShader("comp371/assignment1/src/Shaders/modelShader.vertex", "comp371/assignment1/src/Shaders/modelShader.fragment");
 	Shader lightShader("comp371/assignment1/src/Shaders/lightShader.vertex", "comp371/assignment1/src/Shaders/lightShader.fragment");
+	Shader depthShader("comp371/assignment1/src/Shaders/shadow_mapping_depth.vertex", "comp371/assignment1/src/Shaders/shadow_mapping_depth.fragment");
 
+	setupTextureMapping();
+	
 	// [Models]
 
 		//obj loader
@@ -205,27 +170,33 @@ int main(void)
 	createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
 
+	ModelContainer* sean = new ModelContainer();
+	createSeansModel(sean, &modelShader);
+	sean->bindArrayBuffer();
 
-	Model* sean = new Model(true, false, false, true);
-	createSeansModel(sean);
-	sean->bindArrayBuffer(true, sean);
+	ModelContainer* isa = new ModelContainer();
+	createIsabellesModel(isa, &modelShader);
+	isa->bindArrayBuffer();
 
-	Model* wayne = new Model(true, false, false, true);
-	createWaynesModel(wayne);
-	wayne->bindArrayBuffer(true, wayne);
+	ModelContainer* ziming = new ModelContainer();
+	createZimingsModel(ziming, &modelShader);
+	ziming->bindArrayBuffer();
 
-	Model* isa = new Model(true, false, false, true);
-	createIsabellesModel(isa);
-	isa->bindArrayBuffer(true, isa);
+	ModelContainer* wayne = new ModelContainer();
+	createWaynesModel(wayne, &modelShader);
+	wayne->bindArrayBuffer();
 
-	Model* ziming = new Model(true, false, false, true);
-	createZimingsModel(ziming);
-	ziming->bindArrayBuffer(true, ziming);
-
-	Model* light = new Model(true, false, false, true);
+	Model* light = new Model(true, false, false, true, "light", &lightShader, -1);
 	createLightModel(light);
 	light->bindArrayBuffer(true, light);
 
+	// [Point Light]
+
+	PointLight* bensPL = new PointLight(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
+	PointLight* seansPL = new PointLight(light, glm::vec3(3.5f, 3.0f, -4.0f), false);
+	PointLight* waynesPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, -4.0f), false);
+	PointLight* isasPL = new PointLight(light, glm::vec3(3.5f, 3.0f, 4.0f), false);
+	PointLight* zimingsPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, 4.0f), false);
 
 	// [Grid]
 
@@ -247,13 +218,14 @@ int main(void)
 	GLCall(glBindVertexArray(grid_VAOs[1]));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[1]));
 	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW));
-	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, grid_EBO));
-	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mainGrid.floorIndices), mainGrid.floorIndices, GL_STATIC_DRAW));
-	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
-	GLCall(glEnableVertexAttribArray(0));
+	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0));
+	GLCall(glEnableVertexAttribArray(0));  // Position
+	GLCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(1));  // Texture
+	GLCall(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float))));
+	GLCall(glEnableVertexAttribArray(2));  // Normals
 
 	// [Coordinate Axis]
-	/*
 	GLCall(glBindVertexArray(grid_VAOs[2]));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[2]));
 	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.axisVertices), mainGrid.axisVertices, GL_STATIC_DRAW));
@@ -262,23 +234,22 @@ int main(void)
 	GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))));
 	GLCall(glEnableVertexAttribArray(1));
 
-	*/
-
-
-
-	// Uniform Declarations
+	PointLight** pointLights = new PointLight*[5];
+	pointLights[0] = bensPL;
+	pointLights[1] = seansPL;
+	pointLights[2] = isasPL;
+	pointLights[3] = zimingsPL;
+	pointLights[4] = waynesPL;
 
 	ModelContainer** models = new ModelContainer*[5];
 	models[0] = ben;
-	//models[1] = sean;
-	//models[2] = isa;
-	//models[3] = ziming;
-	//models[4] = wayne;
-
+	models[1] = sean;
+	models[2] = isa;
+	models[3] = ziming;
+	models[4] = wayne;
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	ben->addTranslation(glm::vec3(0.0f, 0.0f, -1.0f));
-
+	ben->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
@@ -292,45 +263,65 @@ int main(void)
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
 
-
 	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	light->addTranslation(bensLightPos);
+	light->addTranslation(glm::vec3(0.0f, 3.0f, -1.0f));
 
+	// [Configure Depth Map FBO]
 
-	
+	glGenFramebuffers(1, &depthMapFBO);
+	// create depth texture
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	modelShader.use();
+	modelShader.setInt("shadowMap", 11);	// Must be unused texture slot
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
-
-		modelShader.use();
-
 		// Set frame for Camera (taken from LearnOpenGL)
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
 		// Event Handling
-		processInput(window, models);
+		processInput(window, models, pointLights);
 
 		// Render
-		GLCall(glClearColor(0.5f, 0.5f, 0.5f, 1.0f));
+		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
 
 		// Start Using Model Shader
 		modelShader.use();
-		modelShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		modelShader.setVec3("lightPos", bensLightPos);
+		modelShader.setInt("useTextures",useTextures);
 		modelShader.setVec3("viewPos", camera.position);
+
+		// Set Light Properties
+		for (int i = 0; i < 5; i++)
+		{
+			if (pointLights[i]->getActive())
+			{
+				pointLights[i]->setShaderValues(&modelShader);
+			}
+		}
 
 		// Recompute Camera Pipeline
 		glm::mat4 model;
 		modelShader.setMat4("model", model);
-		
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 		modelShader.setMat4("projection", projection);
-		
 
 		glm::mat4 view = camera.calculateViewMatrix();
 		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
@@ -339,107 +330,41 @@ int main(void)
 
 
 
-		ben->draw(MODE);
-
-		//ben sphere
-		sphereModel->bind();
-		//	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
-		model = ben->getModelMatrix();
-		model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
-		model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
-		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
-
-
-
-		// [Models]
-
-		//metal1.bind(GL_TEXTURE0);
+		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
+		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphere, grid_VAOs, mainGrid);
 		
-		//modelShader.setInt("u_Texture", 4);
-		//selected == 0 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);
-		//model = ben->getModelMatrix();
-		//modelShader.setMat4("model", model);
-		//GLCall(glDrawArrays(MODE, 0, ben->getVAVertexCount()));
+		// Reset Viewport
+		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		/*
-		metal2.bind(GL_TEXTURE0);
-		sean->bind();
-		modelShader.setInt("u_Texture", 1);
-		selected == 1 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                            
-		model = sean->getModelMatrix();
-		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(MODE, 0, sean->getVAVertexCount()));
-		
-		metal3.bind(GL_TEXTURE0 + 4 * 2);
-		isa->bind();
-		modelShader.setInt("u_Texture", 2);
-		selected == 2 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                                    
-		model = isa->getModelMatrix();
-		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(MODE, 0, isa->getVAVertexCount()));
-		
-		metal1.bind(GL_TEXTURE0 + 4 * 3);
-		ziming->bind();
-		modelShader.setInt("u_Texture", 3);
-		selected == 3 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                            
-		model = ziming->getModelMatrix();
-		modelShader.setMat4("model", model);
-		GLCall(glDrawArrays(MODE, 0, ziming->getVAVertexCount()));
-		
-		metal1.bind(GL_TEXTURE0 + 4 * 4);
-		wayne->bind();
-		modelShader.setInt("u_Texture", 4);
-		selected == 4 ? modelShader.setInt("fill", 4) : modelShader.setInt("fill", 2);                        
-		modelShader.setMat4("model", wayne->getModelMatrix());
-		GLCall(glDrawArrays(MODE, 0, wayne->getVAVertexCount()));
+		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
+		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne,sphere, grid_VAOs, mainGrid);
 
-		*/
-
-
-		// [Grid Mesh]
-
-		GLCall(glBindVertexArray(grid_VAOs[0]));
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
-		modelShader.setMat4("model", model);
-		glDrawArrays(GL_LINES, 0, mainGrid.meshVertices.size());
-
-		// [Grid Floor]
-
-		GLCall(glBindVertexArray(grid_VAOs[1]));
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
-		modelShader.setMat4("model", model);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		// [Objects Not Affected by Light Source]
 
 		// Start Using Lighting Shader
 		lightShader.use();
 		lightShader.setMat4("projection", projection);
 		lightShader.setMat4("view", view);
-
-		/*
-		// [Coordinate Axis]
-		glLineWidth(5.0f);
-		GLCall(glBindVertexArray(grid_VAOs[2]));
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.05f, 0.0f));
-		lightShader.setMat4("model", model);
-		lightShader.setInt("fill", 0);
-		glDrawArrays(GL_LINES, 0, 6);
-		glLineWidth(1.0f);
-
-		*/
-
-		model = glm::mat4(1.0f);
-		light->bind();
-		model = light->getModelMatrix();
-		lightShader.setMat4("model", model);
+		
+		// [Lamps]
 		lightShader.setInt("fill", -1);
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, light->getVAVertexCount()));
+		for (int i = 0; i < 5; i++)
+		{
+			if (pointLights[i]->getActive())
+			{
+				pointLights[i]->getModel()->bind();
+				model = pointLights[i]->getModel()->getModelMatrix();
+				model = glm::mat4(1.0f);
+				model = glm::translate(model, pointLights[i]->getPosition());
+				model = glm::scale(model, glm::vec3(0.1f));
+				lightShader.setMat4("model", model);
+				GLCall(glDrawArrays(GL_TRIANGLES, 0, pointLights[i]->getModel()->getVAVertexCount()));
+			}
+		}
+
+		// Rendering 5x5 XYZ Axes
+		RenderAxes(&lightShader, grid_VAOs, light);
 
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
@@ -461,7 +386,7 @@ int main(void)
 }
 
 // Event handling functions
-void processInput(GLFWwindow *window, ModelContainer** models)
+void processInput(GLFWwindow *window, ModelContainer** models, PointLight** pointLights)
 {
 
 	float cameraSpeed = 1.0 * deltaTime;
@@ -551,30 +476,80 @@ void processInput(GLFWwindow *window, ModelContainer** models)
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && (selected != 0 ))
 	{
 		selected = 0;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 	
 	// Press "2" to select MODEL 1 (A 7)
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && (selected != 1))
 	{
 		selected = 1;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 	
 	// Press "3" to select MODEL 2 (A 0)
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && (selected != 2))
 	{
 		selected = 2;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 	
 	// Press "4" to select MODEL 3 (M 4)
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && (selected != 3))
 	{
 		selected = 3;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 	
 	// Press "5" to select MODEL 4 (Y 7)
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && (selected != 4))
 	{
 		selected = 4;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 
 	// [Translation]
@@ -636,8 +611,6 @@ void processInput(GLFWwindow *window, ModelContainer** models)
 	{
 		models[selected]->addShear(glm::vec3(0.0f, 0.02f,0.0f));
 		//models[selected]->addScale(glm::vec3(0.01f, 0.0f, 0.0f));
-		
-
 	}
 
 	// Press 'O' to shear
@@ -646,14 +619,25 @@ void processInput(GLFWwindow *window, ModelContainer** models)
 		models[selected]->addShear(glm::vec3(0.0f, -0.02f,0.0f));
 		//models[selected]->addScale(glm::vec3(-0.01f, 0.0f, 0.0f));
 	}
-	// [Scale]
+  
+	// Press 'X' to turn textures OFF
+	if ((useTextures != 1) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useTextures = 1;
+	}
+
+	// Press 'SHIFT + X' to turn textures ON
+	if ((useTextures != 0) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useTextures = 0;
+	}
+  
 }
 
 void setModelColor(int modelIndex, Shader* modelShader)
 {
 	selected == modelIndex ? modelShader->setVec3("modelColor", 0.6f, 0.0f, 0.8f) : modelShader->setVec3("modelColor", 0.75f, 0.75f, 0.75f);
 }
-
 
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 {
@@ -688,3 +672,146 @@ void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 	}
 }
 
+void setupTextureMapping()
+{
+	g_texLocations[0] = GL_TEXTURE0;
+	g_texLocations[1] = GL_TEXTURE1;
+	g_texLocations[2] = GL_TEXTURE2;
+	g_texLocations[3] = GL_TEXTURE3;
+	g_texLocations[4] = GL_TEXTURE4;
+	g_texLocations[5] = GL_TEXTURE5;
+	g_texLocations[6] = GL_TEXTURE6;
+	g_texLocations[7] = GL_TEXTURE7;
+	g_texLocations[8] = GL_TEXTURE8;
+	g_texLocations[9] = GL_TEXTURE9;
+	g_texLocations[10] = GL_TEXTURE10;
+
+	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
+	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
+	g_textures[2] = Texture("comp371/assignment1/src/Resources/chrome.png");
+	g_textures[3] = Texture("comp371/assignment1/src/Resources/speaker_holes.png");
+	g_textures[4] = Texture("comp371/assignment1/src/Resources/shiny_metal.png");
+	g_textures[5] = Texture("comp371/assignment1/src/Resources/box1.png");
+	g_textures[6] = Texture("comp371/assignment1/src/Resources/box2.png");
+	g_textures[7] = Texture("comp371/assignment1/src/Resources/box3.png");
+	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
+	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
+	g_textures[10] = Texture("comp371/assignment1/src/Resources/grid_floor.jpg");
+
+	g_shininess[0] = 2.0f;
+	g_shininess[1] = 2.0f;
+	g_shininess[2] = 2.0f;
+	g_shininess[3] = 2.0f;
+	g_shininess[4] = 2.0f;
+	g_shininess[5] = 256.0f;
+	g_shininess[6] = 256.0f;
+	g_shininess[7] = 256.0f;
+	g_shininess[8] = 256.0f;
+	g_shininess[9] = 256.0f;
+	g_shininess[10] = 64.0f;
+
+	g_specularStrength[0] = glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[1] =	glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[2] =	glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[3] =	glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[4] =	glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[5] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[6] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[7] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[8] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[9] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
+}
+
+void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel)
+{
+  //ben sphere
+  sphereModel->bind();
+  //	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
+  model = ben->getModelMatrix();
+  model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+  model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
+  modelShader.setMat4("model", model);
+  GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+  
+	ben->draw(MODE, shader);
+	sean->draw(MODE, shader);
+	isa->draw(MODE, shader);
+	ziming->draw(MODE, shader);
+	wayne->draw(MODE, shader);	
+}
+
+void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
+{
+	// [Grid Floor]
+
+	GLCall(glBindVertexArray(grid_VAOs[1]));
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
+	g_textures[10].bind(g_texLocations[10]);
+	shader->setFloat("material.shininess", g_shininess[10]);
+	shader->setVec3("material.specular", g_specularStrength[10]);
+	shader->setInt("material.diffuse", 10);
+	shader->setMat4("model", model);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+}
+
+void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light)
+{
+	// [Coordinate Axis]
+
+	glLineWidth(5.0f);
+	glBindVertexArray(grid_VAOs[2]);
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 0.05f, 1.0f));
+	shader->setMat4("model", model);
+	shader->setInt("fill", 0);
+	glDrawArrays(GL_LINES, 0, 6);
+	glLineWidth(1.0f);
+}
+
+void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel unsigned int grid_VAOs[], Grid mainGrid)
+{
+	// Render Depth of Scene to Texture (from the light's perspective)
+	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	lightView = glm::lookAt(activeLightSource, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+	lightSpaceMatrix = lightProjection * lightView;
+	
+	// Start Using Depth Shader
+	shader->use();
+	shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	
+	// Rendering Models and Grid with the DepthShader
+	RenderScene(shader, ben, sean, isa, ziming, wayne, sphereModel);
+	RenderGrid(shader, grid_VAOs, mainGrid);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel unsigned int grid_VAOs[], Grid mainGrid)
+{
+	// Render Scene as Normal using the Generated Depth/Shadow map  
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	// Set the Light Uniforms
+	shader->use();
+	shader->setVec3("viewPos", camera.position);
+	shader->setVec3("lightPos", activeLightSource);
+	shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	
+	// Rendering Models and Grid with modelShader
+	RenderScene(shader, ben, sean, isa, ziming, wayne, sphereModel);
+	RenderGrid(shader, grid_VAOs, mainGrid);
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+}
