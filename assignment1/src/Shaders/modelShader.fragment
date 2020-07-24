@@ -28,6 +28,7 @@ struct PointLight {
 };
 
 uniform int useTextures;
+uniform bool useShadows;
 uniform sampler2D shadowMap;
 uniform vec3 viewPos; 
 uniform vec3 lightPos;
@@ -120,8 +121,13 @@ vec3 CalculateLighting(PointLight lightSource, vec3 normal, vec3 fragPos, vec3 v
 	ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
-	float shadow = ShadowCalculation(FragPosLightSpace);  
 
-    return (ambient + (1.0 - shadow) * (diffuse + specular));
+	if (useShadows)
+	{
+		float shadow = ShadowCalculation(FragPosLightSpace);  
 
+	    return (ambient + (1.0 - shadow) * (diffuse + specular));
+	}
+
+	return (ambient + diffuse + specular);
 }

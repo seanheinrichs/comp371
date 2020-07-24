@@ -95,6 +95,7 @@ glm::mat4 lightView(1.0f);
 GLenum MODE = GL_TRIANGLES;
 int selected = 0;
 int useTextures = 1;
+bool useShadows = true;
 glm::vec3 activeLightSource(0.0f, 3.0f, -0.1f);
 
 /* External linkage for global varibles */
@@ -156,7 +157,7 @@ int main(void)
 	
 	// [Models]
 
-		//obj loader
+	//obj loader
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs; //not used yet?
 	std::vector<glm::vec3> normals; // not used?
@@ -304,7 +305,8 @@ int main(void)
 
 		// Start Using Model Shader
 		modelShader.use();
-		modelShader.setInt("useTextures",useTextures);
+		modelShader.setInt("useTextures", useTextures);
+		modelShader.setBool("useShadows", useShadows);
 		modelShader.setVec3("viewPos", camera.position);
 
 		// Set Light Properties
@@ -606,6 +608,8 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
 	}
 
+	// [Shearing]
+
 	// Press 'P' to shear
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
@@ -619,6 +623,8 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 		models[selected]->addShear(glm::vec3(0.0f, -0.02f,0.0f));
 		//models[selected]->addScale(glm::vec3(-0.01f, 0.0f, 0.0f));
 	}
+
+	// [Texture Toggle]
   
 	// Press 'X' to turn textures OFF
 	if ((useTextures != 1) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
@@ -630,6 +636,18 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	if ((useTextures != 0) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useTextures = 0;
+	}
+
+	// [Shadow Toggle]
+	if (!useShadows && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useShadows = true;
+	}
+
+	// Press 'SHIFT + X' to turn textures ON
+	if (useShadows && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useShadows = false;
 	}
   
 }
