@@ -622,22 +622,41 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	}
 
 	// [Shearing]
-
+	//X AXIS
 	// Press 'P' to shear
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addShearX(glm::vec2(0.0f,0.02f));
-		models[selected]->addRotation(0, glm::vec3(0.0f, 0.0f, 0.0f));
-		//models[selected]->addScale(glm::vec3(0.01f, 0.0f, 0.0f));
+		models[selected]->addShearMatrix(glm::vec2(0.0f,0.02f), 'x');
 	}
-
 	// Press 'O' to shear
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addShearX(glm::vec2(-0.00f,-0.02f));
-		//models[selected]->addScale(glm::vec3(-0.01f, 0.0f, 0.0f));
+		models[selected]->addShearMatrix(glm::vec2(-0.00f,-0.02f), 'x');
 	}
 
+	//Y AXIS
+	// Press 'k' to shear
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'y');
+	}
+	// Press 'l' to shear
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(-0.00f, -0.02f), 'y');
+	}
+
+	//Z AXIS
+	// Press 'N' to shear
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
+	}
+	// Press 'M' to shear
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(-0.00f, -0.02f), 'z');
+	}
 	// [Texture Toggle]
   
 	// Press 'X' to turn textures OFF

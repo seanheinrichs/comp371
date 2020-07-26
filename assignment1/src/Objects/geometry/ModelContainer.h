@@ -24,7 +24,7 @@ public:
 	glm::mat4 getShear(); 
 
 	glm::mat4 getShearMatrix();
-	void addShearX(glm::vec2 axis);
+	void addShearMatrix(glm::vec2 shear, char axis);
 	void addShear(glm::vec3 axis);
 	void addShear(glm::vec3 axis, std::string name);
 	void addTranslation(glm::vec3 translate, std::string name);

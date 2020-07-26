@@ -185,22 +185,37 @@ void Model::addShear(glm::vec3 shear)
 }
 
 //adds shears to model
-void Model::addShearX(glm::vec2 shear)
+void Model::addShearMatrix(glm::vec2 shear, char axis)
 {
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->addShearX(shear);
+	if (axis == 'x') {
+		for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+		{
+			if (dynamic_cast<Model*>(*it) != NULL)
+				dynamic_cast<Model*>(*it)->addShearMatrix(shear, axis);
+		}
+		shearX.x += shear.x;
+		shearX.y += shear.y;
 	}
-
-	//shearX.x += shear.x;
-	//shearX.y += shear.y;
-
-	shearY.x += shear.x;
-	shearY.y += shear.y;
-
-	//shearX.x += shear.x;
-	//shearX.y += shear.y;
+	else if (axis == 'y')
+	{
+		for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+		{
+			if (dynamic_cast<Model*>(*it) != NULL)
+				dynamic_cast<Model*>(*it)->addShearMatrix(shear, axis);
+		}
+		shearY.x += shear.x;
+		shearY.y += shear.y;
+	}
+	else if (axis == 'z')
+	{
+		for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+		{
+			if (dynamic_cast<Model*>(*it) != NULL)
+				dynamic_cast<Model*>(*it)->addShearMatrix(shear, axis);
+		}
+		shearZ.x += shear.x;
+		shearZ.y += shear.y;
+	}
 }
 
 //Method that updates the position of the model

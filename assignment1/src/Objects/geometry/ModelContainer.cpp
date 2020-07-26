@@ -178,18 +178,35 @@ void ModelContainer::addShear(glm::vec3 shear)
 }
 
 //adds shears to model
-void ModelContainer::addShearX(glm::vec2 shear)
+void ModelContainer::addShearMatrix(glm::vec2 shear, char axis)
 {
-	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	if (axis == 'x')
 	{
-		(*it)->addShearX(shear);
+		for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+		{
+			(*it)->addShearMatrix(shear, 'x');
+		}
+		shearX.x += shear.x;
+		shearX.y += shear.y;
 	}
-
-	shearY.x += shear.x;
-	shearY.y += shear.y;
-
-	shearX.x += shear.x;
-	shearX.y += shear.y;
+	else if (axis == 'y')
+	{
+		for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+		{
+			(*it)->addShearMatrix(shear, 'y');
+		}
+		shearY.x += shear.x;
+		shearY.y += shear.y;
+	}
+	else if (axis == 'z')
+	{
+		for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+		{
+			(*it)->addShearMatrix(shear, 'z');
+		}
+		shearZ.x += shear.x;
+		shearZ.y += shear.y;
+	}
 }
 
 void ModelContainer::addShear(glm::vec3 shear, std::string name)
