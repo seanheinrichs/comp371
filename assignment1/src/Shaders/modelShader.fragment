@@ -35,7 +35,7 @@ uniform vec3 lightPos;
 uniform Material material;
 uniform PointLight pointLight;
 
-// Shadow Calculation Credit - https://learnopengl.com/
+// Shadow Calculation Credit - https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
 float ShadowCalculation(vec4 fragPosLightSpace)
 {
    // perform perspective divide

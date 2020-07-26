@@ -753,6 +753,7 @@ void setupTextureMapping()
 	g_texLocations[8] = GL_TEXTURE8;
 	g_texLocations[9] = GL_TEXTURE9;
 	g_texLocations[10] = GL_TEXTURE10;
+	//g_texLocations[11] = GL_TEXTURE11; // used by shadow map
 
 	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
 	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
@@ -765,6 +766,7 @@ void setupTextureMapping()
 	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
 	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
 	g_textures[10] = Texture("comp371/assignment1/src/Resources/grid_floor.jpg");
+	//g_textures[11] // used by shadow map
 
 	g_shininess[0] = 2.0f;
 	g_shininess[1] = 2.0f;
@@ -777,6 +779,7 @@ void setupTextureMapping()
 	g_shininess[8] = 256.0f;
 	g_shininess[9] = 256.0f;
 	g_shininess[10] = 64.0f;
+	//g_shininess[11] // used by shadow map
 
 	g_specularStrength[0] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[1] =	glm::vec3(1.0f, 1.0f, 1.0f);
@@ -789,6 +792,7 @@ void setupTextureMapping()
 	g_specularStrength[8] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[9] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
+	//g_specularStrength[11] // used by shadow map
 }
 
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel)
