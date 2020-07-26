@@ -626,14 +626,15 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	// Press 'P' to shear
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addShear(glm::vec3(0.0f, 0.02f,0.0f));
+		models[selected]->addShearX(glm::vec2(0.0f,0.02f));
+		models[selected]->addRotation(0, glm::vec3(0.0f, 0.0f, 0.0f));
 		//models[selected]->addScale(glm::vec3(0.01f, 0.0f, 0.0f));
 	}
 
 	// Press 'O' to shear
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addShear(glm::vec3(0.0f, -0.02f,0.0f));
+		models[selected]->addShearX(glm::vec2(-0.00f,-0.02f));
 		//models[selected]->addScale(glm::vec3(-0.01f, 0.0f, 0.0f));
 	}
 

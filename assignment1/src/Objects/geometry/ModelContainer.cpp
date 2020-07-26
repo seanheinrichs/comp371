@@ -23,6 +23,30 @@ ModelContainer::ModelContainer()
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
+
+	shearX = glm::vec2(0.0f,0.0f);
+	shearY = glm::vec2(0.0f, 0.0f);
+	shearZ = glm::vec2(0.0f, 0.0f);
+	shearMatrix[0][0] = 1;
+	shearMatrix[0][1] = shearZ.y;
+	shearMatrix[0][2] = shearY.y;
+	shearMatrix[0][3] = 0;
+
+	shearMatrix[1][0] = shearZ.x;
+	shearMatrix[1][1] = 1;
+	shearMatrix[1][2] = shearX.y;
+	shearMatrix[1][3] = 0;
+
+	shearMatrix[2][0] = shearY.x;
+	shearMatrix[2][1] = shearX.x;
+	shearMatrix[2][2] = 1;
+	shearMatrix[2][3] = 0;
+
+	shearMatrix[3][0] = 0;
+	shearMatrix[3][1] = 0;
+	shearMatrix[3][2] = 0;
+	shearMatrix[3][3] = 0;
+
 }
 
 Model* ModelContainer::getModelByName(std::string name) 
@@ -119,14 +143,24 @@ glm::mat4 ModelContainer::getShear()
 
 }
 
+
+glm::mat4 ModelContainer::getShearMatrix()
+{
+	return shearMatrix;
+}
+
 //Method that calculates the transformation matrix of the model
 glm::mat4 ModelContainer::getModelMatrix(bool shear)
 {
 	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
 		return getTranslation() *  getScale();
 	else
-		return (shear ? getShear() : glm::mat4(1.0f)) * getTranslation() * getRotation() * getScale();
+		return
+		//		 getTranslation() * getRotation() * getScale() * (shear ? glm::inverse(getShear()) : glm::mat4(1.0f));
+		getTranslation() * getRotation() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
+
 }
+
 
 //adds shears to model
 void ModelContainer::addShear(glm::vec3 shear)
@@ -141,6 +175,21 @@ void ModelContainer::addShear(glm::vec3 shear)
 	shear_vec.y += shear.y;
 	shear_vec.z += shear.z;
 
+}
+
+//adds shears to model
+void ModelContainer::addShearX(glm::vec2 shear)
+{
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->addShearX(shear);
+	}
+
+	shearY.x += shear.x;
+	shearY.y += shear.y;
+
+	shearX.x += shear.x;
+	shearX.y += shear.y;
 }
 
 void ModelContainer::addShear(glm::vec3 shear, std::string name)
