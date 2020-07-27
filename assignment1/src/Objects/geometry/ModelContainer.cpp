@@ -27,6 +27,14 @@ ModelContainer::ModelContainer()
 	shearX = glm::vec2(0.0f,0.0f);
 	shearY = glm::vec2(0.0f, 0.0f);
 	shearZ = glm::vec2(0.0f, 0.0f);
+
+	setupShearMatrix();
+
+}
+
+//sets up the values of the shear matrix for each axis
+void ModelContainer::setupShearMatrix()
+{
 	shearMatrix[0][0] = 1;
 	shearMatrix[0][1] = shearZ.y;
 	shearMatrix[0][2] = shearY.y;
@@ -46,9 +54,7 @@ ModelContainer::ModelContainer()
 	shearMatrix[3][1] = 0;
 	shearMatrix[3][2] = 0;
 	shearMatrix[3][3] = 0;
-
 }
-
 Model* ModelContainer::getModelByName(std::string name) 
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -136,16 +142,10 @@ void ModelContainer::addScale(glm::vec3 scale, std::string name)
 
 }
 
-glm::mat4 ModelContainer::getShear()
-{
-	//return glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //forward/backwards
-	return glm::shearX3D(glm::mat4(-1.0f), shear_vec.y, shear_vec.z); //from side to side
-
-}
-
-
+//returns the shearing matrix
 glm::mat4 ModelContainer::getShearMatrix()
 {
+	setupShearMatrix();
 	return shearMatrix;
 }
 
@@ -156,12 +156,11 @@ glm::mat4 ModelContainer::getModelMatrix(bool shear)
 		return getTranslation() *  getScale();
 	else
 		return
-		//		 getTranslation() * getRotation() * getScale() * (shear ? glm::inverse(getShear()) : glm::mat4(1.0f));
 		getTranslation() * getRotation() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
 
 }
 
-//adds shears to model
+//adds shears to model according to the axis passed, which will determine around which axis it will shear
 void ModelContainer::addShearMatrix(glm::vec2 shear, char axis)
 {
 	if (axis == 'x')

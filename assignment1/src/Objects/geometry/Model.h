@@ -36,11 +36,12 @@ public:
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
 	void Reposition(glm::vec3 position);
+	void setupShearMatrix();
+
 	glm::mat4 getRotation();
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
 	glm::mat4 getModelMatrix(bool shear = false);
-	glm::mat4 getShear(); 
 	glm::mat4 getShearMatrix();
 
 	virtual float* getVertexArray();
