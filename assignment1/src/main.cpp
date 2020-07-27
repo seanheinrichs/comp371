@@ -60,6 +60,7 @@ void setupTextureMapping();
 void setModelColor(int modelIndex, Shader * modelShader);
 float RandomFloat(float a, float b);
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel);
+void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader);
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
 void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light);
 void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
@@ -818,7 +819,8 @@ void setupTextureMapping()
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel)
 {
   //ben sphere
-  sphereModel->bind();
+	/*
+	  sphereModel->bind();
   //	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
   glm:: mat4 model = ben->getModelMatrix();
   model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
@@ -826,11 +828,36 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
   shader->setMat4("model", model);
   GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
   
+  
+	
+	*/
+	DrawSphere(sphereModel, ben, shader);
 	ben->draw(MODE, shader);
+
+	DrawSphere(sphereModel, sean, shader);
 	sean->draw(MODE, shader);
+
+	DrawSphere(sphereModel, isa, shader);
 	isa->draw(MODE, shader);
+
+	DrawSphere(sphereModel, ziming, shader);
 	ziming->draw(MODE, shader);
+
+	DrawSphere(sphereModel, wayne, shader);
 	wayne->draw(MODE, shader);	
+}
+
+void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader)
+{
+	sphereModel->bind();
+	//	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
+	glm::mat4 model = modelInnerSoccerBall->getModelMatrix();
+	model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+	model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
+	shader->setMat4("model", model);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+
+
 }
 
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
