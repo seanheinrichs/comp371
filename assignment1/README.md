@@ -6,7 +6,7 @@ Benjamin Therien (40034572)
 
 Sean Heinrichs (40075789)
 
-Wayne St Amand (40074423)
+Wayne Huras (40074423)
 
 Isabelle Gourchette (40008121)
 
@@ -124,4 +124,7 @@ Sources:
 ---------------------------------------
 * https://www.youtube.com/watch?v=FBbPWSOQ0-w&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=10
 * https://learnopengl.com/?fbclid=IwAR1bqkHtImRamrNihlHn2LQSd9sZBEM9MpjwzWFb8B19jKZm6FMC4fmgrt0
+* https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
 * Objloader.cpp is from lab06 by Jonathan.
+
+

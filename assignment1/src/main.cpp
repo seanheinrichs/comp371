@@ -195,7 +195,7 @@ int main(void)
 	createLightModel(light);
 	light->bindArrayBuffer(true, light);
 
-	// [Point Light]
+	// [Point Lights]
 
 	PointLight* bensPL = new PointLight(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
 	PointLight* seansPL = new PointLight(light, glm::vec3(3.5f, 3.0f, -4.0f), false);
@@ -333,8 +333,6 @@ int main(void)
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		modelShader.setMat4("view", view);
 
-
-
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
 		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
 		
@@ -345,14 +343,14 @@ int main(void)
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
 		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
 
-		// [Objects Not Affected by Light Source]
+		// [Objects Not Affected by Light Source Go Below]
 
 		// Start Using Lighting Shader
 		lightShader.use();
 		lightShader.setMat4("projection", projection);
 		lightShader.setMat4("view", view);
 		
-		// [Lamps]
+		// [Point Lights]
 		lightShader.setInt("fill", -1);
 		for (int i = 0; i < 5; i++)
 		{
@@ -655,12 +653,14 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	}
 
 	// [Shadow Toggle]
+
+	// Press 'M' to turn shadows OFF
 	if (!useShadows && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = true;
 	}
 
-	// Press 'SHIFT + X' to turn textures ON
+	// Press 'SHIFT + M' to turn shadows ON
 	if (useShadows && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = false;
@@ -756,6 +756,7 @@ void setupTextureMapping()
 	g_texLocations[8] = GL_TEXTURE8;
 	g_texLocations[9] = GL_TEXTURE9;
 	g_texLocations[10] = GL_TEXTURE10;
+	//g_texLocations[11] = GL_TEXTURE11; // used by shadow map
 
 	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
 	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
@@ -768,6 +769,7 @@ void setupTextureMapping()
 	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
 	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
 	g_textures[10] = Texture("comp371/assignment1/src/Resources/grid_floor.jpg");
+	//g_textures[11] // used by shadow map
 
 	g_shininess[0] = 2.0f;
 	g_shininess[1] = 2.0f;
@@ -780,6 +782,7 @@ void setupTextureMapping()
 	g_shininess[8] = 256.0f;
 	g_shininess[9] = 256.0f;
 	g_shininess[10] = 64.0f;
+	//g_shininess[11] // used by shadow map
 
 	g_specularStrength[0] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[1] =	glm::vec3(1.0f, 1.0f, 1.0f);
@@ -792,24 +795,58 @@ void setupTextureMapping()
 	g_specularStrength[8] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[9] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
+	//g_specularStrength[11] // used by shadow map
 }
 
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel)
 {
-  //ben sphere
-  sphereModel->bind();
-  //	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
-  glm:: mat4 model = ben->getModelMatrix();
-  model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
-  model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
-  shader->setMat4("model", model);
-  GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+	glm::mat4 sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
+	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
+
+	//ben sphere
+	sphereModel->bind();
+	shader->setMat4("model", ben->getModelMatrix() * sphereTransform);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
   
 	ben->draw(MODE, shader);
+
+
+	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
+	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
+	//sean sphere
+	sphereModel->bind();
+	shader->setMat4("model", sean->getModelMatrix() * sphereTransform);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+
 	sean->draw(MODE, shader);
+
+
+	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
+	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
+	//isa sphere
+	sphereModel->bind();
+	shader->setMat4("model", isa->getModelMatrix() * sphereTransform);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+
 	isa->draw(MODE, shader);
+
+	//ziming sphere
+	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(2.25f, 2.25f, 2.25f));
+	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 3.75f, 0.0f));
+	sphereModel->bind();
+	shader->setMat4("model", ziming->getModelMatrix() * sphereTransform);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+
 	ziming->draw(MODE, shader);
-	wayne->draw(MODE, shader);	
+
+	//wayne sphere
+	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(2.25f, 2.25f, 2.25f));
+	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
+	sphereModel->bind();
+	shader->setMat4("model", wayne->getModelMatrix() * sphereTransform);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+
+	wayne->draw(MODE, shader);
 }
 
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
