@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 
+// Default Constructor
 PointLight::PointLight(Model * model, glm::vec3 startingPos, bool active)
 {
 	PointLight::model = model;
@@ -21,6 +22,7 @@ PointLight::PointLight(Model * model, glm::vec3 startingPos, bool active)
 	PointLight::active = active;
 }
 
+// Parameterized Constructor
 PointLight::PointLight(Model * model, glm::vec3 startingPos, glm::vec3 col, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float line, float quad, bool active)
 {
 	PointLight::model = model;
@@ -39,8 +41,10 @@ PointLight::PointLight(Model * model, glm::vec3 startingPos, glm::vec3 col, glm:
 	PointLight::active = active;
 }
 
+// Deconstructor
 PointLight::~PointLight() {};
 
+// Sets all the values in the fragment shader specific to that light
 void PointLight::setShaderValues(Shader * shader)
 {
 	shader->setVec3("pointLight.position", position);
