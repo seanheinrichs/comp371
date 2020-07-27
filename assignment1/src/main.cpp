@@ -64,10 +64,11 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
 void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light);
 void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
 void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 /* Global Constants */
-const unsigned int WINDOW_WIDTH = 1024;
-const unsigned int WINDOW_HEIGHT = 768;
+unsigned int WINDOW_WIDTH = 1024;
+unsigned int WINDOW_HEIGHT = 768;
 const unsigned int SHADOW_WIDTH = 1024;
 const unsigned int SHADOW_HEIGHT = 1024;
 
@@ -129,6 +130,7 @@ int main(void)
 	glfwSetCursorPosCallback(window, cursorPositionCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// Initialize GLEW 
 	if (glewInit() != GLEW_OK)
@@ -919,4 +921,11 @@ void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean,
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	WINDOW_WIDTH = width;
+	WINDOW_HEIGHT = height;
+	glViewport(0, 0, width, height);
 }

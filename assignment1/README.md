@@ -153,4 +153,4 @@ Sources:
 * https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
 * planet.obj is from https://learnopengl.com/Advanced-OpenGL/Instancing
 * Crate texture is from https://www.filterforge.com/filters/9452.html
-* objloader.cpp is from lab06 written by Jonathan.
+* objloader.cpp is sourced from lab06.
