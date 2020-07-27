@@ -54,6 +54,8 @@ List of Controls:
 * SHIFT + S - Move the selected model down
 * SHIFT + A - Move the selected model left
 * SHIFT + D - Move the selected model right
+* SHIFT + Q - Move the selected model
+* SHIFT + E - Move the selected model
 
 **Rotation**
 * A - Rotate left 5 degrees about y-axis
@@ -79,6 +81,17 @@ List of Controls:
 * SHIFT + P - Change rendering to points
 * SHIFT + L - Change rendering to lines
 * SHIFT + T - Change rendering to triangles
+
+**Shearing**
+* P - Shear horizontal to the left
+* O - Shear horizontal to the right
+
+**Texture Toggle**
+* X - turn textures OFF
+* SHIFT + X - turn textures ON
+
+**Shadow Toggle**
+* 
 
 ---
 
@@ -112,3 +125,6 @@ Sources:
 * https://www.youtube.com/watch?v=FBbPWSOQ0-w&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=10
 * https://learnopengl.com/?fbclid=IwAR1bqkHtImRamrNihlHn2LQSd9sZBEM9MpjwzWFb8B19jKZm6FMC4fmgrt0
 * https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
+* Objloader.cpp is from lab06 by Jonathan.
+
+

@@ -37,6 +37,7 @@ public:
 	void addTranslation(glm::vec3 translate);
 	void Reposition(glm::vec3 position);
 	glm::mat4 getRotation();
+	glm::mat4 getReposition();
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
 	glm::mat4 getModelMatrix(bool shear = false);
