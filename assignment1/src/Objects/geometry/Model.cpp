@@ -140,6 +140,12 @@ void Model::addShear(glm::vec3 shear)
 //Method that updates the position of the model
 void Model::Reposition(glm::vec3 position)
 {
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->Reposition(position);
+	}
+
 	Model::translate_vec.x = position.x;
 	Model::translate_vec.y = position.y;
 	Model::translate_vec.z = position.z;
@@ -169,6 +175,11 @@ glm::mat4 Model::getShear()
 	//return glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //forward/backwards
 	return glm::shearY3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z)*glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //from side to side
 
+}
+
+glm::mat4 Model::getReposition()
+{
+	return glm::translate(glm::mat4(1.0f), translate_vec);
 }
 
 //Method that calculates the transformation matrix of the model

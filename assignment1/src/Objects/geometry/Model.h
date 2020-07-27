@@ -41,6 +41,7 @@ public:
 	glm::mat4 getScale();
 	glm::mat4 getModelMatrix(bool shear = false);
 	glm::mat4 getShear(); 
+	glm::mat4 getReposition();
 
 
 	virtual float* getVertexArray();
