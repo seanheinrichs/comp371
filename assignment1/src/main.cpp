@@ -818,19 +818,6 @@ void setupTextureMapping()
 
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel)
 {
-  //ben sphere
-	/*
-	  sphereModel->bind();
-  //	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
-  glm:: mat4 model = ben->getModelMatrix();
-  model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
-  model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
-  shader->setMat4("model", model);
-  GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
-  
-  
-	
-	*/
 	DrawSphere(sphereModel, ben, shader);
 	ben->draw(MODE, shader);
 
@@ -856,8 +843,6 @@ void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader
 	model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
 	shader->setMat4("model", model);
 	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
-
-
 }
 
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)

@@ -5,7 +5,6 @@
 #include "../Opengl_a/Shader.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-
 static void createShape(Model * model,
 	std::vector<glm::vec3> & in_vertices,
 	std::vector<glm::vec2> & in_uvs,
@@ -248,7 +247,6 @@ static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 	zero->addPolygon(Shape6);
 	zero->addPolygon(Shape7);
 	zero->addPolygon(Shape8);
-
 
 	// Set initial position
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
