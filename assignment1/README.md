@@ -1,4 +1,4 @@
-# COMP 371 - Section CC Practical Assignment #1
+# COMP 371 - Section CC Practical Assignment #2
 
 Author & Contributor List
 -----------
@@ -14,6 +14,7 @@ Ziming Wang (40041601)
 
 Implementation Specifications
 ---------------------------------------
+**Part 1 (PA1): Modeling and Camera Control**
 * Creates a 100x100 square grid (ground surface) in the XZ plane centred at the origin.
 * Creates a set of three lines 5 grid units in length, in 3 different colors, representing each coordinate axis in virtual world space, centered at the origin.
 * Creates an alphabet and a digit model as described earlier and like the one depicted in the figure by suitably transforming a unit cube. There must be one model by each of the team members based on their name and student ID.
@@ -33,6 +34,30 @@ Implementation Specifications
   * While right button is pressed → use mouse movement in x direction to pan.
   * While middle button is pressed → use mouse movement in y direction to tilt.
 * The user can zoom in and out of the scene - while left button is pressed → use mouse movement to move into/out of the scene.
+
+**Part 2 (PA2): Lighting and Texture Mapping**
+* Enclose the entire model in a big sphere (like a soccer ball bubble and use triangle mesh representations. You should have the lower half of the model outside the bubble.)
+  * Clarifications: roughly 1/3 to a half of the letter/digit should be “sticking out” from the bottom of the sphere.
+* Illuminate the scene by adding a point light source (white) 30 units above the model using the Phong illumination model.
+  * Clarifications: here we talk about the entire world’s model with everyone’s individual letters.
+  * If you did multiple lights, one on top of each individual letter/digit pair, is even better.
+* Render the scene with a tiled texture on the ground mesh, a box-lie texture on the alphabet and a shiny metal finish (color of your choice) for the digit (set key ‘X’ for toggling texture on/off).
+  * Clarifications: you may use stock image textures with a reference to the source or better snap your own photographs of the corresponding materials and use them as textures.
+* Render the scene with shadows using the two-pass shadow algorithm (set key ‘B’ to toggle).
+* Make the model move by moving the segments touching the ground (lower half of the model), while also providing either lateral/vertical movement to the upper half of the model. (One key of your choice for one small forward movement, and other key for continuous forward movement. Same for reverse movement).
+  * Clarifications: this is basically a shearing transformation.
+* Make the model turn right or left by a small amount (choose your own keys and the amount). Document the keys and the amount!
+* Pressing the spacebar should re-position the model at a random location on the grid.
+* The user can incrementally size up the Model by pressing ‘U’ for scale-up and ‘J’ for scale-down. Each key press should result in a small size change (define delta change in a variable and document it).	
+* The user can control the Model position and orientation using keyboard input, i.e., ‘A’ → move left, ‘D’ → move right, ‘W’ → move up, ‘S’ → move down, a → rotate left 5 degrees about Y axis, ‘d’ → rotate right 5 degrees about Y axis. You may add other rotations about other axes, if you want, if you do, please document.	
+* The world orientation is changed by using keyboard input, i.e., left arrow → Rx, right arrow → R-x, up arrow → Ry, down arrow → R-y. (Rx denotes a small anticlockwise rotation about positive x axis, R-x about negative x axis, etc.). Pressing the ‘Home’ button should reset to the initial world position and orientation.	
+* A user can change rendering mode for the Model, i.e., points, lines, or triangles, based on keyboard input, i.e., use key ‘P’ for points, key ‘L’ for lines, key ‘T’ for triangles.	
+* The user can pan and tilt the camera as follows:
+  * While right button is pressed → use mouse movement in x direction to pan
+  * While middle button is pressed → use mouse movement in y direction to tilt
+* The user can zoom in and out of the scene – while left button is pressed → use mouse movement to move into/out of the scene.
+* Window resize handling: The application should handle window resize events and correctly adjust the aspect ratio accordingly. This means, the meshes should not be distorted in anyway.
+
  
 ---
 
@@ -54,8 +79,8 @@ List of Controls:
 * SHIFT + S - Move the selected model down
 * SHIFT + A - Move the selected model left
 * SHIFT + D - Move the selected model right
-* SHIFT + Q - Move the selected model
-* SHIFT + E - Move the selected model
+* SHIFT + Q - Move the selected model forward
+* SHIFT + E - Move the selected model backward
 
 **Rotation**
 * A - Rotate left 5 degrees about y-axis
@@ -91,8 +116,10 @@ List of Controls:
 * SHIFT + X - turn textures ON
 
 **Shadow Toggle**
-* 
 
+* M - Turn shadow OFF
+* SHIFT + M Turn shadow ON
+* 
 ---
 
 Libraries:
@@ -125,6 +152,7 @@ Sources:
 * https://www.youtube.com/watch?v=FBbPWSOQ0-w&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=10
 * https://learnopengl.com/?fbclid=IwAR1bqkHtImRamrNihlHn2LQSd9sZBEM9MpjwzWFb8B19jKZm6FMC4fmgrt0
 * https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
+
+* planet.obj is from https://learnopengl.com/Advanced-OpenGL/Instancing
+* Crate texture is from https://www.filterforge.com/filters/9452.html
 * Objloader.cpp is from lab06 by Jonathan.
-
-
