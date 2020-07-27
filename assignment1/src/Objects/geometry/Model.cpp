@@ -170,21 +170,6 @@ void Model::addTranslation(glm::vec3 translate)
 }
 
 //adds shears to model
-void Model::addShear(glm::vec3 shear)
-{
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->addShear(shear);
-	}
-
-	shear_vec.x += shear.x;
-	shear_vec.y += shear.y;
-	shear_vec.z += shear.z;
-
-}
-
-//adds shears to model
 void Model::addShearMatrix(glm::vec2 shear, char axis)
 {
 	if (axis == 'x') {

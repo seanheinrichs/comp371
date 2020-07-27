@@ -161,22 +161,6 @@ glm::mat4 ModelContainer::getModelMatrix(bool shear)
 
 }
 
-
-//adds shears to model
-void ModelContainer::addShear(glm::vec3 shear)
-{
-
-	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
-	{
-		(*it)->addShear(shear);
-	}
-
-	shear_vec.x += shear.x;
-	shear_vec.y += shear.y;
-	shear_vec.z += shear.z;
-
-}
-
 //adds shears to model
 void ModelContainer::addShearMatrix(glm::vec2 shear, char axis)
 {
@@ -209,20 +193,6 @@ void ModelContainer::addShearMatrix(glm::vec2 shear, char axis)
 	}
 }
 
-void ModelContainer::addShear(glm::vec3 shear, std::string name)
-{
-
-	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
-	{
-		if ((**it).name == name)
-		{
-			(*it)->addShear(shear);
-			break;
-		}
-	}
-
-
-}
 
 //Method that updates the values of the x-y-z components of the translation vector used to calculate the model transformation matrix
 void ModelContainer::addTranslation(glm::vec3 translate)
