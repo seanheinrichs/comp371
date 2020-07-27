@@ -126,6 +126,7 @@ int main(void)
 		return -1;
 	}
 
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwMakeContextCurrent(window);
 	glfwSetCursorPosCallback(window, cursorPositionCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -194,7 +195,7 @@ int main(void)
 	createLightModel(light);
 	light->bindArrayBuffer(true, light);
 
-	// [Point Light]
+	// [Point Lights]
 
 	PointLight* bensPL = new PointLight(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
 	PointLight* seansPL = new PointLight(light, glm::vec3(3.5f, 3.0f, -4.0f), false);
@@ -287,7 +288,6 @@ int main(void)
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	modelShader.use();
 	modelShader.setInt("shadowMap", 11);	// Must be unused texture slot
 
@@ -333,26 +333,24 @@ int main(void)
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		modelShader.setMat4("view", view);
 
-
-
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
 		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
 		
 		// Reset Viewport
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
 		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
 
-		// [Objects Not Affected by Light Source]
+		// [Objects Not Affected by Light Source Go Below]
 
 		// Start Using Lighting Shader
 		lightShader.use();
 		lightShader.setMat4("projection", projection);
 		lightShader.setMat4("view", view);
 		
-		// [Lamps]
+		// [Point Lights]
 		lightShader.setInt("fill", -1);
 		for (int i = 0; i < 5; i++)
 		{
@@ -370,11 +368,12 @@ int main(void)
 
 		// Rendering 5x5 XYZ Axes
 		RenderAxes(&lightShader, grid_VAOs, light);
-
+		
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+	
 
 	// De-allocate resources 
 	ben->deallocate();
@@ -654,12 +653,14 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	}
 
 	// [Shadow Toggle]
+
+	// Press 'M' to turn shadows OFF
 	if (!useShadows && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = true;
 	}
 
-	// Press 'SHIFT + X' to turn textures ON
+	// Press 'SHIFT + M' to turn shadows ON
 	if (useShadows && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = false;

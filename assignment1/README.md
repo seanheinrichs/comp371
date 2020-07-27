@@ -116,9 +116,10 @@ List of Controls:
 * SHIFT + X - turn textures ON
 
 **Shadow Toggle**
+
 * M - Turn shadow OFF
 * SHIFT + M Turn shadow ON
-
+* 
 ---
 
 Libraries:
@@ -151,6 +152,7 @@ Sources:
 * https://www.youtube.com/watch?v=FBbPWSOQ0-w&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=10
 * https://learnopengl.com/?fbclid=IwAR1bqkHtImRamrNihlHn2LQSd9sZBEM9MpjwzWFb8B19jKZm6FMC4fmgrt0
 * https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
+
 * planet.obj is from https://learnopengl.com/Advanced-OpenGL/Instancing
 * Crate texture is from https://www.filterforge.com/filters/9452.html
-* objloader.cpp is sourced from lab06.
+* Objloader.cpp is from lab06 by Jonathan.
