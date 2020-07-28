@@ -17,6 +17,20 @@ void ModelContainer::addModel(Model* model)
 	models.push_back(model);
 }
 
+void ModelContainer::resetShear()
+{
+	shearX = glm::vec2(0.0f, 0.0f);
+	shearY = glm::vec2(0.0f, 0.0f);
+	shearZ = glm::vec2(0.0f, 0.0f);
+
+	setupShearMatrix();
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->resetShear();
+	}
+
+}
+
 ModelContainer::ModelContainer() 
 {
 	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -29,6 +43,7 @@ ModelContainer::ModelContainer()
 	shearZ = glm::vec2(0.0f, 0.0f);
 
 	setupShearMatrix();
+	
 
 }
 
@@ -250,17 +265,6 @@ void ModelContainer::Reposition(glm::vec3 position)
 	ModelContainer::translate_vec.z = position.z;
 }
 
-void ModelContainer::Reposition(glm::vec3 position, std::string name)
-{
-	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
-	{
-		if ((**it).name == name)
-		{
-			(*it)->Reposition(position);
-			break;
-		}
-	}
-}
 
 glm::mat4 ModelContainer::getReposition()
 {

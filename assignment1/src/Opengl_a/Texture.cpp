@@ -1,9 +1,23 @@
+/*
+*
+*Texture class highly inspired from this video
+*
+*source: https://www.youtube.com/watch?v=n4k7ANAFsIQ&t=1161s
+*
+*/
+
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "Texture.h"
 #include "../utils/stb_image.h"
 #include "../utils/gl_error.h"
 
+
+/*
+*
+*Read texture image and create the texture itself in opengl
+*
+*/
 Texture::Texture(const std::string& path) : filePath(path), localBuffer(nullptr), width(0), height(0), BPP(0)
 {
 	//flip image for orientation to reflect opengl's
@@ -37,6 +51,11 @@ Texture::Texture() : filePath(""), localBuffer(nullptr), width(0), height(0), BP
 
 Texture::~Texture() {}
 
+/*
+*
+*bind a texture to a slot
+*
+*/
 void Texture::bind(unsigned int slot) const 
 {
 	GLCall(glActiveTexture(slot ));

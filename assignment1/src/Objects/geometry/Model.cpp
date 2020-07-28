@@ -39,6 +39,9 @@ Model::Model(bool position, bool texture, bool color, bool normal, std::string n
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
+	shearX = glm::vec2(0.0f, 0.0f);
+	shearY = glm::vec2(0.0f, 0.0f);
+	shearZ = glm::vec2(0.0f, 0.0f);
 
 	setupShearMatrix();
 }
@@ -59,12 +62,20 @@ Model::Model()
 	rotate_angle = 0.0;
 
 
-	shearX = glm::vec2(1.0f, 1.0f);
-	shearY = glm::vec2(1.0f, 1.0f);
-	shearZ = glm::vec2(1.0f, 1.0f);
+	shearX = glm::vec2(0.0f, 0.0f);
+	shearY = glm::vec2(0.0f, 0.0f);
+	shearZ = glm::vec2(0.0f, 0.0f);
 
 	setupShearMatrix();
 	
+}
+
+void Model::resetShear() 
+{
+	shearX = glm::vec2(0.0f, 0.0f);
+	shearY = glm::vec2(0.0f, 0.0f);
+	shearZ = glm::vec2(0.0f, 0.0f);
+	setupShearMatrix();
 }
 
 //sets up the values of the shear matrix for each axis
