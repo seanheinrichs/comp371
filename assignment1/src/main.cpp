@@ -163,11 +163,11 @@ int main(void)
 	// [Models]
 
 	//obj loader
-	//these vectors will stores the extracted data from the obj file through the objloader 
+	//these vectors will store the extracted data from the obj file through the objloader 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs; 
 	std::vector<glm::vec3> normals;
-	//extracting data from obj fles
+	//extracting data from obj files
 	bool extraction = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
 
 	Model * sphereModel = new Model(true, false, false, false, "sphere");
