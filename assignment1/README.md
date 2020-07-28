@@ -87,10 +87,10 @@ List of Controls:
 * D - Rotate right 5 degrees about y-axis
 
 **Camera FPS Movement**
-* G - Move camera forward
-* V - Move camera backward
-* C - Move camera left
-* B - Move camera right
+* T - Move camera forward
+* G - Move camera backward
+* F - Move camera left
+* H - Move camera right
 * Left mouse botton - Move to zoom in and out of the scene
 * Middle mouse botton - Move in y direction to tilt
 * Right mouse botton - Move in x direction to pan
@@ -108,8 +108,27 @@ List of Controls:
 * SHIFT + T - Change rendering to triangles
 
 **Shearing**
-* P - Shear horizontal to the left
-* O - Shear horizontal to the right
+* P - Shear up
+* O - Shear down
+* K - Shear forward
+* L - Shear backward
+* M - Shear left 
+* N - Shear right
+* R - reset shear
+
+**Shearing Experiments**
+* [ - arbitrtary shear1
+* SHIFT + [ - arbitrtary shear1
+* ] - arbitrtary shear1
+* SHIFT + ] - arbitrtary shear1
+* ; - arbitrtary shear1
+* SHIFT + ; - arbitrtary shear1
+* ' - arbitrtary shear1
+* SHIFT + ' - arbitrtary shear1
+* . - arbitrtary shear1
+* SHIFT + . - arbitrtary shear1
+* / - arbitrtary shear1
+* SHIFT + / - arbitrtary shear1
 
 **Texture Toggle**
 * X - turn textures OFF
@@ -117,8 +136,8 @@ List of Controls:
 
 **Shadow Toggle**
 
-* M - Turn shadow OFF
-* SHIFT + M Turn shadow ON
+* B - Turn shadow OFF
+* SHIFT + B Turn shadow ON
 * 
 ---
 
@@ -155,4 +174,5 @@ Sources:
 
 * planet.obj is from https://learnopengl.com/Advanced-OpenGL/Instancing
 * Crate texture is from https://www.filterforge.com/filters/9452.html
-* Objloader.cpp is from lab06 by Jonathan.
+* Objloader.cpp is from lab06.
+*Texture.cpp was highly inspired from https://www.youtube.com/watch?v=n4k7ANAFsIQ&t=1161s

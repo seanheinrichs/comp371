@@ -2,6 +2,15 @@
 #include <vector>
 #include <string>
 #include "Model.h"
+
+/*
+*Model Container 
+*
+*A container for many models, the model container allows many models to be rendered in the same method
+*
+*This class was created to avoid future rendering conflicts
+*
+*/
 class ModelContainer 
 {
 public: 
@@ -24,6 +33,7 @@ public:
 	void addShearMatrix(glm::vec2 shear, char axis);
 	void addTranslation(glm::vec3 translate, std::string name);
 	void setupShearMatrix();
+	void resetShear();
 
 	glm::mat4 getShearMatrix();
 	glm::mat4 getRotation();

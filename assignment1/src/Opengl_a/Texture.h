@@ -1,6 +1,12 @@
 #pragma once
 #include <string>
 
+/*
+*Texture 
+*
+*Description: provides a simple interface for creating textures and binding them to interfaces in opengl
+*
+*/
 class Texture
 {
 

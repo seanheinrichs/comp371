@@ -402,25 +402,25 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	// [Camera FPS Movement]
 
 	// Press "G" to move FORWARD
-	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 	{
 		camera.moveForward(cameraSpeed);
 	}
 
 	// Press "V" to move BACKWARDS
-	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 	{
 		camera.moveBackward(cameraSpeed);
 	}
 
 	// Press "C" to move LEFT
-	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
 	{
 		camera.moveLeft(cameraSpeed);
 	}
 
 	// // Press "B" to move RIGHT
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 	{
 		camera.moveRight(cameraSpeed);
 	}
@@ -626,6 +626,11 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->resetShear();
+	}
+
 	// [Shearing]
 	//X AXIS
 	// Press 'P' to shear
@@ -662,6 +667,66 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	{
 		models[selected]->addShearMatrix(glm::vec2(	-0.02f, -0.0f), 'z');
 	}
+
+	// Press '[' to shear
+	if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
+	}
+	// Press '{' to shear
+	if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
+	}
+
+	// Press ']' to shear
+	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.02f), 'z');
+	}
+	// Press '}' to shear
+	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.02f), 'z');
+	}
+
+
+	// Press ';' to shear
+	if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.02f), 'y');
+	}
+	// Press ':' to shear
+	if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.02f), 'y');
+	}
+
+	// Press '/' to shear
+	if (glfwGetKey(window, GLFW_KEY_SLASH) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'x');
+		// Press '?' to shear
+	if (glfwGetKey(window, GLFW_KEY_SLASH) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'x');
+	}
+
+	// Press '.' to shear
+	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'y');
+	}
+	// Press '>' to shear
+	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'y');
+	}
+
 	// [Texture Toggle]
   
 	// Press 'X' to turn textures OFF
@@ -679,13 +744,13 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	// [Shadow Toggle]
 
 	// Press 'M' to turn shadows OFF
-	if (!useShadows && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	if (!useShadows && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = true;
 	}
 
 	// Press 'SHIFT + M' to turn shadows ON
-	if (useShadows && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	if (useShadows && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = false;
 	}
@@ -704,7 +769,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
 	{
 		if (selected == 0) {
-			models[selected]->Reposition(glm::vec3(0.0f, 0.0f, -1.0f));
+			models[selected]->Reposition(glm::vec3(0.0f, 0.0f, 0.0f));
 		}
 		else if (selected == 1) {
 			models[selected]->Reposition(glm::vec3(3.5f, 0.0f, -4.0f));
@@ -767,6 +832,7 @@ void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 	}
 }
 
+//map textures to a global data structure
 void setupTextureMapping()
 {
 	g_texLocations[0] = GL_TEXTURE0;
