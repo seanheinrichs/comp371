@@ -60,6 +60,7 @@ void setupTextureMapping();
 void setModelColor(int modelIndex, Shader * modelShader);
 float RandomFloat(float a, float b);
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel);
+void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader);
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
 void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light);
 void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
@@ -623,21 +624,41 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	}
 
 	// [Shearing]
-
+	//X AXIS
 	// Press 'P' to shear
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addShear(glm::vec3(0.0f, 0.02f,0.0f));
-		//models[selected]->addScale(glm::vec3(0.01f, 0.0f, 0.0f));
+		models[selected]->addShearMatrix(glm::vec2(0.02f,0.0f), 'x');
 	}
-
 	// Press 'O' to shear
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addShear(glm::vec3(0.0f, -0.02f,0.0f));
-		//models[selected]->addScale(glm::vec3(-0.01f, 0.0f, 0.0f));
+		models[selected]->addShearMatrix(glm::vec2(-0.02f,-0.0f), 'x');
 	}
 
+	//Y AXIS
+	// Press 'k' to shear
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'y');
+	}
+	// Press 'l' to shear
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(-0.0f, -0.02f), 'y');
+	}
+
+	//Z AXIS
+	// Press 'N' to shear
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'z');
+	}
+	// Press 'M' to shear
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(	-0.02f, -0.0f), 'z');
+	}
 	// [Texture Toggle]
   
 	// Press 'X' to turn textures OFF
@@ -847,6 +868,17 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 	wayne->draw(MODE, shader);
+}
+
+void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader)
+{
+	sphereModel->bind();
+	//	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
+	glm::mat4 model = modelInnerSoccerBall->getModelMatrix();
+	model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
+	model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
+	shader->setMat4("model", model);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 }
 
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)

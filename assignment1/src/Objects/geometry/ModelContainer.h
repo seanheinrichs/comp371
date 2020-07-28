@@ -20,12 +20,12 @@ public:
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
 	void addRotation(float radians, glm::vec3 axis, std::string name);
-	void addScale(glm::vec3 scale, std::string name);
-	void Reposition(glm::vec3 position, std::string name);
-	glm::mat4 getShear(); 
-	void addShear(glm::vec3 axis);
-	void addShear(glm::vec3 axis, std::string name);
+	void addScale(glm::vec3 scale, std::string name); 
+	void addShearMatrix(glm::vec2 shear, char axis);
 	void addTranslation(glm::vec3 translate, std::string name);
+	void setupShearMatrix();
+
+	glm::mat4 getShearMatrix();
 	glm::mat4 getRotation();
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
@@ -36,5 +36,11 @@ public:
 	glm::vec3 rotate_vec;
 	glm::vec3 translate_vec;
 	glm::vec3 scale_vec;
+
+	glm::mat4 shearMatrix;
+	glm::vec2 shearX;
+	glm::vec2 shearY;
+	glm::vec2 shearZ;
+
 	float rotate_angle;
 };

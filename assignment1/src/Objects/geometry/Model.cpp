@@ -39,6 +39,8 @@ Model::Model(bool position, bool texture, bool color, bool normal, std::string n
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
+
+	setupShearMatrix();
 }
 
 //default constructor
@@ -55,8 +57,39 @@ Model::Model()
 	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
+
+
+	shearX = glm::vec2(1.0f, 1.0f);
+	shearY = glm::vec2(1.0f, 1.0f);
+	shearZ = glm::vec2(1.0f, 1.0f);
+
+	setupShearMatrix();
+	
 }
 
+//sets up the values of the shear matrix for each axis
+void Model::setupShearMatrix()
+{
+	shearMatrix[0][0] = 1;
+	shearMatrix[0][1] = shearZ.y;
+	shearMatrix[0][2] = shearY.y;
+	shearMatrix[0][3] = 0;
+
+	shearMatrix[1][0] = shearZ.x;
+	shearMatrix[1][1] = 1;
+	shearMatrix[1][2] = shearX.y;
+	shearMatrix[1][3] = 0;
+
+	shearMatrix[2][0] = shearY.x;
+	shearMatrix[2][1] = shearX.x;
+	shearMatrix[2][2] = 1;
+	shearMatrix[2][3] = 0;
+
+	shearMatrix[3][0] = 0;
+	shearMatrix[3][1] = 0;
+	shearMatrix[3][2] = 0;
+	shearMatrix[3][3] = 1;
+}
 void Model::setBoolean(bool position, bool texture, bool color, bool normal) 
 {
 	Model::position = position;
@@ -122,19 +155,38 @@ void Model::addTranslation(glm::vec3 translate)
 	Model::translate_vec.z += translate.z;
 }
 
-//adds shears to model
-void Model::addShear(glm::vec3 shear)
+//adds shears to model according to the axis passed, which will determine around which axis it will shear
+void Model::addShearMatrix(glm::vec2 shear, char axis)
 {
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->addShear(shear);
+	if (axis == 'x') {
+		for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+		{
+			if (dynamic_cast<Model*>(*it) != NULL)
+				dynamic_cast<Model*>(*it)->addShearMatrix(shear, axis);
+		}
+		shearX.x += shear.x;
+		shearX.y += shear.y;
 	}
-
-	shear_vec.x += shear.x;
-	shear_vec.y += shear.y;
-	shear_vec.z += shear.z;
-
+	else if (axis == 'y')
+	{
+		for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+		{
+			if (dynamic_cast<Model*>(*it) != NULL)
+				dynamic_cast<Model*>(*it)->addShearMatrix(shear, axis);
+		}
+		shearY.x += shear.x;
+		shearY.y += shear.y;
+	}
+	else if (axis == 'z')
+	{
+		for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+		{
+			if (dynamic_cast<Model*>(*it) != NULL)
+				dynamic_cast<Model*>(*it)->addShearMatrix(shear, axis);
+		}
+		shearZ.x += shear.x;
+		shearZ.y += shear.y;
+	}
 }
 
 //Method that updates the position of the model
@@ -175,17 +227,13 @@ glm::mat4 Model::getScale()
 	return glm::scale(glm::mat4(1.0f), scale_vec);
 }
 
-glm::mat4 Model::getShear()
+//returns shear matrix
+glm::mat4 Model::getShearMatrix()
 {
-	//return glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //forward/backwards
-	return glm::shearY3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z)*glm::shearZ3D(glm::mat4(1.0f), shear_vec.y, shear_vec.z); //from side to side
-
+	setupShearMatrix();
+	return shearMatrix;
 }
 
-glm::mat4 Model::getReposition()
-{
-	return glm::translate(glm::mat4(1.0f), translate_vec);
-}
 
 //Method that calculates the transformation matrix of the model
 glm::mat4 Model::getModelMatrix(bool shear)
@@ -194,10 +242,8 @@ glm::mat4 Model::getModelMatrix(bool shear)
 		return getTranslation() *  getScale();
 	else
 		return 
-		(shear ? glm::inverse(getShear()) : glm::mat4(1.0f)) * getTranslation() * getRotation() * getScale() ;
+		getTranslation() * getRotation() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
 }
-
-
 
 //Method that adds a polygon object to the list of polygons that this model is composed of
 void Model::addPolygon(Polygon* poly) 
@@ -218,7 +264,6 @@ void Model::setVertexController(bool position, bool texture, bool color, bool no
 	{
 		(**it).setVertexController(position, texture, color, normal);
 	}
-
 }
 
 //Method that returns the sample vertex of the polygon list

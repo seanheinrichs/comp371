@@ -32,17 +32,18 @@ public:
 	Model();
 
 	void addRotation(float radians, glm::vec3 axis);
-	void addShear(glm::vec3 axis);
+	void addShearMatrix(glm::vec2 shear, char axis);
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
 	void Reposition(glm::vec3 position);
+	void setupShearMatrix();
+
 	glm::mat4 getRotation();
 	glm::mat4 getReposition();
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
 	glm::mat4 getModelMatrix(bool shear = false);
-	glm::mat4 getShear(); 
-	glm::mat4 getReposition();
+	glm::mat4 getShearMatrix();
 
 
 	virtual float* getVertexArray();
@@ -73,6 +74,10 @@ public:
 	glm::vec3 rotate_vec;
 	glm::vec3 translate_vec;
 	glm::vec3 scale_vec;
+	glm::mat4 shearMatrix;
+	glm::vec2 shearX;
+	glm::vec2 shearY;
+	glm::vec2 shearZ;
 	float rotate_angle;
 
 };
