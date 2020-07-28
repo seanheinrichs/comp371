@@ -5,10 +5,12 @@
 #include "../Opengl_a/Shader.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+//this method has for arguments the extracted data from the objloader and creates a model with this data
 static void createShape(Model * model,
 	std::vector<glm::vec3> & in_vertices,
 	std::vector<glm::vec2> & in_uvs,
 	std::vector<glm::vec3> & in_normals) {
+	//create shape with extracted vertices
 	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), in_vertices, in_uvs, in_normals);
 	model->addPolygon(loadedShape);
 }

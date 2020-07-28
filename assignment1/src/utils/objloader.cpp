@@ -5,8 +5,8 @@
 
 #include <glm/glm.hpp>
 
-//OBJloader from Lab6
-//too include in README
+//The following code is not ours.
+//This code is from the OBJloader from Lab06 
 
 inline bool loadOBJ(
 	const char * path,
