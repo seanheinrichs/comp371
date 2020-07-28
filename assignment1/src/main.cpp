@@ -656,7 +656,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	// Press 'M' to shear
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.0f), 'z');
+		models[selected]->addShearMatrix(glm::vec2(	-0.02f, -0.0f), 'z');
 	}
 	// [Texture Toggle]
   
