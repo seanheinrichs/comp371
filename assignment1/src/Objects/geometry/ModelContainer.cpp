@@ -244,4 +244,25 @@ void ModelContainer::Reposition(glm::vec3 position)
 	{
 		(*it)->Reposition(position);
 	}
+
+	ModelContainer::translate_vec.x = position.x;
+	ModelContainer::translate_vec.y = position.y;
+	ModelContainer::translate_vec.z = position.z;
+}
+
+void ModelContainer::Reposition(glm::vec3 position, std::string name)
+{
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		if ((**it).name == name)
+		{
+			(*it)->Reposition(position);
+			break;
+		}
+	}
+}
+
+glm::mat4 ModelContainer::getReposition()
+{
+	return glm::translate(glm::mat4(1.0f), translate_vec);
 }

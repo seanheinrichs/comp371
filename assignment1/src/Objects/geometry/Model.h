@@ -39,10 +39,12 @@ public:
 	void setupShearMatrix();
 
 	glm::mat4 getRotation();
+	glm::mat4 getReposition();
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
 	glm::mat4 getModelMatrix(bool shear = false);
 	glm::mat4 getShearMatrix();
+
 
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();

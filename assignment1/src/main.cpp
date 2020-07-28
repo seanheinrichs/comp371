@@ -65,10 +65,11 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
 void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light);
 void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
 void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 /* Global Constants */
-const unsigned int WINDOW_WIDTH = 1024;
-const unsigned int WINDOW_HEIGHT = 768;
+unsigned int WINDOW_WIDTH = 1024;
+unsigned int WINDOW_HEIGHT = 768;
 const unsigned int SHADOW_WIDTH = 1024;
 const unsigned int SHADOW_HEIGHT = 1024;
 
@@ -126,10 +127,12 @@ int main(void)
 		return -1;
 	}
 
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwMakeContextCurrent(window);
 	glfwSetCursorPosCallback(window, cursorPositionCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// Initialize GLEW 
 	if (glewInit() != GLEW_OK)
@@ -193,7 +196,7 @@ int main(void)
 	createLightModel(light);
 	light->bindArrayBuffer(true, light);
 
-	// [Point Light]
+	// [Point Lights]
 
 	PointLight* bensPL = new PointLight(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
 	PointLight* seansPL = new PointLight(light, glm::vec3(3.5f, 3.0f, -4.0f), false);
@@ -286,7 +289,6 @@ int main(void)
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	modelShader.use();
 	modelShader.setInt("shadowMap", 11);	// Must be unused texture slot
 
@@ -332,26 +334,24 @@ int main(void)
 		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
 		modelShader.setMat4("view", view);
 
-
-
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
 		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
 		
 		// Reset Viewport
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
 		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
 
-		// [Objects Not Affected by Light Source]
+		// [Objects Not Affected by Light Source Go Below]
 
 		// Start Using Lighting Shader
 		lightShader.use();
 		lightShader.setMat4("projection", projection);
 		lightShader.setMat4("view", view);
 		
-		// [Lamps]
+		// [Point Lights]
 		lightShader.setInt("fill", -1);
 		for (int i = 0; i < 5; i++)
 		{
@@ -369,11 +369,12 @@ int main(void)
 
 		// Rendering 5x5 XYZ Axes
 		RenderAxes(&lightShader, grid_VAOs, light);
-
+		
 		// Swap Buffers and Poll for Events
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+	
 
 	// De-allocate resources 
 	ben->deallocate();
@@ -582,13 +583,13 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 		models[selected]->addTranslation(glm::vec3(0.0f, -0.1f, 0.0f));
 	}
 
-	// Press "SHIFT + S" to move the selected model DOWN
+	// Press "SHIFT + Q" to move the selected model DOWN
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, -0.1f));
 	}
 
-	// Press "SHIFT + S" to move the selected model DOWN
+	// Press "SHIFT + E" to move the selected model DOWN
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, 0.1f));
@@ -673,12 +674,14 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	}
 
 	// [Shadow Toggle]
+
+	// Press 'M' to turn shadows OFF
 	if (!useShadows && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = true;
 	}
 
-	// Press 'SHIFT + X' to turn textures ON
+	// Press 'SHIFT + M' to turn shadows ON
 	if (useShadows && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = false;
@@ -818,20 +821,53 @@ void setupTextureMapping()
 
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel)
 {
-	DrawSphere(sphereModel, ben, shader);
+	glm::mat4 sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
+	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
+
+	//ben sphere
+	sphereModel->bind();
+	shader->setMat4("model", ben->getModelMatrix() * sphereTransform);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+  
 	ben->draw(MODE, shader);
 
-	DrawSphere(sphereModel, sean, shader);
+
+	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
+	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
+	//sean sphere
+	sphereModel->bind();
+	shader->setMat4("model", sean->getModelMatrix() * sphereTransform);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+
 	sean->draw(MODE, shader);
 
-	DrawSphere(sphereModel, isa, shader);
+
+	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
+	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
+	//isa sphere
+	sphereModel->bind();
+	shader->setMat4("model", isa->getModelMatrix() * sphereTransform);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+
 	isa->draw(MODE, shader);
 
-	DrawSphere(sphereModel, ziming, shader);
+	//ziming sphere
+	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(2.25f, 2.25f, 2.25f));
+	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 3.75f, 0.0f));
+	sphereModel->bind();
+	shader->setMat4("model", ziming->getModelMatrix() * sphereTransform);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+
 	ziming->draw(MODE, shader);
 
-	DrawSphere(sphereModel, wayne, shader);
-	wayne->draw(MODE, shader);	
+	//wayne sphere
+	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(2.25f, 2.25f, 2.25f));
+	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
+	sphereModel->bind();
+	shader->setMat4("model", wayne->getModelMatrix() * sphereTransform);
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+
+	wayne->draw(MODE, shader);
 }
 
 void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader)
@@ -918,4 +954,11 @@ void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean,
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	WINDOW_WIDTH = width;
+	WINDOW_HEIGHT = height;
+	glViewport(0, 0, width, height);
 }
