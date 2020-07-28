@@ -639,12 +639,12 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	// Press 'k' to shear
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.02f), 'y');
+		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'y');
 	}
 	// Press 'l' to shear
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.02f), 'y');
+		models[selected]->addShearMatrix(glm::vec2(-0.0f, -0.02f), 'y');
 	}
 
 	//Z AXIS
