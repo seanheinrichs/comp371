@@ -707,85 +707,87 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	{
 		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
 		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'x');
-		// Press '?' to shear
-		if (glfwGetKey(window, GLFW_KEY_SLASH) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-		{
-			models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
-			models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'x');
+
+	}
+	// Press '?' to shear
+	if (glfwGetKey(window, GLFW_KEY_SLASH) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'x');
+	}
+
+	// Press '.' to shear
+	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'y');
+	}
+	// Press '>' to shear
+	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'y');
+	}
+
+	// [Texture Toggle]
+
+	// Press 'X' to turn textures OFF
+	if ((useTextures != 1) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useTextures = 1;
+	}
+
+	// Press 'SHIFT + X' to turn textures ON
+	if ((useTextures != 0) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useTextures = 0;
+	}
+
+	// [Shadow Toggle]
+
+	// Press 'M' to turn shadows OFF
+	if (!useShadows && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useShadows = true;
+	}
+
+	// Press 'SHIFT + M' to turn shadows ON
+	if (useShadows && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useShadows = false;
+	}
+
+	// Press 'SPACE' to re-position the model at a random location on the grid
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		float a = -5.0f;
+		float b = 5.0f;
+		float x = RandomFloat(a, b);
+		float z = RandomFloat(a, b);
+		models[selected]->Reposition(glm::vec3(x, 0.0f, z));
+	}
+
+	// Press 'BACKSPACE' to reset to original position
+	if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
+	{
+		if (selected == 0) {
+			models[selected]->Reposition(glm::vec3(0.0f, 0.0f, 0.0f));
 		}
-
-		// Press '.' to shear
-		if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-		{
-			models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
-			models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'y');
+		else if (selected == 1) {
+			models[selected]->Reposition(glm::vec3(3.5f, 0.0f, -4.0f));
 		}
-		// Press '>' to shear
-		if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-		{
-			models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
-			models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'y');
+		else if (selected == 2) {
+			models[selected]->Reposition(glm::vec3(3.5f, 0.0f, 4.0f));
 		}
-
-		// [Texture Toggle]
-
-		// Press 'X' to turn textures OFF
-		if ((useTextures != 1) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-		{
-			useTextures = 1;
+		else if (selected == 3) {
+			models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, 4.0f));
 		}
-
-		// Press 'SHIFT + X' to turn textures ON
-		if ((useTextures != 0) && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-		{
-			useTextures = 0;
-		}
-
-		// [Shadow Toggle]
-
-		// Press 'M' to turn shadows OFF
-		if (!useShadows && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-		{
-			useShadows = true;
-		}
-
-		// Press 'SHIFT + M' to turn shadows ON
-		if (useShadows && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-		{
-			useShadows = false;
-		}
-
-		// Press 'SPACE' to re-position the model at a random location on the grid
-		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		{
-			float a = -5.0f;
-			float b = 5.0f;
-			float x = RandomFloat(a, b);
-			float z = RandomFloat(a, b);
-			models[selected]->Reposition(glm::vec3(x, 0.0f, z));
-		}
-
-		// Press 'BACKSPACE' to reset to original position
-		if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
-		{
-			if (selected == 0) {
-				models[selected]->Reposition(glm::vec3(0.0f, 0.0f, 0.0f));
-			}
-			else if (selected == 1) {
-				models[selected]->Reposition(glm::vec3(3.5f, 0.0f, -4.0f));
-			}
-			else if (selected == 2) {
-				models[selected]->Reposition(glm::vec3(3.5f, 0.0f, 4.0f));
-			}
-			else if (selected == 3) {
-				models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, 4.0f));
-			}
-			else if (selected == 4) {
-				models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, -4.0f));
-			}
+		else if (selected == 4) {
+			models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, -4.0f));
 		}
 	}
 }
+
 
 //Method to generate random float between a & b
 float RandomFloat(float a, float b) {
