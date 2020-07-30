@@ -43,7 +43,7 @@ Texture::Texture(const std::string& path) : filePath(path), localBuffer(nullptr)
 	if (localBuffer)
 	{
 		stbi_image_free(localBuffer);
-		std::cout << "images was loaded and now its deleted" << std::endl;
+		//std::cout << "images was loaded and now its deleted" << std::endl;
 	}
 }
 
