@@ -320,7 +320,7 @@ int main(void)
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
 
-	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	wayne->addScale(glm::vec3(0.002f, 0.002f, 0.002f));
 	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
 	wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
 	
@@ -668,41 +668,6 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.02f), 'z');
-	}
-
-
-	// Press ';' to shear
-	if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[4]->addRotationY(1);
-	}
-	// Press ':' to shear
-	if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[4]->addRotationY(1);
-	}
-
-	// Press '/' to shear
-	if (glfwGetKey(window, GLFW_KEY_SLASH) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[4]->addRotationZ(1);
-
-	}
-	// Press '?' to shear
-	if (glfwGetKey(window, GLFW_KEY_SLASH) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[4]->addRotationZ(-1);
-	}
-
-	// Press '.' to shear
-	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[4]->addRotationX(1);
-	}
-	// Press '>' to shear
-	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[4]->addRotationX(-1);
 	}
 
 	// [Texture Toggle]
