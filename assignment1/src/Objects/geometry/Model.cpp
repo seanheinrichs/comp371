@@ -39,7 +39,6 @@ Model::Model(bool position, bool texture, bool color, bool normal, std::string n
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
-
 	aabb.min = glm::vec4(0.0f);
 	aabb.max = glm::vec4(0.0f);
 	rotate_angleX = 0.0;
@@ -235,6 +234,52 @@ void Model::setRotation(float degrees, glm::vec3 axis)
 	rotate_angle = degrees;
 }
 
+void Model::addRotationX(float degrees)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addRotationX(degrees);
+	}
+
+	rotate_angleX += degrees;
+}
+
+void Model::addRotationY(float degrees)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addRotationY(degrees);
+	}
+
+	rotate_angleY += degrees;
+}
+
+void Model::addRotationZ(float degrees)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addRotationZ(degrees);
+	}
+
+	rotate_angleZ += degrees;
+}
+
+
+void Model::setRotation(float degrees, glm::vec3 axis)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->setRotation(degrees, axis);
+	}
+
+	rotate_vec = axis;
+	rotate_angle = degrees;
+}
+
 //Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
 void Model::addScale(glm::vec3 scale)
 {
@@ -335,6 +380,7 @@ glm::mat4 Model::getRotation(float angle, glm::vec3 rotateVec)
 	return glm::rotate(glm::mat4(1.0f), glm::radians(angle), rotateVec);
 }
 
+
 //Method that returns the rotation matrix
 glm::mat4 Model::getRotationX()
 {
@@ -345,8 +391,6 @@ glm::mat4 Model::getRotationY()
 {
 	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angleY), glm::vec3(0.0, 1.0, 0.0));
 }
-
-
 
 glm::mat4 Model::getRotationZ()
 {

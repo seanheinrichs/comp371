@@ -236,7 +236,11 @@ int main(void)
 	createZimingsModel(ziming, &modelShader);
 	ziming->bindArrayBuffer();
 
+<<<<<<< HEAD
 	ModelContainer* wayne = loadModel("../Assets/Models/backpack.obj");
+=======
+	ModelContainer* wayne = loadModel("../Assets/Models/house.obj");
+>>>>>>> cc6d397... assimp begining
 
 		//new ModelContainer();
 	//createWaynesModel(wayne, &modelShader);
@@ -670,6 +674,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.02f), 'z');
 	}
 
+	
 	// [Texture Toggle]
 
 	// Press 'X' to turn textures OFF
