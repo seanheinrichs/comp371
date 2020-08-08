@@ -33,10 +33,13 @@ void ModelContainer::resetShear()
 
 ModelContainer::ModelContainer() 
 {
-	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
+	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
+	rotate_angleX = 0.0;
+	rotate_angleY = 0.0;
+	rotate_angleZ = 0.0;
 
 	shearX = glm::vec2(0.0f,0.0f);
 	shearY = glm::vec2(0.0f, 0.0f);
@@ -123,6 +126,59 @@ void ModelContainer::addRotation(float degrees, glm::vec3 axis, std::string name
 	}
 }
 
+void ModelContainer::addRotationX(float degrees)
+{
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->addRotationX(degrees);
+	}
+	rotate_angleX += degrees;
+}
+
+void ModelContainer::addRotationY(float degrees)
+{
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->addRotationY(degrees);
+	}
+	rotate_angleY += degrees;
+}
+
+void ModelContainer::addRotationZ(float degrees)
+{
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->addRotationZ(degrees);
+	}
+	rotate_angleZ += degrees;
+}
+
+void ModelContainer::setRotation(float degrees, glm::vec3 axis)
+{
+	rotate_vec = axis;
+	rotate_angle = degrees;
+
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->setRotation(degrees, axis);
+	}
+}
+
+glm::mat4 ModelContainer::getRotationX()
+{
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angleX), glm::vec3(1.0, 0.0, 0.0));
+}
+
+glm::mat4 ModelContainer::getRotationY()
+{
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angleY), glm::vec3(0.0, 1.0, 0.0));
+}
+
+glm::mat4 ModelContainer::getRotationZ()
+{
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angleZ), glm::vec3(0.0, 0.0, 1.0));
+}
+
 //Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
 void ModelContainer::addScale(glm::vec3 scale)
 {
@@ -167,12 +223,7 @@ glm::mat4 ModelContainer::getShearMatrix()
 //Method that calculates the transformation matrix of the model
 glm::mat4 ModelContainer::getModelMatrix(bool shear)
 {
-	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
-		return getTranslation() *  getScale();
-	else
-		return
-		getTranslation() * getRotation() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
-
+	return getTranslation() * getRotationX() * getRotationY() * getRotationZ() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
 }
 
 //adds shears to model according to the axis passed, which will determine around which axis it will shear

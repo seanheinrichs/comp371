@@ -31,9 +31,14 @@ in main: #include <glm/gtx/transform2.hpp>
 #include <string>
 #include <sstream>
 #include <filesystem>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <assimp/config.h>
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
 
+#include "utils/AssimpTranslation.h"
 #include "Objects/geometry/Polygon.h"
 #include "Objects/Grid.hpp"
 #include "Objects/Camera.h"
@@ -231,8 +236,10 @@ int main(void)
 	createZimingsModel(ziming, &modelShader);
 	ziming->bindArrayBuffer();
 
-	ModelContainer* wayne = new ModelContainer();
-	createWaynesModel(wayne, &modelShader);
+	ModelContainer* wayne = loadModel("../Assets/Models/house.obj");
+
+		//new ModelContainer();
+	//createWaynesModel(wayne, &modelShader);
 	wayne->bindArrayBuffer();
 
 	Model* light = new Model(true, false, false, true, "light", &lightShader, -1);
@@ -313,8 +320,10 @@ int main(void)
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
 
-	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	wayne->addScale(glm::vec3(0.002f, 0.002f, 0.002f));
 	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
+	wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
+	
 
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
@@ -567,6 +576,133 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		camera.moveLeft(cameraSpeed * 1.5);
+	}
+
+	// [Rotation]
+
+	// Press 'SHIFT + A' to rotate the model to the left 5 degrees about y-axis
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addRotation(5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	// Press 'SHIFT + D' to rotate the model to the right 5 degrees about y-axis
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addRotation(-5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	// [Scale]
+
+	// Press 'U' to scale UP the model
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+	{
+		models[selected]->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	}
+
+	// Press 'J' to scale DOWN the model
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	{
+		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->resetShear();
+	}
+
+	// [Shearing]
+	//X AXIS
+	// Press 'P' to shear
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'x');
+	}
+	// Press 'O' to shear
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.0f), 'x');
+	}
+
+	//Y AXIS
+	// Press 'k' to shear
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'y');
+	}
+	// Press 'l' to shear
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(-0.0f, -0.02f), 'y');
+	}
+
+	//Z AXIS
+	// Press 'N' to shear
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'z');
+	}
+	// Press 'M' to shear
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.0f), 'z');
+	}
+
+	// Press '[' to shear
+	if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
+	}
+	// Press '{' to shear
+	if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
+	}
+
+	// Press ']' to shear
+	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.02f), 'z');
+	}
+	// Press '}' to shear
+	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.02f), 'z');
+	}
+
+
+	// Press ';' to shear
+	if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[4]->addRotationY(1);
+	}
+	// Press ':' to shear
+	if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[4]->addRotationY(1);
+	}
+
+	// Press '/' to shear
+	if (glfwGetKey(window, GLFW_KEY_SLASH) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[4]->addRotationZ(1);
+
+	}
+	// Press '?' to shear
+	if (glfwGetKey(window, GLFW_KEY_SLASH) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[4]->addRotationZ(-1);
+	}
+
+	// Press '.' to shear
+	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[4]->addRotationX(1);
+	}
+	// Press '>' to shear
+	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[4]->addRotationX(-1);
 	}
 
 	// [Texture Toggle]

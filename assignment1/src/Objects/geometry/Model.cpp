@@ -42,7 +42,9 @@ Model::Model(bool position, bool texture, bool color, bool normal, std::string n
 
 	aabb.min = glm::vec4(0.0f);
 	aabb.max = glm::vec4(0.0f);
-
+	rotate_angleX = 0.0;
+	rotate_angleY = 0.0;
+	rotate_angleZ = 0.0;
 	shearX = glm::vec2(0.0f, 0.0f);
 	shearY = glm::vec2(0.0f, 0.0f);
 	shearZ = glm::vec2(0.0f, 0.0f);
@@ -64,6 +66,9 @@ Model::Model()
 	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
+	rotate_angleX = 0.0;
+	rotate_angleY = 0.0;
+	rotate_angleZ = 0.0;
 
 	aabb.min = glm::vec4(0.0f);
 	aabb.max = glm::vec4(0.0f);
@@ -136,6 +141,52 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 
 	// Update AABB (Collision)
 	setAABB();
+}
+
+void Model::addRotationX(float degrees)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addRotationX(degrees);
+	}
+
+	rotate_angleX += degrees;
+}
+
+void Model::addRotationY(float degrees)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addRotationY(degrees);
+	}
+
+	rotate_angleY += degrees;
+}
+
+void Model::addRotationZ(float degrees)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addRotationZ(degrees);
+	}
+
+	rotate_angleZ += degrees;
+}
+
+
+void Model::setRotation(float degrees, glm::vec3 axis)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->setRotation(degrees, axis);
+	}
+
+	rotate_vec = axis;
+	rotate_angle = degrees;
 }
 
 //Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
@@ -233,10 +284,27 @@ void Model::Reposition(glm::vec3 position)
 }
 
 //Method that returns the rotation matrix
-glm::mat4 Model::getRotation() 
+glm::mat4 Model::getRotation(float angle, glm::vec3 rotateVec)
 {
-	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec);
+	return glm::rotate(glm::mat4(1.0f), glm::radians(angle), rotateVec);
 }
+
+//Method that returns the rotation matrix
+glm::mat4 Model::getRotationX()
+{
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angleX), glm::vec3(1.0, 0.0, 0.0));
+}
+
+glm::mat4 Model::getRotationY()
+{
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angleY), glm::vec3(0.0, 1.0, 0.0));
+}
+
+glm::mat4 Model::getRotationZ()
+{
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angleZ), glm::vec3(0.0, 0.0, 1.0));
+}
+
 
 //Method that returns the translation matrix
 glm::mat4 Model::getTranslation() 
@@ -267,11 +335,8 @@ glm::mat4 Model::getShearMatrix()
 //Method that calculates the transformation matrix of the model
 glm::mat4 Model::getModelMatrix(bool shear)
 {
-	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
-		return getTranslation() *  getScale();
-	else
-		return 
-		getTranslation() * getRotation() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
+
+	return getTranslation() * getRotationX() * getRotationY() * getRotationZ() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
 }
 
 //Method that adds a polygon object to the list of polygons that this model is composed of

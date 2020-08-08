@@ -38,6 +38,10 @@ public:
 	Model();
 
 	void addRotation(float radians, glm::vec3 axis);
+	void addRotationX(float radians);
+	void addRotationY(float radians);
+	void addRotationZ(float radians);
+	void setRotation(float radians, glm::vec3 axis);
 	void addShearMatrix(glm::vec2 shear, char axis);
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
@@ -45,7 +49,10 @@ public:
 	void setupShearMatrix();
 	void resetShear();
 
-	glm::mat4 getRotation();
+	glm::mat4 getRotation(float angle,glm::vec3 rotateVec);
+	glm::mat4 getRotationX();
+	glm::mat4 getRotationY();
+	glm::mat4 getRotationZ();
 	glm::mat4 getReposition();
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
@@ -83,7 +90,7 @@ public:
 	glm::vec2 shearX;
 	glm::vec2 shearY;
 	glm::vec2 shearZ;
-	float rotate_angle;
+	float rotate_angle, rotate_angleX, rotate_angleY, rotate_angleZ;
 
 	// Collision Components
 	AABB aabb;
