@@ -20,6 +20,9 @@ public:
 	void moveBackward(float speed);
 	void moveLeft(float speed);
 	void moveRight(float speed);
+	void moveUpward(float speed);
+
+	void ProcessMouseMovement(float xoffset, float yoffset);
 
 	glm::mat4 calculateViewMatrix();
 

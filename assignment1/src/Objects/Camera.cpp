@@ -81,3 +81,27 @@ void Camera::moveRight(float speed)
 {
 	position += glm::normalize(glm::cross(front, up)) * speed;
 }
+
+void Camera::moveUpward(float speed)
+{
+	position.y += speed;
+}
+
+void Camera::ProcessMouseMovement(float xoffset, float yoffset)
+{
+	xoffset *= 0.1f;
+	yoffset *= 0.1f;
+
+	yawAngle += xoffset;
+	pitchAngle += yoffset;
+
+	if (true)
+	{
+		if (pitchAngle > 89.0f)
+			pitchAngle = 89.0f;
+		if (pitchAngle < -89.0f)
+			pitchAngle = -89.0f;
+	}
+
+	updateCamera();
+}

@@ -96,6 +96,8 @@ float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
 
+bool firstMouse = true;
+
 // Variables used for light and shadows
 unsigned int depthMapFBO;
 unsigned int depthMap;
@@ -419,31 +421,31 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 
 	float cameraSpeed = 1.0 * deltaTime;
 
-	// [Camera FPS Movement]
+	//// [Camera FPS Movement]
 
-	// Press "G" to move FORWARD
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-	{
-		camera.moveForward(cameraSpeed);
-	}
+	//// Press "G" to move FORWARD
+	//if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+	//{
+	//	camera.moveForward(cameraSpeed);
+	//}
 
-	// Press "V" to move BACKWARDS
-	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
-	{
-		camera.moveBackward(cameraSpeed);
-	}
+	//// Press "V" to move BACKWARDS
+	//if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+	//{
+	//	camera.moveBackward(cameraSpeed);
+	//}
 
-	// Press "C" to move LEFT
-	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-	{
-		camera.moveLeft(cameraSpeed);
-	}
+	//// Press "C" to move LEFT
+	//if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+	//{
+	//	camera.moveLeft(cameraSpeed);
+	//}
 
-	// // Press "B" to move RIGHT
-	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
-	{
-		camera.moveRight(cameraSpeed);
-	}
+	//// // Press "B" to move RIGHT
+	//if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+	//{
+	//	camera.moveRight(cameraSpeed);
+	//}
 
 	// [World Rotation]
 
@@ -583,51 +585,67 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	// [Translation]
 
 	// Press "SHIFT + A" to move the selected model to the LEFT
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		models[selected]->addTranslation(glm::vec3(-0.1f, 0.0f, 0.0f));
+		camera.moveForward(cameraSpeed);
 	}
 
 	// Press "SHIFT + D" to move the selected model to the RIGHT
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		models[selected]->addTranslation(glm::vec3(0.1f, 0.0f, 0.0f));
+		camera.moveBackward(cameraSpeed);
 	}
 
 	// Press "SHIFT + W" to move the selected model UP
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		models[selected]->addTranslation(glm::vec3(0.0f, 0.1f, 0.0f));
+		camera.moveLeft(cameraSpeed);
 	}
 
 	// Press "SHIFT + S" to move the selected model DOWN
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		camera.moveRight(cameraSpeed);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		camera.moveUpward(cameraSpeed);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		camera.moveForward(cameraSpeed * 4.0);
+	}
+
+	// Press "SHIFT + DOWN ARROW" to move FORWARD faster
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addTranslation(glm::vec3(0.0f, -0.1f, 0.0f));
+		camera.moveBackward(cameraSpeed * 4.0);
 	}
 
-	// Press "SHIFT + Q" to move the selected model DOWN
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	// Press "SHIFT + RIGHT ARROW" to move FORWARD faster
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, -0.1f));
+		camera.moveRight(cameraSpeed * 4.0);
 	}
 
-	// Press "SHIFT + E" to move the selected model DOWN
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	// Press "SHIFT + LEFT ARROW" to move FORWARD faster
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, 0.1f));
+		camera.moveLeft(cameraSpeed * 4.0);
 	}
 
 	// [Rotation]
 
-	// Press 'A' to rotate the model to the left 5 degrees about y-axis
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	// Press 'SHIFT + A' to rotate the model to the left 5 degrees about y-axis
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		models[selected]->addRotation(5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
-	// Press 'D' to rotate the model to the right 5 degrees about y-axis
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	// Press 'SHIFT + D' to rotate the model to the right 5 degrees about y-axis
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		models[selected]->addRotation(-5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
@@ -776,36 +794,6 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 	{
 		useShadows = false;
 	}
-
-	// Press 'SPACE' to re-position the model at a random location on the grid
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		float a = -5.0f;
-		float b = 5.0f;
-		float x = RandomFloat(a, b);
-		float z = RandomFloat(a, b);
-		models[selected]->Reposition(glm::vec3(x, 0.0f, z));
-	}
-
-	// Press 'BACKSPACE' to reset to original position
-	if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
-	{
-		if (selected == 0) {
-			models[selected]->Reposition(glm::vec3(0.0f, 0.0f, 0.0f));
-		}
-		else if (selected == 1) {
-			models[selected]->Reposition(glm::vec3(3.5f, 0.0f, -4.0f));
-		}
-		else if (selected == 2) {
-			models[selected]->Reposition(glm::vec3(3.5f, 0.0f, 4.0f));
-		}
-		else if (selected == 3) {
-			models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, 4.0f));
-		}
-		else if (selected == 4) {
-			models[selected]->Reposition(glm::vec3(-4.0f, 0.0f, -4.0f));
-		}
-	}
 }
 
 
@@ -824,35 +812,49 @@ void setModelColor(int modelIndex, Shader* modelShader)
 
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 {
-	const float SENSITIVITY = 0.05f;
+	//const float SENSITIVITY = 0.05f;
 
-	xOffset = xPos - previousXPos;
-	yOffset = previousYPos - yPos;
+	//xOffset = xPos - previousXPos;
+	//yOffset = previousYPos - yPos;
+
+	//previousXPos = xPos;
+	//previousYPos = yPos;
+
+	//// Limit speed of camera movement
+	//xOffset *= SENSITIVITY;
+	//yOffset *= SENSITIVITY;
+
+	//// Pan camera when holding the right mouse button
+	//if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+	//{
+	//	camera.panCamera(xOffset);
+	//}
+
+	//// Tilt camera when holding the middle mouse button
+	//if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
+	//{
+	//	camera.tiltCamera(yOffset);
+	//}
+
+	//// Zoom camera when holding the left mouse button
+	//if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	//{
+	//	camera.zoomCamera(yOffset);
+	//}
+	if (firstMouse)
+	{
+		previousXPos = xPos;
+		previousYPos = yPos;
+		firstMouse = false;
+	}
+
+	float xoffset = xPos - previousXPos;
+	float yoffset = previousYPos - yPos;
 
 	previousXPos = xPos;
 	previousYPos = yPos;
 
-	// Limit speed of camera movement
-	xOffset *= SENSITIVITY;
-	yOffset *= SENSITIVITY;
-
-	// Pan camera when holding the right mouse button
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-	{
-		camera.panCamera(xOffset);
-	}
-
-	// Tilt camera when holding the middle mouse button
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
-	{
-		camera.tiltCamera(yOffset);
-	}
-
-	// Zoom camera when holding the left mouse button
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	{
-		camera.zoomCamera(yOffset);
-	}
+	camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 //map textures to a global data structure
