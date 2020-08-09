@@ -36,7 +36,7 @@ in main: #include <glm/gtx/transform2.hpp>
 #include "Objects/geometry/Polygon.h"
 #include "Objects/Grid.hpp"
 #include "Objects/Camera.h"
-#include "Objects/PointLight.h"
+#include "Objects/lighting/Light.h"
 #include "modeling/OurModels.cpp"
 #include "utils/GL_Error.h"
 #include "utils/objloader.cpp"
@@ -58,7 +58,7 @@ in main: #include <glm/gtx/transform2.hpp>
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
 
 /* Function Declarations */
-void processInput(GLFWwindow *window, ModelContainer** models, PointLight** pointLights);
+void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights);
 void setModelColor(int modelIndex, Shader* modelShader);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 void setupTextureMapping();
@@ -214,12 +214,14 @@ int main(void)
 
 	// [Point Lights]
 
-	PointLight* bensPL = new PointLight(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
-	PointLight* seansPL = new PointLight(light, glm::vec3(3.5f, 3.0f, -4.0f), false);
-	PointLight* waynesPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, -4.0f), false);
-	PointLight* isasPL = new PointLight(light, glm::vec3(3.5f, 3.0f, 4.0f), false);
-	PointLight* zimingsPL = new PointLight(light, glm::vec3(-4.0f, 3.0f, 4.0f), false);
+	Light* bensPL = new Light(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
+	Light* seansPL = new Light(light, glm::vec3(3.5f, 3.0f, -4.0f), false);
+	Light* waynesPL = new Light(light, glm::vec3(-4.0f, 3.0f, -4.0f), false);
+	Light* isasPL = new Light(light, glm::vec3(3.5f, 3.0f, 4.0f), false);
+	Light* zimingsPL = new Light(light, glm::vec3(-4.0f, 3.0f, 4.0f), false);
 
+	Light* spotLight = new Light(light, glm::vec3(0.0f, 1.0f, -8.0f), false);
+			
 	// [Grid]
 
 	Grid mainGrid = Grid();
@@ -256,7 +258,7 @@ int main(void)
 	GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))));
 	GLCall(glEnableVertexAttribArray(1));
 
-	PointLight** pointLights = new PointLight*[5];
+	Light** pointLights = new Light*[5];
 	pointLights[0] = bensPL;
 	pointLights[1] = seansPL;
 	pointLights[2] = isasPL;
@@ -333,11 +335,13 @@ int main(void)
 		modelShader.setVec3("viewPos", camera.position);
 
 		// Set Light Properties
+		spotLight->setShaderValues(&modelShader, true);
+
 		for (int i = 0; i < 5; i++)
 		{
 			if (pointLights[i]->getActive())
 			{
-				pointLights[i]->setShaderValues(&modelShader);
+				pointLights[i]->setShaderValues(&modelShader, false);
 			}
 		}
 
@@ -414,7 +418,7 @@ int main(void)
 }
 
 // Event handling functions
-void processInput(GLFWwindow *window, ModelContainer** models, PointLight** pointLights)
+void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights)
 {
 
 	float cameraSpeed = 1.0 * deltaTime;
