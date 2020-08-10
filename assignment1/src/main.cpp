@@ -107,6 +107,11 @@ glm::mat4 lightView(1.0f);
 // Variables used for Skybox
 unsigned int skyboxVAO, skyboxVBO, cubemapTexture;
 
+// Variables used for Fog / Sky Color (Fog/ClearColor)
+const float RED = 0.5;
+const float BLUE = 0.5;
+const float GREEN = 0.5;
+
 //globals used for selecting render mode and models
 GLenum MODE = GL_TRIANGLES;
 int selected = 0;
@@ -311,6 +316,9 @@ int main(void)
 	modelShader.use();
 	modelShader.setInt("shadowMap", 11);	// Must be unused texture slot
 
+	// Fog
+	modelShader.setVec3("skyColor", RED, BLUE, GREEN);
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -323,7 +331,7 @@ int main(void)
 		processInput(window, models, pointLights);
 
 		// Render
-		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+		GLCall(glClearColor(RED, BLUE, GREEN, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		// Start Using Model Shader

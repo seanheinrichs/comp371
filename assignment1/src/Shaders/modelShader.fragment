@@ -6,6 +6,7 @@ in vec3 Normal;
 in vec3 FragPos;
 in vec2 v_TexCoord;
 in vec4 FragPosLightSpace;
+in float visibility;
 
 struct Material {
 	sampler2D diffuse;
@@ -32,6 +33,7 @@ uniform vec3 viewPos;
 uniform vec3 lightPos;
 uniform Material material;
 uniform PointLight pointLight;
+uniform vec3 skyColor;
 
 float ShadowCalculation(vec4 fragPosLightSpace);
 vec3 CalculateLighting(PointLight lightSource, vec3 nromal, vec3 fragPos, vec3 viewDir);
@@ -44,6 +46,7 @@ void main()
 	vec3 result = CalculateLighting(pointLight, norm, FragPos, viewDir);
 
 	FragColor = vec4(result, 1.0);
+	FragColor = mix(vec4(skyColor, 1.0), FragColor, visibility);
 }
 
 // Light Calculation Credit - https://learnopengl.com/Lighting/Basic-Lighting
