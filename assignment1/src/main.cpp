@@ -198,6 +198,12 @@ int main(void)
 	createShape(sphereModel, vertices, uvs, normals);
 	sphereModel->bindArrayBuffer(true, sphereModel);
 
+	ModelContainer * terrain = new ModelContainer();
+	//creating a model with the vertices data extracted from object loader
+	createTerrain(terrain, &modelShader);
+	terrain->bindArrayBuffer();
+
+
 	ModelContainer* ben = new ModelContainer();
 	createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
@@ -276,11 +282,15 @@ int main(void)
 	pointLights[4] = waynesPL;
 
 	ModelContainer** models = new ModelContainer*[5];
-	models[0] = ben;
+	models[0] = terrain;
 	models[1] = sean;
 	models[2] = isa;
 	models[3] = ziming;
 	models[4] = wayne;
+
+	terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
+	terrain->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
+
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -351,6 +361,7 @@ int main(void)
 		modelShader.setBool("useShadows", useShadows);
 		modelShader.setVec3("viewPos", camera.position);
 
+
 		// Set Light Properties
 		spotLight->setShaderValues(&modelShader, true);
 
@@ -374,14 +385,14 @@ int main(void)
 		modelShader.setMat4("view", view);
 
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
-		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
+		ShadowFirstPass(&depthShader, terrain, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
 		
 		// Reset Viewport
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
-		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
+		ShadowSecondPass(&modelShader, terrain, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
 
 		// [Objects Not Affected by Light Source Go Below]
 
@@ -426,6 +437,7 @@ int main(void)
 	ziming->deallocate();
 	light->deallocate();
 	sphereModel->deallocate();
+	terrain->deallocate();
 	glDeleteVertexArrays(1, &skyboxVAO);
 	glDeleteBuffers(1, &skyboxVAO);
 
