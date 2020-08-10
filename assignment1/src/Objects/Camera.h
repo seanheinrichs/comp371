@@ -21,6 +21,8 @@ public:
 	void moveLeft(float speed);
 	void moveRight(float speed);
 
+	void ProcessMouseMovement(float xoffset, float yoffset);
+
 	glm::mat4 calculateViewMatrix();
 
 	float fieldOfViewAngle;

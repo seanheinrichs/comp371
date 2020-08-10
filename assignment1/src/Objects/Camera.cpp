@@ -64,12 +64,12 @@ void Camera::updateCamera()
 
 void Camera::moveForward(float speed)
 {
-	position += speed * front;
+	position += speed * glm::vec3(front.x, 0.0f, front.z);
 }
 
 void Camera::moveBackward(float speed)
 {
-	position -= speed * front;
+	position -= speed * glm::vec3(front.x, 0.0f, front.z);
 }
 
 void Camera::moveLeft(float speed)
@@ -80,4 +80,23 @@ void Camera::moveLeft(float speed)
 void Camera::moveRight(float speed)
 {
 	position += glm::normalize(glm::cross(front, up)) * speed;
+}
+
+void Camera::ProcessMouseMovement(float xoffset, float yoffset)
+{
+	xoffset *= 0.1f;
+	yoffset *= 0.1f;
+
+	yawAngle += xoffset;
+	pitchAngle += yoffset;
+
+	if (true)
+	{
+		if (pitchAngle > 89.0f)
+			pitchAngle = 89.0f;
+		if (pitchAngle < -89.0f)
+			pitchAngle = -89.0f;
+	}
+
+	updateCamera();
 }
