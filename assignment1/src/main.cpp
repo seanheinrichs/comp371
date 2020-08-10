@@ -96,6 +96,11 @@ float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
 
+glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 cameraDirection = glm::normalize(cameraTarget - camera.position);
+glm::vec3 cameraJump = glm::vec3(0.0f, 1.0f, 0.0f);
+int jumpCounter = 0;
+
 bool firstMouse = true;
 
 // Variables used for light and shadows
@@ -610,7 +615,16 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		camera.moveUpward(cameraSpeed);
+		camera.position += cameraJump * cameraSpeed;
+		cameraTarget += cameraJump * cameraSpeed;
+		jumpCounter++;
+	}
+
+	else if (jumpCounter > 0)
+	{
+		camera.position -= cameraJump * cameraSpeed;
+		cameraTarget -= cameraJump * cameraSpeed;
+		jumpCounter--;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
