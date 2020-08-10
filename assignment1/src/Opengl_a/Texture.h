@@ -16,6 +16,10 @@ public:
 	unsigned char* localBuffer;
 	int width, height, BPP;
 
+	std::string id, type, path;
+	
+
+	void TextureFromFile(const char* path);
 	Texture(const std::string& path);
 	Texture();
 	~Texture();

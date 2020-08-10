@@ -479,14 +479,47 @@ void Model::translateToOrigin()
 
 void Model::draw(int mode, Shader* shaderProg)
 {
-	shaderProg->use();
 	this->bind();
-	if (textureIndex == -1)
+	
+	if (textures.size() > 0)
+	{
+		std::cout << "made it" << std::endl;
+
+		for (std::vector<Texture>::iterator it = textures.begin(); it < textures.end(); it++) 
+		{
+			if ((*it).type == "texture_diffuse")
+			{
+				std::cout << "setting diffuse" << std::endl;
+				std::cout << "binding: " << (*it).renderer_id << std::endl;
+				shaderProg->setFloat("assimpMat.diffuse", (*it).renderer_id);
+				//g_textures[0].bind(g_texLocations[0]);
+				//shaderProg->setFloat("assimpMat.diffuse", 0);
+				(*it).bind(g_texLocations[(*it).renderer_id]);
+			}
+			else if ((*it).type == "texture_specular")
+			{
+				std::cout << "setting specular" << std::endl;
+				std::cout << "binding: " << (*it).renderer_id << std::endl;
+
+				//g_textures[0].bind(g_texLocations[0]);
+				shaderProg->setFloat("assimpMat.specular", (*it).renderer_id);
+				//shaderProg->setFloat("assimpMat.specular", 0);
+				(*it).bind(g_texLocations[(*it).renderer_id]);
+			}
+		
+		}
+		//g_textures[textureIndex].bind(g_texLocations[textureIndex]);
+		shaderProg->setFloat("assimpMat.shininess", 50);
+		//shaderProg->setVec3("material.specular", g_specularStrength[textureIndex]);
+		//shaderProg->setInt("material.diffuse", textureIndex);
+	}
+	else if (textureIndex == -1)
 	{
 		shaderProg->setInt("fill", textureIndex);
 	}
 	else
 	{
+		//shader->setFloat("loaded", 2);
 		g_textures[textureIndex].bind(g_texLocations[textureIndex]);
 		shaderProg->setFloat("material.shininess", g_shininess[textureIndex]);
 		shaderProg->setVec3("material.specular", g_specularStrength[textureIndex]);
@@ -503,4 +536,9 @@ void Model::setAABB()
 
 	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
 	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
+}
+
+void Model::insertTextures(std::vector<Texture> tex)
+{
+	textures.insert(textures.end(), tex.begin(), tex.end());
 }

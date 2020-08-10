@@ -19,6 +19,7 @@ class VertexComponent;
 class Shape : public Polygon {
 
 public:
+	Shape();
 	Shape(glm::vec3 origin_a);
 	Shape(glm::vec3 origin_a,
 		std::vector<glm::vec3> & in_vertices,

@@ -19,6 +19,7 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include "polygon.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "../../opengl_a/Shader.h"
+#include "../../Opengl_a/Texture.h"
 
 // Container to hold the Axis-Aligned Boundary Box
 struct AABB
@@ -33,6 +34,8 @@ public:
 	virtual void setVertexController(bool position, bool texture, bool color, bool normal);
 	virtual void transform(glm::mat4 transmat);
 	std::vector<Polygon*> polygons;
+	std::vector<Texture> textures;
+	void insertTextures(std::vector<Texture> tex);
 	void addPolygon(Polygon* poly);
 	Model(bool position = true, bool texture = false, bool color = false, bool normal = false, std::string name = "default", Shader* shader = nullptr, int textureIndex = -1);
 	Model();

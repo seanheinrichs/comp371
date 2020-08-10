@@ -191,7 +191,7 @@ int main(void)
 	GLCall(glFrontFace(GL_CCW));
 
 	// Build and Compile Shader Program 
-	Shader modelShader("comp371/assignment1/src/Shaders/modelShader.vertex", "comp371/assignment1/src/Shaders/modelShader.fragment");
+	Shader modelShader("comp371/assignment1/src/Shaders/assimp.modelShader.vertex", "comp371/assignment1/src/Shaders/assimp.modelShader.fragment");
 	Shader lightShader("comp371/assignment1/src/Shaders/lightShader.vertex", "comp371/assignment1/src/Shaders/lightShader.fragment");
 	Shader depthShader("comp371/assignment1/src/Shaders/shadow_mapping_depth.vertex", "comp371/assignment1/src/Shaders/shadow_mapping_depth.fragment");
 	Shader skyboxShader("comp371/assignment1/src/Shaders/skyboxShader.vertex", "comp371/assignment1/src/Shaders/skyboxShader.fragment");
@@ -236,7 +236,7 @@ int main(void)
 	createZimingsModel(ziming, &modelShader);
 	ziming->bindArrayBuffer();
 
-	ModelContainer* wayne = loadModel("../Assets/Models/house.obj");
+	ModelContainer* wayne = loadModel("../Assets/Models/backpack.obj");
 
 		//new ModelContainer();
 	//createWaynesModel(wayne, &modelShader);
@@ -320,7 +320,7 @@ int main(void)
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
 
-	wayne->addScale(glm::vec3(0.002f, 0.002f, 0.002f));
+	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
 	wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
 	
@@ -751,7 +751,6 @@ void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
 }
-
 //map textures to a global data structure
 void setupTextureMapping()
 {
@@ -766,8 +765,25 @@ void setupTextureMapping()
 	g_texLocations[8] = GL_TEXTURE8;
 	g_texLocations[9] = GL_TEXTURE9;
 	g_texLocations[10] = GL_TEXTURE10;
-	//g_texLocations[11] = GL_TEXTURE11; // used by shadow map
-	//g_texLocations[12] = GL_TEXTURE12; // used by skybox
+	g_texLocations[11] = GL_TEXTURE11; // used by shadow map
+	g_texLocations[12] = GL_TEXTURE12; // used by skybox
+	g_texLocations[13] = GL_TEXTURE13;
+	g_texLocations[14] = GL_TEXTURE14;
+	g_texLocations[15] = GL_TEXTURE15;
+	g_texLocations[16] = GL_TEXTURE16;
+	g_texLocations[17] = GL_TEXTURE17;
+	g_texLocations[18] = GL_TEXTURE18;
+	g_texLocations[19] = GL_TEXTURE19;
+	g_texLocations[20] = GL_TEXTURE20;
+	g_texLocations[21] = GL_TEXTURE21;
+	g_texLocations[22] = GL_TEXTURE22;
+	g_texLocations[23] = GL_TEXTURE23;
+	g_texLocations[24] = GL_TEXTURE24;
+	g_texLocations[25] = GL_TEXTURE25;
+	g_texLocations[26] = GL_TEXTURE26;
+	g_texLocations[27] = GL_TEXTURE27;
+	g_texLocations[28] = GL_TEXTURE28;
+	g_texLocations[29] = GL_TEXTURE29;
 
 	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
 	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
@@ -780,6 +796,7 @@ void setupTextureMapping()
 	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
 	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
 	g_textures[10] = Texture("comp371/assignment1/src/Resources/grid_floor.jpg");
+	g_textures[13] = Texture("C:\\Users\\Benjamin Therien\\Documents\\comp371\\models\\backpack\\diffuse.jpg");
 	//g_textures[11] // used by shadow map
 	//g_textures[12] // used by skybox
 
@@ -794,6 +811,7 @@ void setupTextureMapping()
 	g_shininess[8] = 256.0f;
 	g_shininess[9] = 256.0f;
 	g_shininess[10] = 64.0f;
+	g_shininess[13] = 64.0f;
 	//g_shininess[11] // used by shadow map
 	//g_shininess[12] // used by skybox
 
@@ -808,12 +826,15 @@ void setupTextureMapping()
 	g_specularStrength[8] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[9] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
+	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);
 	//g_specularStrength[11] // used by shadow map
 	//g_specularStrength[12] // used by skybox
 }
 
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, ModelContainer *terrain)
 {
+	shader->use();
+	shader->setFloat("loaded", 0);
 	glm::mat4 sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
 
@@ -852,15 +873,12 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	ziming->draw(MODE, shader);
 
 	//wayne sphere
-	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(2.25f, 2.25f, 2.25f));
-	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
-	sphereModel->bind();
-	shader->setMat4("model", wayne->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
-
+	shader->use();
+	//shader->setFloat("loaded", 1);
 	wayne->draw(MODE, shader);
 
 	terrain->draw(MODE, shader);
+	shader->setFloat("loaded", 0);
 }
 
 void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader)
