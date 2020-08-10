@@ -236,11 +236,7 @@ int main(void)
 	createZimingsModel(ziming, &modelShader);
 	ziming->bindArrayBuffer();
 
-<<<<<<< HEAD
 	ModelContainer* wayne = loadModel("../Assets/Models/backpack.obj");
-=======
-	ModelContainer* wayne = loadModel("../Assets/Models/house.obj");
->>>>>>> cc6d397... assimp begining
 
 		//new ModelContainer();
 	//createWaynesModel(wayne, &modelShader);
@@ -324,7 +320,7 @@ int main(void)
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
 
-	wayne->addScale(glm::vec3(0.002f, 0.002f, 0.002f));
+	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
 	wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
 	

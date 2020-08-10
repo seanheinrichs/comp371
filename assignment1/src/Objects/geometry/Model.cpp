@@ -622,6 +622,7 @@ void Model::draw(int mode, Shader* shaderProg)
 
 }
 
+
 void Model::setAABB()
 {
 	std::map<std::string, glm::vec3> map = getMinMax();
