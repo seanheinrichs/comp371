@@ -96,9 +96,7 @@ float yOffset = 0.0f;
 float rX = 0.0f;
 float rY = 0.0f;
 
-glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 cameraDirection = glm::normalize(cameraTarget - camera.position);
-glm::vec3 cameraJump = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraJump = glm::vec3(0.0f, 2.0f, 0.0f);
 int jumpCounter = 0;
 
 bool firstMouse = true;
@@ -589,62 +587,62 @@ void processInput(GLFWwindow *window, ModelContainer** models, PointLight** poin
 
 	// [Translation]
 
-	// Press "SHIFT + A" to move the selected model to the LEFT
+	// Press "W" to move FORWARD
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		camera.moveForward(cameraSpeed);
 	}
 
-	// Press "SHIFT + D" to move the selected model to the RIGHT
+	// Press "S" to move BACKWARD
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		camera.moveBackward(cameraSpeed);
 	}
 
-	// Press "SHIFT + W" to move the selected model UP
+	// Press "A" to move LEFT
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		camera.moveLeft(cameraSpeed);
 	}
 
-	// Press "SHIFT + S" to move the selected model DOWN
+	// Press "D" to move RIGHT
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		camera.moveRight(cameraSpeed);
 	}
 
+	//Press "SPACE" to JUMP
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		camera.position += cameraJump * cameraSpeed;
-		cameraTarget += cameraJump * cameraSpeed;
 		jumpCounter++;
 	}
 
 	else if (jumpCounter > 0)
 	{
 		camera.position -= cameraJump * cameraSpeed;
-		cameraTarget -= cameraJump * cameraSpeed;
 		jumpCounter--;
 	}
 
+	// Press "SHIFT + W" to move FORWARD faster
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		camera.moveForward(cameraSpeed * 4.0);
 	}
 
-	// Press "SHIFT + DOWN ARROW" to move FORWARD faster
+	// Press "SHIFT + S" to move BACKWARD faster
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		camera.moveBackward(cameraSpeed * 4.0);
 	}
 
-	// Press "SHIFT + RIGHT ARROW" to move FORWARD faster
+	// Press "SHIFT + D" to move RIGHT faster
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		camera.moveRight(cameraSpeed * 4.0);
 	}
 
-	// Press "SHIFT + LEFT ARROW" to move FORWARD faster
+	// Press "SHIFT + A" to move LEFT faster
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		camera.moveLeft(cameraSpeed * 4.0);
