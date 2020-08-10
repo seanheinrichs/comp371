@@ -26,6 +26,22 @@ struct PointLight {
 	float quadratic;
 };
 
+struct SpotLight {
+	vec3 position;
+	vec3 direction;
+
+	float cutOff;
+	float outerCutOff;
+
+	float constant;
+	float linear;
+	float quadratic;
+
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+};
+
 uniform int useTextures;
 uniform bool useShadows;
 uniform sampler2D shadowMap;
@@ -33,24 +49,28 @@ uniform vec3 viewPos;
 uniform vec3 lightPos;
 uniform Material material;
 uniform PointLight pointLight;
+uniform SpotLight spotLight;
 uniform vec3 skyColor;
 
 float ShadowCalculation(vec4 fragPosLightSpace);
-vec3 CalculateLighting(PointLight lightSource, vec3 nromal, vec3 fragPos, vec3 viewDir);
+vec3 CalculatePointLighting(PointLight lightSource, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalculateSpotLighting(SpotLight lightSource, vec3 normal, vec3 fragPost, vec3 viewDir);
 
 void main()
 {
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
 
-	vec3 result = CalculateLighting(pointLight, norm, FragPos, viewDir);
+	vec3 result = CalculatePointLighting(pointLight, norm, FragPos, viewDir);
+
+	result += CalculateSpotLighting(spotLight, norm, FragPos, viewDir);
 
 	FragColor = vec4(result, 1.0);
 	FragColor = mix(vec4(skyColor, 1.0), FragColor, visibility);
 }
 
 // Light Calculation Credit - https://learnopengl.com/Lighting/Basic-Lighting
-vec3 CalculateLighting(PointLight lightSource, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec3 CalculatePointLighting(PointLight lightSource, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
 	// Calculate direction
 	vec3 lightDir = normalize(lightSource.position - fragPos);
@@ -85,6 +105,56 @@ vec3 CalculateLighting(PointLight lightSource, vec3 normal, vec3 fragPos, vec3 v
 	ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
+
+	if (useShadows)
+	{
+		float shadow = ShadowCalculation(FragPosLightSpace);  
+
+	    return (ambient + (1.0 - shadow) * (diffuse + specular));
+	}
+
+	return (ambient + diffuse + specular);
+}
+
+vec3 CalculateSpotLighting(SpotLight lightSource, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+// Calculate direction
+	vec3 lightDir = normalize(lightSource.position - fragPos);
+
+	// Account for diffuse lighting
+	float diff = max(dot(normal, lightDir), 0.0);
+
+	// Account for specular lighting
+	vec3 reflectDir = reflect(-lightDir, normal);  
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+	
+	// Account for distance
+    float distance = length(lightSource.position - fragPos);
+    float attenuation = 1.0 / (lightSource.constant + lightSource.linear * distance + lightSource.quadratic * (distance * distance));   
+
+	float theta = dot(lightDir, normalize(-lightSource.direction));
+	float epsilon = lightSource.cutOff - lightSource.outerCutOff;
+	float intensity = clamp((theta - lightSource.outerCutOff) / epsilon, 0.0, 1.0);
+
+	vec3 ambient;
+	vec3 diffuse;
+
+	// Combine everything to calculate fragment color
+	if(useTextures == 1)
+	{
+		ambient = lightSource.ambient * vec3(texture(material.diffuse, v_TexCoord));
+		diffuse = lightSource.diffuse * diff * vec3(texture(material.diffuse, v_TexCoord));
+	}
+	else
+	{
+		ambient = lightSource.ambient * vec3(0.5,0.5,0.5);
+		diffuse = lightSource.diffuse * diff * vec3(0.5,0.5,0.5);
+	}
+    vec3 specular = lightSource.specular * (spec * material.specular); 
+	                 
+	ambient *= attenuation * intensity;
+    diffuse *= attenuation * intensity;
+    specular *= attenuation * intensity;
 
 	if (useShadows)
 	{

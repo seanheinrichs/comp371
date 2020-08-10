@@ -1,23 +1,25 @@
 #pragma once
 
-#include "../Opengl_a/Shader.h"
-#include "geometry/Model.h"
+#include "../../Opengl_a/Shader.h"
+#include "../geometry/Model.h"
 
-class PointLight
+class Light
 {
 public:
 	// Constructors & Destructors
-	PointLight(Model * lampModel, glm::vec3 startingPos, bool active);
-	PointLight(Model * lampModel, glm::vec3 startingPos, glm::vec3 col, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float line, float quad, bool active);
-	~PointLight();
+
+	Light(Model * lampModel, glm::vec3 startingPos, bool active);
+	Light(Model * lampModel, glm::vec3 startingPos, glm::vec3 dir, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float line, float quad, bool active);
+	
+	~Light();
 
 	// Functions
-	void setShaderValues(Shader * shader);
+	void setShaderValues(Shader * shader, bool isSpotLight);
 
 	// Accessors
 	Model* getModel() const { return model; };
 	glm::vec3 getPosition() const { return position; };
-	glm::vec3 getColor() const { return color; };
+	glm::vec3 getDirection() const { return direction; };
 	glm::vec3 getAmbient() const { return ambient; };
 	glm::vec3 getDiffuse() const { return diffuse; };
 	glm::vec3 getSpecular() const { return specular; };
@@ -32,7 +34,7 @@ public:
 private:
 	Model * model;
 
-	glm::vec3 color;
+	glm::vec3 direction;
 	glm::vec3 position;
 
 	// Light Modifiers
