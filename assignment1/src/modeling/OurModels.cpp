@@ -28,7 +28,7 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 		for (int j = 0; j<VERTEX_COUNT; j++) {
 			float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 			float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
-			vertices_temp.push_back(glm::vec3(x,
+			vertices.push_back(glm::vec3(x,
 								0.0f,
 								//height->generateHeight(x,z),
 								z));
@@ -67,7 +67,7 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 			//indices[pointer++] = bottomRight;
 		}
 	}
-
+/*
 	for (unsigned int i = 3; i < vertices_temp.size(); i+=3)
 	{
 		//unsigned int index = 3; //fetch right index of vertex
@@ -78,6 +78,7 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 		vertex = vertices_temp[i - 3];
 		vertices.push_back(vertex);
 	}
+	*/
 	Model* terrain = new Model(true, true, false, true, "a", shader, 5);
 	//return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), vertices, textureCoords, normals);

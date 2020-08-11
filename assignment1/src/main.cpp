@@ -194,6 +194,7 @@ int main(void)
 	//extracting data from obj files
 	bool extraction = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
 
+
 	Model * sphereModel = new Model(true, false, false, false, "sphere");
 	//creating a model with the vertices data extracted from object loader
 	createShape(sphereModel, vertices, uvs, normals);
@@ -290,7 +291,7 @@ int main(void)
 	models[4] = wayne;
 
 	terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
-	terrain->addTranslation(glm::vec3(-400.0f, 0.0f, 0.0f));
+	terrain->addTranslation(glm::vec3(-50.0f, 0.0f, 0.0f));
 
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
