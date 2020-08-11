@@ -5,29 +5,32 @@
 #include "../Opengl_a/Shader.h"
 #include "../utils/terrainHeight.h"
 #include <glm/gtc/matrix_transform.hpp>
-
+#include <glm/glm.hpp>
 
 static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 {
-	terrainHeight * height = new terrainHeight();
+	//terrainHeight * height = new terrainHeight();
 
 	const int VERTEX_COUNT = 128;
-	const int SIZE = 800;
+	const int SIZE = 100;
 	int count = VERTEX_COUNT * VERTEX_COUNT;
+	std::vector<glm::vec3>  vertices_temp;
 	std::vector<glm::vec3>  vertices;
 	std::vector<glm::vec2>  textureCoords;
 	std::vector<glm::vec3> normals;
 	//float * vertices = new float[count * 3];
 	//float * normals = new float[count * 3];
 	//float * textureCoords = new float[count * 2];
-	int * indices = new int[6 * (VERTEX_COUNT - 1)*(VERTEX_COUNT - 1)];
+	std::vector<int> indices;
+	//= new int[6 * (VERTEX_COUNT - 1)*(VERTEX_COUNT - 1)];
 	int vertexPointer = 0;
-	for (int i = 1; i<VERTEX_COUNT; i++) {
-		for (int j = 1; j<VERTEX_COUNT; j++) {
+	for (int i = 0; i<VERTEX_COUNT; i++) {
+		for (int j = 0; j<VERTEX_COUNT; j++) {
 			float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 			float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
-			vertices.push_back(glm::vec3(x,
-								height->generateHeight(x,z),
+			vertices_temp.push_back(glm::vec3(x,
+								0.0f,
+								//height->generateHeight(x,z),
 								z));
 
 
@@ -51,13 +54,29 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 			int topRight = topLeft + 1;
 			int bottomLeft = ((gz + 1)*VERTEX_COUNT) + gx;
 			int bottomRight = bottomLeft + 1;
-			indices[pointer++] = topLeft;
-			indices[pointer++] = bottomLeft;
-			indices[pointer++] = topRight;
-			indices[pointer++] = topRight;
-			indices[pointer++] = bottomLeft;
-			indices[pointer++] = bottomRight;
+			indices.push_back(topLeft);
+			indices.push_back(bottomLeft);
+			indices.push_back(topRight);
+			indices.push_back(topRight);
+			indices.push_back(bottomLeft);
+			indices.push_back(bottomRight);
+			//indices[pointer++] = bottomLeft;
+			//indices[pointer++] = topRight;
+			//indices[pointer++] = topRight;
+			//indices[pointer++] = bottomLeft;
+			//indices[pointer++] = bottomRight;
 		}
+	}
+
+	for (unsigned int i = 3; i < vertices_temp.size(); i+=3)
+	{
+		//unsigned int index = 3; //fetch right index of vertex
+		glm::vec3 vertex = vertices_temp[i - 1];
+		vertices.push_back(vertex);
+		 vertex = vertices_temp[i - 2];
+		vertices.push_back(vertex);
+		vertex = vertices_temp[i - 3];
+		vertices.push_back(vertex);
 	}
 	Model* terrain = new Model(true, true, false, true, "a", shader, 5);
 	//return loader.loadToVAO(vertices, textureCoords, normals, indices);
