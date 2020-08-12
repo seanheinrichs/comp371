@@ -242,6 +242,8 @@ int main(void)
 			
 	// [Grid]
 
+
+
 	Grid mainGrid = Grid();
 
 	unsigned int grid_VAOs[3], grid_VBOs[3], grid_EBO;
@@ -249,13 +251,15 @@ int main(void)
 	GLCall(glGenBuffers(3, grid_VBOs));
 	GLCall(glGenBuffers(1, &grid_EBO));
 
+
 	// [Grid Mesh] 
+	/*
 	GLCall(glBindVertexArray(grid_VAOs[0]));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]));
 	GLCall(glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW));
 	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
 	GLCall(glEnableVertexAttribArray(0));
-
+	*/
 	// [Grid Floor] 
 	GLCall(glBindVertexArray(grid_VAOs[1]));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[1]));
@@ -656,9 +660,30 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	sphereModel->bind();
 	shader->setMat4("model", ben->getModelMatrix() * sphereTransform);
 	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
-  
-	ben->draw(MODE, shader);
+	const int VERTEX_COUNT = 128;
+	std::vector<int> indices;
 
+	for (int gz = 0; gz<VERTEX_COUNT - 1; gz++) {
+		for (int gx = 0; gx<VERTEX_COUNT - 1; gx++) {
+			int topLeft = (gz*VERTEX_COUNT) + gx;
+			int topRight = topLeft + 1;
+			int bottomLeft = ((gz + 1)*VERTEX_COUNT) + gx;
+			int bottomRight = bottomLeft + 1;
+			indices.push_back(topLeft);
+			indices.push_back(bottomLeft);
+			indices.push_back(topRight);
+			indices.push_back(topRight);
+			indices.push_back(bottomLeft);
+			indices.push_back(bottomRight);
+			//indices[pointer++] = bottomLeft;
+			//indices[pointer++] = topRight;
+			//indices[pointer++] = topRight;
+			//indices[pointer++] = bottomLeft;
+			//indices[pointer++] = bottomRight;
+		}
+	}
+	
+	ben->draw(MODE, shader);
 
 	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));

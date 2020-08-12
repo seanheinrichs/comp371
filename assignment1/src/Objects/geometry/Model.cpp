@@ -429,6 +429,7 @@ void Model::draw(int mode, Shader* shaderProg)
 	}
 	shaderProg->setMat4("model", this->getModelMatrix(true));
 	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
+
 }
 
 void Model::setAABB()
