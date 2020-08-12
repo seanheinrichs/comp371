@@ -75,7 +75,7 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 		vertices.push_back(vertex);
 	}
 	
-	Model* terrain = new Model(true, true, false, true, "a", shader, 5);
+	Model* terrain = new Model(true, false, false, false, "terrain");
 	//return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), vertices, textureCoords, normals);
 	terrain->addPolygon(loadedShape);

@@ -659,7 +659,7 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	//ben sphere
 	sphereModel->bind();
 	shader->setMat4("model", ben->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
 	const int VERTEX_COUNT = 128;
 	std::vector<int> indices;
 
@@ -683,14 +683,14 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 		}
 	}
 	
-	ben->draw(MODE, shader);
+
 
 	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
 	//sean sphere
 	sphereModel->bind();
 	shader->setMat4("model", sean->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
 
 	sean->draw(MODE, shader);
 
@@ -700,7 +700,7 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	//isa sphere
 	sphereModel->bind();
 	shader->setMat4("model", isa->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
 
 	isa->draw(MODE, shader);
 
@@ -709,7 +709,7 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 3.75f, 0.0f));
 	sphereModel->bind();
 	shader->setMat4("model", ziming->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
 
 	ziming->draw(MODE, shader);
 
@@ -718,9 +718,10 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
 	sphereModel->bind();
 	shader->setMat4("model", wayne->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
+	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
 
 	wayne->draw(MODE, shader);
+	ben->draw(MODE, shader);
 }
 
 void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader)
