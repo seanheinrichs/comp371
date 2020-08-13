@@ -7,6 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 
+#include "../utils/SimplexNoise.h"
+
 static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 {
 	//terrainHeight * height = new terrainHeight();
@@ -29,7 +31,8 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 			float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 			float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
 			vertices_temp.push_back(glm::vec3(x,
-								(float)(rand()%5),
+								//(float)(rand()%5),
+								SimplexNoise::noise(x,z),
 								//height->generateHeight(x,z),
 								z));
 
