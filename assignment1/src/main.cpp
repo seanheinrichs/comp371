@@ -295,7 +295,7 @@ int main(void)
 	models[4] = wayne;
 
 	terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
-	terrain->addTranslation(glm::vec3(-50.0f, 0.0f, 0.0f));
+	terrain->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
 
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));

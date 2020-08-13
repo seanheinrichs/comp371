@@ -36,9 +36,9 @@ public:
 	* @param[in] lacunarity   Lacunarity specifies the frequency multiplier between successive octaves (default to 2.0).
 	* @param[in] persistence  Persistence is the loss of amplitude between successive octaves (usually 1/lacunarity)
 	*/
-	explicit SimplexNoise(float frequency = 1.0f,
-		float amplitude = 1.0f,
-		float lacunarity = 2.0f,
+	explicit SimplexNoise(float frequency = 0.10f,
+		float amplitude = 0.50f,
+		float lacunarity = 1.0f,
 		float persistence = 0.5f) :
 		mFrequency(frequency),
 		mAmplitude(amplitude),
