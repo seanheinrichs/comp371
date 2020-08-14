@@ -657,9 +657,13 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
 
 	//ben sphere
+	/*
 	sphereModel->bind();
 	shader->setMat4("model", ben->getModelMatrix() * sphereTransform);
 	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
+	
+	*/
+
 	const int VERTEX_COUNT = 128;
 	std::vector<int> indices;
 
@@ -684,7 +688,7 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	}
 	
 
-
+	/*
 	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
 	//sean sphere
@@ -721,6 +725,9 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
 
 	wayne->draw(MODE, shader);
+	
+	*/
+
 	ben->draw(MODE, shader);
 }
 

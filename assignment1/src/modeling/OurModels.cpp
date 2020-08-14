@@ -13,8 +13,8 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 {
 	//terrainHeight * height = new terrainHeight();
 
-	const int VERTEX_COUNT = 200;
-	const int SIZE = 10;
+	const int VERTEX_COUNT = 50;
+	const int SIZE = 5;
 	int count = VERTEX_COUNT * VERTEX_COUNT;
 	std::vector<glm::vec3>  vertices_temp;
 	std::vector<glm::vec3>  vertices;
@@ -25,17 +25,29 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 	//float * textureCoords = new float[count * 2];
 	std::vector<int> indices;
 	//= new int[6 * (VERTEX_COUNT - 1)*(VERTEX_COUNT - 1)];
-	float smooth = 3.0f;
+	float smooth = 10.0f;
 	int vertexPointer = 0;
+	int flip = rand() % 10;
 	for (int i = 0; i<VERTEX_COUNT; i++) {
+		flip = rand() % 10;
+	
+
+		 if (smooth >= 2) {
+			smooth *= 0.95;
+		}
+	
+
 		for (int j = 0; j<VERTEX_COUNT; j++) {
 			float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 			float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
 			vertices_temp.push_back(glm::vec3(x,
 								//(float)(rand()%5),
 								SimplexNoise::noise(x,z)/smooth,
-								//height->generateHeight(x,z),
+								//height->generateHeight (x,z),
 								z));
+			
+			
+			/*
 			if (smooth <= 0) {
 				smooth += 0.000001;
 			}
@@ -45,7 +57,7 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 			else {
 				smooth -= 0.000001;
 			}
-
+			*/
 			/*
 			vertices[vertexPointer * 3] = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 			vertices[vertexPointer * 3 + 1] = 0;
@@ -58,6 +70,7 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 			vertexPointer++;
 			*/
 		}
+		flip = !flip;
 	}
 	int pointer = 0;
 	for (int gz = 0; gz<VERTEX_COUNT - 1; gz++) {
