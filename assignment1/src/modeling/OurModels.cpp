@@ -3,41 +3,97 @@
 #include "../Objects/geometry/ModelContainer.h"
 #include "../Objects/geometry/Shape.h"
 #include "../Opengl_a/Shader.h"
-#include "../utils/terrainHeight.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 
 #include "../utils/SimplexNoise.h"
 
-static void createTerrain(ModelContainer* modelContainer, Shader* shader)
+static void createTerrain(ModelContainer* modelContainer, Shader* shader, int VERTEX_COUNT, int SIZE)
 {
-	//terrainHeight * height = new terrainHeight();
-
-	const int VERTEX_COUNT = 50;
-	const int SIZE = 5;
+	//const int VERTEX_COUNT = 200;
+	//const int SIZE = 20;
 	int count = VERTEX_COUNT * VERTEX_COUNT;
 	std::vector<glm::vec3>  vertices_temp;
 	std::vector<glm::vec3>  vertices;
 	std::vector<glm::vec2>  textureCoords;
 	std::vector<glm::vec3> normals;
-	//float * vertices = new float[count * 3];
-	//float * normals = new float[count * 3];
-	//float * textureCoords = new float[count * 2];
+	std::vector<glm::vec3> normals_temp;
+
 	std::vector<int> indices;
-	//= new int[6 * (VERTEX_COUNT - 1)*(VERTEX_COUNT - 1)];
-	float smooth = 10.0f;
+
+	int relief = (rand() % 6);
+	float smooth = 20.0f;
+	float smoothInitial = smooth;
+	float offset = VERTEX_COUNT / 3;
 	int vertexPointer = 0;
-	int flip = rand() % 10;
+
 	for (int i = 0; i<VERTEX_COUNT; i++) {
-		flip = rand() % 10;
-	
-
-		 if (smooth >= 2) {
-			smooth *= 0.95;
+		if (smooth >2.0f) {
+			smooth *= 0.995;
 		}
-	
-
 		for (int j = 0; j<VERTEX_COUNT; j++) {
+
+			if (i == j) {
+
+				//if (i > VERTEX_COUNT / 2) {
+					
+				if (smooth >2.0f) {
+					smooth *= 0.99;
+				}
+					if (i > VERTEX_COUNT / 2 - offset / 2 &&
+						i < VERTEX_COUNT / 2 + offset / 2 &&
+						j > VERTEX_COUNT / 2 - offset / 2 &&
+						j < VERTEX_COUNT / 2 + offset / 2) {
+						//nothing
+					}
+					else {
+						//if (smooth >2.0f) {
+							//smooth *= 0.75;
+					//	}
+					}
+				//}
+				//else {
+					/*
+						if (i > VERTEX_COUNT / 2 - offset / 2 &&
+						i < VERTEX_COUNT / 2 + offset / 2 &&
+						j > VERTEX_COUNT / 2 - offset / 2 &&
+						j < VERTEX_COUNT / 2 + offset / 2) {
+						//nothing
+					}
+					else {
+						if (smooth < 12.0f) {
+							smooth *= 1.15;
+							//smooth *= 0.60;
+						}
+					}
+					*/
+				
+					
+				//}
+
+
+				/*
+				if (i > VERTEX_COUNT / 2 - offset/2 &&
+					i < VERTEX_COUNT / 2 + offset/2 &&
+					j > VERTEX_COUNT / 2 - offset/2 &&
+					j < VERTEX_COUNT / 2 + offset/2) {
+					//smooth = 10.0f;
+
+					if (smooth > smoothInitial / 4) {
+						smooth *= 0.70;
+					}
+					else {
+						//smooth *= 1.05;
+					}
+				}
+				else {
+					if (smooth > 1) {
+						//smooth *= 1.05;
+						smooth *= 0.99;
+					}
+				}
+				*/
+			}
 			float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 			float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
 			vertices_temp.push_back(glm::vec3(x,
@@ -45,32 +101,8 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 								SimplexNoise::noise(x,z)/smooth,
 								//height->generateHeight (x,z),
 								z));
-			
-			
-			/*
-			if (smooth <= 0) {
-				smooth += 0.000001;
-			}
-			else if (smooth >= 3) {
-				smooth -= 0.000001;
-			}
-			else {
-				smooth -= 0.000001;
-			}
-			*/
-			/*
-			vertices[vertexPointer * 3] = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
-			vertices[vertexPointer * 3 + 1] = 0;
-			vertices[vertexPointer * 3 + 2] = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
-			normals[vertexPointer * 3] = 0;
-			normals[vertexPointer * 3 + 1] = 1;
-			normals[vertexPointer * 3 + 2] = 0;
-			textureCoords[vertexPointer * 2] = (float)j / ((float)VERTEX_COUNT - 1);
-			textureCoords[vertexPointer * 2 + 1] = (float)i / ((float)VERTEX_COUNT - 1);
-			vertexPointer++;
-			*/
+			normals_temp.push_back(glm::vec3(0, 1, 0));
 		}
-		flip = !flip;
 	}
 	int pointer = 0;
 	for (int gz = 0; gz<VERTEX_COUNT - 1; gz++) {
@@ -85,11 +117,6 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 			indices.push_back(topRight);
 			indices.push_back(bottomLeft);
 			indices.push_back(bottomRight);
-			//indices[pointer++] = bottomLeft;
-			//indices[pointer++] = topRight;
-			//indices[pointer++] = topRight;
-			//indices[pointer++] = bottomLeft;
-			//indices[pointer++] = bottomRight;
 		}
 	}
 
@@ -97,7 +124,9 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader)
 	{
 		//unsigned int index = 3; //fetch right index of vertex
 		glm::vec3 vertex = vertices_temp[indices[i]];
+		glm::vec3 vertexNormal = normals_temp[indices[i]];
 		vertices.push_back(vertex);
+		normals.push_back(vertexNormal);
 	}
 	
 	Model* terrain = new Model(true, false, false, false, "terrain");

@@ -81,6 +81,11 @@ unsigned int WINDOW_WIDTH = 1024;
 unsigned int WINDOW_HEIGHT = 768;
 const unsigned int SHADOW_WIDTH = 1024;
 const unsigned int SHADOW_HEIGHT = 1024;
+const unsigned int VERTEX_COUNT_TERRAIN = 100;
+const unsigned int SIZE = 10;
+
+
+
 
 /* Camera Setup */
 Camera camera = Camera(glm::vec3(0.0f, 0.3f, 2.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -202,7 +207,7 @@ int main(void)
 
 	ModelContainer * terrain = new ModelContainer();
 	//creating a model with the vertices data extracted from object loader
-	createTerrain(terrain, &modelShader);
+	createTerrain(terrain, &modelShader, VERTEX_COUNT_TERRAIN, SIZE);
 	terrain->bindArrayBuffer();
 
 
@@ -295,7 +300,7 @@ int main(void)
 	models[4] = wayne;
 
 	terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
-	terrain->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
+	terrain->addTranslation(glm::vec3(0.0f-SIZE/2, 0.0f, 0.0f-SIZE/2));
 
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
@@ -314,7 +319,7 @@ int main(void)
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
 
 	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	light->addTranslation(glm::vec3(0.0f, 3.0f, -1.0f));
+	light->addTranslation(glm::vec3(0.0f, 0.50f, -1.0f));
 
 	// Skybox load
 	loadSkybox(skyboxShader);
@@ -663,30 +668,6 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
 	
 	*/
-
-	const int VERTEX_COUNT = 128;
-	std::vector<int> indices;
-
-	for (int gz = 0; gz<VERTEX_COUNT - 1; gz++) {
-		for (int gx = 0; gx<VERTEX_COUNT - 1; gx++) {
-			int topLeft = (gz*VERTEX_COUNT) + gx;
-			int topRight = topLeft + 1;
-			int bottomLeft = ((gz + 1)*VERTEX_COUNT) + gx;
-			int bottomRight = bottomLeft + 1;
-			indices.push_back(topLeft);
-			indices.push_back(bottomLeft);
-			indices.push_back(topRight);
-			indices.push_back(topRight);
-			indices.push_back(bottomLeft);
-			indices.push_back(bottomRight);
-			//indices[pointer++] = bottomLeft;
-			//indices[pointer++] = topRight;
-			//indices[pointer++] = topRight;
-			//indices[pointer++] = bottomLeft;
-			//indices[pointer++] = bottomRight;
-		}
-	}
-	
 
 	/*
 	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
