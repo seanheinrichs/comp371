@@ -85,7 +85,6 @@ const unsigned int SHADOW_HEIGHT = 1024;
 Camera camera = Camera(glm::vec3(0.0f, 0.3f, 2.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-float distance = 0.0f;
 bool collision = false;
 glm::mat4 model, projection, view;
 
@@ -503,25 +502,28 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	// Press "SHIFT + W" to move FORWARD faster
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		camera.moveForward(cameraSpeed * 4.0);
+		if (!collision) 
+		{
+			camera.moveForward(cameraSpeed * 1.5);
+		}
 	}
 
 	// Press "SHIFT + S" to move BACKWARD faster
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		camera.moveBackward(cameraSpeed * 4.0);
+		camera.moveBackward(cameraSpeed * 1.5);
 	}
 
 	// Press "SHIFT + D" to move RIGHT faster
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		camera.moveRight(cameraSpeed * 4.0);
+		camera.moveRight(cameraSpeed * 1.5);
 	}
 
 	// Press "SHIFT + A" to move LEFT faster
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		camera.moveLeft(cameraSpeed * 4.0);
+		camera.moveLeft(cameraSpeed * 1.5);
 	}
 
 	// [Texture Toggle]
@@ -975,20 +977,11 @@ bool checkCollision(ModelContainer** models)
 	// Check our models (letters and numbers)
 	for (int i = 0; i < 5; i++)
 	{
-		// If collision is detected, break from the loop
-		if (collisionDetected)
-		{
-			return collisionDetected;
-		}
+		// Check if Number has collision
+		collisionDetected ? true : collisionDetected = distanceFromCamera(camera.position, models[i]->models[0]->getAABB()) < 0.2f ? true : false;
 
-		// Check Letter
-		collisionDetected = distanceFromCamera(camera.position, models[i]->models[0]->getAABB()) < 0.2f ? true : false;
-
-		// Check Number
-		if (!collisionDetected)
-		{
-			collisionDetected = distanceFromCamera(camera.position, models[i]->models[1]->getAABB()) < 0.2f ? true : false;
-		}
+		// Check if Letter has collision
+		collisionDetected ? true : collisionDetected = distanceFromCamera(camera.position, models[i]->models[1]->getAABB()) < 0.2f ? true : false;
 	}
 
 	return collisionDetected;

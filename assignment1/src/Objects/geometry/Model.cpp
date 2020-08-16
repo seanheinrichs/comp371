@@ -135,7 +135,7 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 	rotate_angle += degrees;
 
 	// Update AABB (Collision)
-	getMinMax();
+	setAABB();
 }
 
 //Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
@@ -159,7 +159,7 @@ void Model::addScale(glm::vec3 scale)
 	}
 
 	// Update AABB (Collision)
-	getMinMax();
+	setAABB();
 }
 
 //Method that updates the values of the x-y-z components of the translation vector used to calculate the model transformation matrix
@@ -177,12 +177,8 @@ void Model::addTranslation(glm::vec3 translate)
 	Model::translate_vec.y += translate.y;
 	Model::translate_vec.z += translate.z;
 
-	std::cout << "translate_vec.x " << translate_vec.x << std::endl;
-	std::cout << "translate_vec.y " << translate_vec.y << std::endl;
-	std::cout << "translate_vec.z " << translate_vec.z << std::endl;
-
 	// Update AABB (Collision)
-	getMinMax();
+	setAABB();
 }
 
 //adds shears to model according to the axis passed, which will determine around which axis it will shear
@@ -233,7 +229,7 @@ void Model::Reposition(glm::vec3 position)
 	Model::translate_vec.z = position.z;
 
 	// Update AABB (Collision)
-	getMinMax();
+	setAABB();
 }
 
 //Method that returns the rotation matrix
@@ -370,52 +366,28 @@ std::map<std::string, glm::vec3> Model::getMinMax()
 	std::map<std::string, glm::vec3> map;
 	map["min"] = glm::vec3(0.0f);
 	map["max"] = glm::vec3(0.0f);
-	//for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	//{
-	//	std::map<std::string, glm::vec3> temp = (**it).getMinMax();
-	//	if (map["max"].x < temp["max"].x)
-	//		map["max"].x = temp["max"].x * scale_vec.x + translate_vec.x;
-	//
-	//	if (map["max"].y < temp["max"].y)
-	//		map["max"].y = temp["max"].y * scale_vec.y + translate_vec.y;
-	//
-	//	if (map["max"].z < temp["max"].z)
-	//		map["max"].z = temp["max"].z * scale_vec.z + translate_vec.z;
-	//
-	//	if (map["min"].x > temp["min"].x)
-	//		map["min"].x = temp["min"].x * scale_vec.x + translate_vec.x;
-	//
-	//	if (map["min"].y > temp["min"].y)
-	//		map["min"].y = temp["min"].y * scale_vec.y + translate_vec.y;
-	//
-	//	if (map["min"].z > temp["min"].z)
-	//		map["min"].z = temp["min"].z * scale_vec.z + translate_vec.z;
-	//}
 
 	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
 	{
 		std::map<std::string, glm::vec3> temp = (**it).getMinMax();
 		if (map["max"].x < temp["max"].x)
 			map["max"].x = temp["max"].x;
-	
+
 		if (map["max"].y < temp["max"].y)
 			map["max"].y = temp["max"].y;
-	
+
 		if (map["max"].z < temp["max"].z)
 			map["max"].z = temp["max"].z;
-	
+
 		if (map["min"].x > temp["min"].x)
 			map["min"].x = temp["min"].x;
-	
+
 		if (map["min"].y > temp["min"].y)
 			map["min"].y = temp["min"].y;
-	
+
 		if (map["min"].z > temp["min"].z)
 			map["min"].z = temp["min"].z;
 	}
-
-	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
-	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
 
 	return map;
 }
@@ -457,4 +429,12 @@ void Model::draw(int mode, Shader* shaderProg)
 	}
 	shaderProg->setMat4("model", this->getModelMatrix(true));
 	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
+}
+
+void Model::setAABB()
+{
+	std::map<std::string, glm::vec3> map = getMinMax();
+
+	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
+	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
 }

@@ -88,4 +88,5 @@ public:
 	// Collision Components
 	AABB aabb;
 	AABB getAABB() const { return aabb; };
+	void setAABB();
 };
