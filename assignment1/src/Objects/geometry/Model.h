@@ -20,6 +20,12 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include <glm/gtc/type_ptr.hpp>
 #include "../../opengl_a/Shader.h"
 
+// Container to hold the Axis-Aligned Boundary Box
+struct AABB
+{
+	glm::vec4 min;
+	glm::vec4 max;
+};
 
 class Model : public Polygon, public Binder
 {
@@ -46,7 +52,6 @@ public:
 	glm::mat4 getModelMatrix(bool shear = false);
 	glm::mat4 getShearMatrix();
 
-
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();
 	virtual int getVAByteSize();
@@ -68,7 +73,6 @@ public:
 	int vaByteSize;
 	float offset = 1.0f;
 
-
 	//vertex components
 	bool position, color, texture, normal;
 	glm::vec3 shear_vec;
@@ -81,4 +85,7 @@ public:
 	glm::vec2 shearZ;
 	float rotate_angle;
 
+	// Collision Components
+	AABB aabb;
+	AABB getAABB() const { return aabb; };
 };
