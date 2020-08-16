@@ -26,6 +26,8 @@ in main: #include <glm/gtx/transform2.hpp>
 #define _SCL_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 
+
+#include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -46,6 +48,7 @@ in main: #include <glm/gtx/transform2.hpp>
 #include "modeling/OurModels.cpp"
 #include "utils/GL_Error.h"
 #include "utils/objloader.cpp"
+#include "utils/renderHelpers.h"
 #include "Opengl_a/Shader.h"
 #include "Common.h"
 
@@ -146,6 +149,9 @@ glm::vec3 *g_specularStrength = new glm::vec3[32];
 
 int main(void)
 {
+	time_t startTime = time(new time_t());
+
+
 	/* Initialize GLFW */
 	if (!glfwInit())
 	{
@@ -196,13 +202,13 @@ int main(void)
 	Shader depthShader("comp371/assignment1/src/Shaders/shadow_mapping_depth.vertex", "comp371/assignment1/src/Shaders/shadow_mapping_depth.fragment");
 	Shader skyboxShader("comp371/assignment1/src/Shaders/skyboxShader.vertex", "comp371/assignment1/src/Shaders/skyboxShader.fragment");
 	setupTextureMapping();
-	
+
 	// [Models]
 
 	//obj loader
 	//these vectors will store the extracted data from the obj file through the objloader 
 	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec2> uvs; 
+	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 	//extracting data from obj files
 	bool extraction = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
@@ -220,8 +226,21 @@ int main(void)
 	terrain->bindArrayBuffer();
 
 
-	ModelContainer* ben = new ModelContainer();
-	createBensModel(ben, &modelShader);
+
+	ModelContainer* ben = loadModel("../Assets/Models/backpack.obj");
+	ben->optimizeModels();
+	ben->setVertexController(true, true, false, true);
+
+	for (std::vector<Model *>::iterator it = ben->models.begin(); it < ben->models.end(); it++)
+		(*it)->textureIndex = 11; 
+
+	ben->print();
+	std::cout << ben->models.size() << std::endl;
+	
+
+	//ModelContainer* ben = new ModelContainer();
+	//createBensModel(ben, &modelShader);
+
 	ben->bindArrayBuffer();
 
 	ModelContainer* sean = new ModelContainer();
@@ -236,9 +255,10 @@ int main(void)
 	createZimingsModel(ziming, &modelShader);
 	ziming->bindArrayBuffer();
 
-	ModelContainer* wayne = loadModel("../Assets/Models/backpack.obj");
 
-		//new ModelContainer();
+
+
+	ModelContainer* wayne = new ModelContainer();
 	//createWaynesModel(wayne, &modelShader);
 	wayne->bindArrayBuffer();
 
@@ -255,7 +275,7 @@ int main(void)
 	Light* zimingsPL = new Light(light, glm::vec3(-4.0f, 3.0f, 4.0f), false);
 
 	Light* spotLight = new Light(light, glm::vec3(0.0f, 1.0f, -8.0f), false);
-			
+
 	// [Grid]
 
 
@@ -315,7 +335,9 @@ int main(void)
 	terrain->addTranslation(glm::vec3(0.0f-SIZE/2, 0.50f, 0.0f-SIZE/2));
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	ben->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
+	ben->addTranslation(glm::vec3(0.0f, 0.4f, 0.0f));
+	ben->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
+
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
@@ -323,7 +345,7 @@ int main(void)
 	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
 	wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
-	
+
 
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
@@ -360,6 +382,10 @@ int main(void)
 	// Fog
 	modelShader.setVec3("skyColor", RED, BLUE, GREEN);
 
+	bindTextures();
+
+	std::cout << "it took " << difftime(time(new time_t), startTime) << "seconds to reach rendering" << std::endl;
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -376,7 +402,8 @@ int main(void)
 		processInput(window, models, pointLights, collision);
 
 		// Render
-		GLCall(glClearColor(RED, BLUE, GREEN, 1.0f));
+		//GLCall(glClearColor(RED, BLUE, GREEN, 1.0f));
+		GLCall(glClearColor(0, 0, 0, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		// Start Using Model Shader
@@ -410,11 +437,11 @@ int main(void)
 
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
 		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid, terrain);
-		
+
 		// Reset Viewport
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
 		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid, terrain);
 
@@ -424,7 +451,7 @@ int main(void)
 		lightShader.use();
 		lightShader.setMat4("projection", projection);
 		lightShader.setMat4("view", view);
-		
+
 		// [Point Lights]
 		lightShader.setInt("fill", -1);
 		for (int i = 0; i < 5; i++)
@@ -443,7 +470,7 @@ int main(void)
 
 		// Rendering 5x5 XYZ Axes
 		RenderAxes(&lightShader, grid_VAOs, light);
-		
+
 		// Draw Skybox as last item
 		drawSkybox(skyboxShader);
 
@@ -451,7 +478,7 @@ int main(void)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-	
+
 
 	// De-allocate resources 
 	ben->deallocate();
@@ -750,6 +777,8 @@ void setupTextureMapping()
 	g_texLocations[27] = GL_TEXTURE27;
 	g_texLocations[28] = GL_TEXTURE28;
 	g_texLocations[29] = GL_TEXTURE29;
+	g_texLocations[30] = GL_TEXTURE30;
+	g_texLocations[31] = GL_TEXTURE31;
 
 	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
 	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
@@ -762,9 +791,10 @@ void setupTextureMapping()
 	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
 	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
 	g_textures[10] = Texture("comp371/assignment1/src/Resources/grid_floor.jpg");
-	g_textures[13] = Texture("C:\\Users\\Benjamin Therien\\Documents\\comp371\\models\\backpack\\diffuse.jpg");
+	//g_textures[13] = Texture("C:\\Users\\Benjamin Therien\\Documents\\comp371\\models\\backpack\\diffuse.jpg");
 	//g_textures[11] // used by shadow map
 	//g_textures[12] // used by skybox
+
 
 	g_shininess[0] = 2.0f;
 	g_shininess[1] = 2.0f;
@@ -778,8 +808,8 @@ void setupTextureMapping()
 	g_shininess[9] = 256.0f;
 	g_shininess[10] = 64.0f;
 	g_shininess[13] = 64.0f;
-	//g_shininess[11] // used by shadow map
-	//g_shininess[12] // used by skybox
+	g_shininess[11] = 64.0f;// used by shadow map
+	g_shininess[12] = 64.0f; // used by skybox
 
 	g_specularStrength[0] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[1] =	glm::vec3(1.0f, 1.0f, 1.0f);
@@ -792,6 +822,8 @@ void setupTextureMapping()
 	g_specularStrength[8] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[9] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
+	g_specularStrength[11] = glm::vec3(0.5f, 0.5f, 0.5f);
+	g_specularStrength[12] = glm::vec3(0.5f, 0.5f, 0.5f);
 	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);
 	//g_specularStrength[11] // used by shadow map
 	//g_specularStrength[12] // used by skybox
@@ -799,6 +831,7 @@ void setupTextureMapping()
 
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, ModelContainer *terrain)
 {
+	bindTextures();
 	shader->use();
 	shader->setFloat("loaded", 0);
 	glm::mat4 sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
@@ -809,7 +842,9 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	shader->setMat4("model", ben->getModelMatrix() * sphereTransform);
 	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 	
+	shader->setFloat("loaded", 1);
 	ben->draw(MODE, shader);
+	shader->setFloat("loaded", 0);
 
 	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
@@ -838,12 +873,11 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 
 	ziming->draw(MODE, shader);
 
-	//wayne sphere
-	shader->use();
-	//shader->setFloat("loaded", 1);
+
 	wayne->draw(MODE, shader);
 
 	terrain->draw(MODE, shader);
+
 	shader->setFloat("loaded", 0);
 }
 

@@ -354,3 +354,8 @@ std::map<std::string, glm::vec3> Shape::getMinMax()
 {
 	return vc->getMinMax();
 }
+
+void Shape::print() 
+{
+	vc->print();
+}

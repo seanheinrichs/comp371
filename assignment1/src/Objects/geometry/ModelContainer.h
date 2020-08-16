@@ -38,6 +38,10 @@ public:
 	void addTranslation(glm::vec3 translate, std::string name);
 	void setupShearMatrix();
 	void resetShear();
+	void setVertexController(bool position, bool texture, bool color, bool normal);
+	void print();
+
+	void optimizeModels();
 
 	glm::mat4 getShearMatrix();
 	glm::mat4 getRotation();

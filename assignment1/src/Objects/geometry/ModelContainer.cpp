@@ -321,3 +321,51 @@ glm::mat4 ModelContainer::getReposition()
 {
 	return glm::translate(glm::mat4(1.0f), translate_vec);
 }
+
+
+
+void ModelContainer::optimizeModels() 
+{	
+	std::vector<Model*> m;
+	int mCounter = 0;
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		if (mCounter == 0)
+		{
+			m.push_back(*it);
+			mCounter += 1;
+		}
+		else
+		{
+			bool found = false;
+			for (std::vector<Model *>::iterator it2 = m.begin(); it2 < m.end(); it2++)
+			{
+				if ((*it2)->textureIndex == (*it)->textureIndex) {
+					(*it2)->addModel((**it));
+					found = true;
+					break;
+				}
+			}
+
+			if (found = false) 
+				m.push_back(*it);
+
+		}
+	}
+
+
+	models = m;
+}
+
+void ModelContainer::setVertexController(bool position, bool texture, bool color, bool normal)
+{
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+		(*it)->setVertexController(position, texture, color, normal);
+}
+
+void ModelContainer::print() 
+{
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+		(*it)->print();
+}
+

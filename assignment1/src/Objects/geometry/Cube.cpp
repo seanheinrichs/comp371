@@ -320,3 +320,8 @@ std::map<std::string, glm::vec3> Cube::getMinMax()
 {
 	return vc->getMinMax();
 }
+
+void Cube::print() 
+{
+	vc->print();
+}

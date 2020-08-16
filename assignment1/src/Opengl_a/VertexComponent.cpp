@@ -1,4 +1,7 @@
 #include "VertexComponent.h"
+#include <iostream>
+#include <string>
+#include <sstream>
 
 /*
 *@param tp : the type of Vertex component we wish to create
@@ -30,6 +33,22 @@ VertexComponent::VertexComponent(Components tp, glm::vec4 dat)
 	data[2] = dat.z;
 	data[3] = dat.w;
 	floatCount = 4;
+}
+
+std::string VertexComponent::toString()
+{
+	std::ostringstream ss;
+		
+	for (int i = 0; i < floatCount; i++) 
+	{
+		if(i == floatCount-1)
+			ss << data[i];
+		else
+			ss << data[i]<<", ";
+	}
+		
+	std::string s(ss.str());
+	return comps[type] + " (" + s + ")";
 }
 
 float* VertexComponent::getData()

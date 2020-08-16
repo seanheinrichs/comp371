@@ -19,7 +19,7 @@
 
 void Texture::TextureFromFile(const char* path)
 {
-	
+
 
 	//flip image for orientation to reflect opengl's
 	stbi_set_flip_vertically_on_load(1);
@@ -41,13 +41,13 @@ void Texture::TextureFromFile(const char* path)
 
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, localBuffer);
 		glGenerateMipmap(GL_TEXTURE_2D);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		
+
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -59,34 +59,7 @@ void Texture::TextureFromFile(const char* path)
 		stbi_image_free(localBuffer);
 	}
 
-	/*
-
-	if (localBuffer == NULL)
-		std::cout << "failed to load image" << std::endl;
-	else
-		std::cout << "loaded " << path << std::endl;
-
-	GLCall(glGenTextures(1, &renderer_id));
-	GLCall(glBindTexture(GL_TEXTURE_2D, renderer_id));
-
-
-
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-
-	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, localBuffer));
-
-	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
-
-	if (localBuffer)
-	{
-		stbi_image_free(localBuffer);
-		//std::cout << "images was loaded and now its deleted" << std::endl;
-	}
-
-	*/
+	Texture::bound = false;
 }
 
 
@@ -103,16 +76,21 @@ Texture::Texture(const std::string& path) : filePath(path), localBuffer(nullptr)
 		if (std::string(path) == g_textures[i].path)
 		{
 			texIndex = i;
+			std::cout << "\"" << std::string(path) << "\"  and  \"" << g_textures[i].path << "\"  matching " << std::endl;
 			break;
 		}
 
-		std::cout << std::string(path) << "  and  " << g_textures[i].path << "not matching" << std::endl;
+		//std::cout << "\"" << std::string(path) << "\"  and  \"" << g_textures[i].path << "\" not matching " << std::endl;
 
 	}
 	if (texIndex == -1) 
 	{
 		Texture::path = path;
 		TextureFromFile(path.c_str());
+
+		g_textures[renderer_id - 1] = *this;
+		std::cout << "assigned texture with rendererid: " << renderer_id << std::endl;
+		std::cout << "and path:  " << path << std::endl;
 	}
 	else 
 	{
@@ -135,8 +113,15 @@ Texture::~Texture() {}
 */
 void Texture::bind(unsigned int slot) const 
 {
-	GLCall(glActiveTexture(slot ));
+	
+	GLCall(glActiveTexture(g_texLocations[renderer_id-1]));
 	GLCall(glBindTexture(GL_TEXTURE_2D, renderer_id));
+	//g_textures[renderer_id].bound = true;
+}
+
+void Texture::setBound(bool value)
+{
+	//g_textures[renderer_id].bound = value;
 }
 
 void Texture::unbind() const

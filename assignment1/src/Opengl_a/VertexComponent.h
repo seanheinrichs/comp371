@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <string>
 
 
 /*
@@ -39,6 +40,8 @@ class VertexComponent
 
 	public:
 
+		std::string comps[4] = {"Position","Texture","Color","Normal"};
+
 		Components type;
 		float * data;
 		int floatCount = 0;
@@ -46,6 +49,7 @@ class VertexComponent
 		inline int getFloatCount() { return floatCount; }
 		inline int getByteSize() { return floatCount*sizeof(float); }
 
+		std::string toString();
 		VertexComponent(Components tp, glm::vec2 dat);
 		VertexComponent(Components tp, glm::vec3 dat);
 		VertexComponent(Components tp, glm::vec4 dat);

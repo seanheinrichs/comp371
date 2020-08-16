@@ -32,6 +32,7 @@ class Polygon
 			return map;
 		};
 		virtual float* getVertexArray() = 0;
+		virtual void print() = 0;
 };
 
 

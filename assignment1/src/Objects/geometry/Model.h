@@ -51,6 +51,8 @@ public:
 	void Reposition(glm::vec3 position);
 	void setupShearMatrix();
 	void resetShear();
+	void addModel(Model m);
+	void print();
 
 	glm::mat4 getRotation(float angle,glm::vec3 rotateVec);
 	glm::mat4 getRotationX();

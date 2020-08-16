@@ -17,6 +17,10 @@ public:
 	int width, height, BPP;
 
 	std::string id, type, path;
+
+	bool bound;
+
+	void setBound(bool value);
 	
 
 	void TextureFromFile(const char* path);

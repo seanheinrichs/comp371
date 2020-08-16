@@ -571,39 +571,27 @@ void Model::translateToOrigin()
 
 void Model::draw(int mode, Shader* shaderProg)
 {
+	shaderProg->use();
 	this->bind();
 	
-	if (textures.size() > 0)
+	if (textures.size() > 10)
 	{
-		std::cout << "made it" << std::endl;
-
 		for (std::vector<Texture>::iterator it = textures.begin(); it < textures.end(); it++) 
 		{
 			if ((*it).type == "texture_diffuse")
 			{
-				std::cout << "setting diffuse" << std::endl;
-				std::cout << "binding: " << (*it).renderer_id << std::endl;
+				//std::cout << "texture_diffuse at :" << (*it).path << std::endl;
+
 				shaderProg->setFloat("assimpMat.diffuse", (*it).renderer_id);
-				//g_textures[0].bind(g_texLocations[0]);
-				//shaderProg->setFloat("assimpMat.diffuse", 0);
-				(*it).bind(g_texLocations[(*it).renderer_id]);
 			}
 			else if ((*it).type == "texture_specular")
 			{
-				std::cout << "setting specular" << std::endl;
-				std::cout << "binding: " << (*it).renderer_id << std::endl;
+				//std::cout << "texture_specular at :" << (*it).path << std::endl;
 
-				//g_textures[0].bind(g_texLocations[0]);
 				shaderProg->setFloat("assimpMat.specular", (*it).renderer_id);
-				//shaderProg->setFloat("assimpMat.specular", 0);
-				(*it).bind(g_texLocations[(*it).renderer_id]);
 			}
-		
 		}
-		//g_textures[textureIndex].bind(g_texLocations[textureIndex]);
-		shaderProg->setFloat("assimpMat.shininess", 50);
-		//shaderProg->setVec3("material.specular", g_specularStrength[textureIndex]);
-		//shaderProg->setInt("material.diffuse", textureIndex);
+		shaderProg->setFloat("assimpMat.shininess", 225);
 	}
 	else if (textureIndex == -1)
 	{
@@ -611,8 +599,6 @@ void Model::draw(int mode, Shader* shaderProg)
 	}
 	else
 	{
-		//shader->setFloat("loaded", 2);
-		g_textures[textureIndex].bind(g_texLocations[textureIndex]);
 		shaderProg->setFloat("material.shininess", g_shininess[textureIndex]);
 		shaderProg->setVec3("material.specular", g_specularStrength[textureIndex]);
 		shaderProg->setInt("material.diffuse", textureIndex);
@@ -634,4 +620,16 @@ void Model::setAABB()
 void Model::insertTextures(std::vector<Texture> tex)
 {
 	textures.insert(textures.end(), tex.begin(), tex.end());
+}
+
+
+void Model::addModel(Model m) 
+{
+	polygons.insert(polygons.end(), m.polygons.begin(), m.polygons.end());
+}
+
+void Model::print()
+{
+	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
+		(*it)->print();
 }
