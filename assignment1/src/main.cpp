@@ -956,12 +956,9 @@ float distanceFromCamera(glm::vec3 cameraPos, AABB aabb)
 		{
 			sqDist += (aabb.min[i] - cameraVector) * (aabb.min[i] - cameraVector);
 		}
-		else
+		else if (cameraVector > aabb.max[i])
 		{
-			if (cameraVector > aabb.max[i])
-			{
-				sqDist += (cameraVector - aabb.max[i]) * (cameraVector - aabb.max[i]);
-			}
+			sqDist += (cameraVector - aabb.max[i]) * (cameraVector - aabb.max[i]);
 		}
 	}
 
