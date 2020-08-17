@@ -9,14 +9,16 @@
 #include "../utils/SimplexNoise.h"
 
 //vertex grid && indices from example: https://www.youtube.com/watch?v=l6PEfzQVpvM&fbclid=IwAR0TkM569m6FsOe30NcF_5qdPV8wGODo2qeTYbzT2rkkLCjqLWWu-2J0VXI
+//https://www.youtube.com/watch?v=yNYwZMmgTJk
 static void createTerrain(ModelContainer* modelContainer, Shader* shader, int VERTEX_COUNT, int SIZE)
 {
 
 	std::vector<glm::vec3>  vertices_temp;
 	std::vector<glm::vec3>  vertices;
-	std::vector<glm::vec2>  textureCoords;
+	std::vector<glm::vec2>  textures;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec3> normals_temp;
+	std::vector<glm::vec2> textures_temp;
 
 	std::vector<int> indices;
 
@@ -51,6 +53,7 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader, int VE
 								SimplexNoise::noise(x,z)/smooth,
 								z));
 			normals_temp.push_back(glm::vec3(0, 1, 0));
+			textures_temp.push_back(glm::vec2(x, z));
 		}
 	}
 
@@ -73,13 +76,15 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader, int VE
 	{
 		glm::vec3 vertex = vertices_temp[indices[i]];
 		glm::vec3 vertexNormal = normals_temp[indices[i]];
+		glm::vec2 vertexTexture = textures_temp[indices[i]];
 		vertices.push_back(vertex);
 		normals.push_back(vertexNormal);
+		textures.push_back(vertexTexture);
 	}
 	
 	//Model* terrain = new Model(true, false, false, false, "terrain");
-	Model* terrain = new Model(true, true, false, true, "7", shader, 0);
-	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), vertices, textureCoords, normals);
+	Model* terrain = new Model(true, true, false, true, "7", shader, 3);
+	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), vertices, textures, normals, false);
 	terrain->addPolygon(loadedShape);
 	modelContainer->addModel(terrain);
 }
@@ -89,7 +94,7 @@ static void createShape(Model * model,
 	std::vector<glm::vec2> & in_uvs,
 	std::vector<glm::vec3> & in_normals) {
 	//create shape with extracted vertices
-	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), in_vertices, in_uvs, in_normals);
+	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), in_vertices, in_uvs, in_normals, true);
 	model->addPolygon(loadedShape);
 }
 

@@ -19,10 +19,16 @@ Shape::Shape(glm::vec3 origin_a)
 Shape::Shape(glm::vec3 origin_a,
 	std::vector<glm::vec3> & in_vertices,
 	std::vector<glm::vec2> & in_uvs,
-	std::vector<glm::vec3> & in_normals)
+	std::vector<glm::vec3> & in_normals, bool option)
 {
+	if (option) {
+		setUpLoadedObj(in_vertices, in_uvs, in_normals);
+			}
+	else {
+		setUpTerrain(in_vertices, in_uvs, in_normals);
 
-	setUpLoadedObj(in_vertices, in_uvs, in_normals);
+	}
+	
 	origin = origin_a;
 	translate_fromOrigin();
 }
@@ -37,6 +43,28 @@ void Shape::setUpLoadedObj(
 	{
 		Vertex * v = new Vertex();
 		v->addVertexComponent(VertexComponent(POSITION, in_vertices.at(i)));
+		v->addVertexComponent(VertexComponent(TEXTURE, in_uvs.at(i)));
+		v->addVertexComponent(VertexComponent(NORMAL, in_normals.at(i)));
+		vc->appendVertex(*v);
+		//v.addVertexComponent(VertexComponent(NORMAL, in_normals.at(i)));
+	}
+}
+
+void Shape::setUpTerrain(
+	std::vector<glm::vec3> & in_vertices,
+	std::vector<glm::vec2> & in_uvs,
+	std::vector<glm::vec3> & in_normals)
+{
+	vc = new VertexController(true, false, false);
+	for (int i = 0; i < in_vertices.size(); i++)
+	{
+		Vertex * v = new Vertex();
+		v->addVertexComponent(VertexComponent(POSITION, in_vertices.at(i)));
+		//if (i < in_uvs.size()) {
+			v->addVertexComponent(VertexComponent(TEXTURE, in_uvs.at(i)));
+		//}
+
+		v->addVertexComponent(VertexComponent(NORMAL, in_normals.at(i)));
 		vc->appendVertex(*v);
 		//v.addVertexComponent(VertexComponent(NORMAL, in_normals.at(i)));
 	}

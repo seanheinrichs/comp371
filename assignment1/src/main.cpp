@@ -132,7 +132,7 @@ int selected = 0;
 int useTextures = 1;
 bool useShadows = true;
 glm::vec3 activeLightSource(0.0f, 3.0f, -0.1f);
-
+	
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
 Texture* g_textures = new Texture[32];
@@ -723,7 +723,8 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 	wayne->draw(MODE, shader);
-
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	terrain->draw(MODE, shader);
 }
 
