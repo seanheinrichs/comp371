@@ -142,38 +142,11 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 	setAABB();
 }
 
-void Model::addRotationX(float degrees)
-{
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->addRotationX(degrees);
-	}
 
-	rotate_angleX += degrees;
-}
 
-void Model::addRotationY(float degrees)
-{
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->addRotationY(degrees);
-	}
 
-	rotate_angleY += degrees;
-}
 
-void Model::addRotationZ(float degrees)
-{
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->addRotationZ(degrees);
-	}
 
-	rotate_angleZ += degrees;
-}
 
 
 void Model::setRotation(float degrees, glm::vec3 axis)
@@ -222,63 +195,7 @@ void Model::addRotationZ(float degrees)
 }
 
 
-void Model::setRotation(float degrees, glm::vec3 axis)
-{
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->setRotation(degrees, axis);
-	}
 
-	rotate_vec = axis;
-	rotate_angle = degrees;
-}
-
-void Model::addRotationX(float degrees)
-{
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->addRotationX(degrees);
-	}
-
-	rotate_angleX += degrees;
-}
-
-void Model::addRotationY(float degrees)
-{
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->addRotationY(degrees);
-	}
-
-	rotate_angleY += degrees;
-}
-
-void Model::addRotationZ(float degrees)
-{
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->addRotationZ(degrees);
-	}
-
-	rotate_angleZ += degrees;
-}
-
-
-void Model::setRotation(float degrees, glm::vec3 axis)
-{
-	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
-	{
-		if (dynamic_cast<Model*>(*it) != NULL)
-			dynamic_cast<Model*>(*it)->setRotation(degrees, axis);
-	}
-
-	rotate_vec = axis;
-	rotate_angle = degrees;
-}
 
 //Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
 void Model::addScale(glm::vec3 scale)

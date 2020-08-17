@@ -65,6 +65,7 @@ public:
 	glm::mat4 getModelMatrix(bool shear = false);
 	glm::mat4 getShearMatrix();
 
+
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();
 	virtual int getVAByteSize();

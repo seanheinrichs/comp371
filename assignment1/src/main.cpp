@@ -260,7 +260,7 @@ int main(void)
 
 
 	ModelContainer* wayne = new ModelContainer();
-	//createWaynesModel(wayne, &modelShader);
+	createWaynesModel(wayne, &modelShader);
 	wayne->bindArrayBuffer();
 
 	Model* light = new Model(true, false, false, true, "light", &lightShader, -1);
@@ -870,12 +870,13 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 
 	ziming->draw(MODE, shader);
 
-
 	wayne->draw(MODE, shader);
 
 	terrain->draw(MODE, shader);
 
 	shader->setFloat("loaded", 0);
+
+	wayne->draw(MODE, shader);
 }
 
 void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader)
