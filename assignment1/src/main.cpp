@@ -57,6 +57,10 @@ in main: #include <glm/gtx/transform2.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform2.hpp>
+#include <yaml-cpp/parser.h>
+#include <yaml-cpp/yaml.h>
+#include <yaml-cpp/node/parse.h>
+
 
 // for Skybox
 #include "utils/stb_image.h"
@@ -149,6 +153,12 @@ glm::vec3 *g_specularStrength = new glm::vec3[32];
 
 int main(void)
 {
+	YAML::Node config = YAML::LoadFile("comp371/assignment1/src/Config/config.yaml");
+
+	for (std::size_t i = 0; i < config["Variables"].size(); i++) {
+		std::cout << config["Variables"][i]["name"].as<std::string>() << " = " << config["Variables"][i]["value"].as<std::string>() << "\n";
+	}
+
 	time_t startTime = time(new time_t());
 	std::cout << "cpp version: "<< __cplusplus << std::endl;
 
