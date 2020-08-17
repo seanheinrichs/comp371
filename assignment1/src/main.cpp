@@ -62,12 +62,14 @@ in main: #include <glm/gtx/transform2.hpp>
 void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights, bool collision);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 void setupTextureMapping();
-void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel);
+void setModelColor(int modelIndex, Shader * modelShader);
+float RandomFloat(float a, float b);
+void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, ModelContainer *terrain);
 void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader);
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
 void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light);
-void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
-void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid);
+void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid, ModelContainer *terrain);
+void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid, ModelContainer *terrain);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 unsigned int loadTexture(const char *path);
 unsigned int loadCubemap(std::vector<std::string> faces);
@@ -87,8 +89,9 @@ const unsigned int SIZE = 10;
 
 
 
+
 /* Camera Setup */
-Camera camera = Camera(glm::vec3(0.0f, 0.3f, 2.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+Camera camera = Camera(glm::vec3(0.0f, 1.0f, 5.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool collision = false;
@@ -205,6 +208,7 @@ int main(void)
 	createShape(sphereModel, vertices, uvs, normals);
 	sphereModel->bindArrayBuffer(true, sphereModel);
 
+	/*WILL BE REFACTORED*/
 	ModelContainer * terrain = new ModelContainer();
 	//creating a model with the vertices data extracted from object loader
 	createTerrain(terrain, &modelShader, VERTEX_COUNT_TERRAIN, SIZE);
@@ -292,16 +296,16 @@ int main(void)
 	pointLights[3] = zimingsPL;
 	pointLights[4] = waynesPL;
 
-	ModelContainer** models = new ModelContainer*[5];
-	models[0] = terrain;
+	ModelContainer** models = new ModelContainer*[6];
+	models[0] = ben;
 	models[1] = sean;
 	models[2] = isa;
 	models[3] = ziming;
 	models[4] = wayne;
+	models[5] = terrain;
 
-	terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
-	terrain->addTranslation(glm::vec3(0.0f-SIZE/2, 0.0f, 0.0f-SIZE/2));
-
+	terrain->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
+	terrain->addTranslation(glm::vec3(0.0f-SIZE/2, 0.50f, 0.0f-SIZE/2));
 
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -396,14 +400,14 @@ int main(void)
 		modelShader.setMat4("view", view);
 
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
-		ShadowFirstPass(&depthShader, terrain, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
+		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid, terrain);
 		
 		// Reset Viewport
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
-		ShadowSecondPass(&modelShader, terrain, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid);
+		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid, terrain);
 
 		// [Objects Not Affected by Light Source Go Below]
 
@@ -507,6 +511,22 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		camera.moveRight(cameraSpeed);
+	}
+	
+	// Press "6" to select terrain
+	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS && (selected != 5))
+	{
+		selected = 5;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == selected) {
+				pointLights[i]->setActive(true);
+				activeLightSource = pointLights[i]->getPosition();
+			}
+			else {
+				pointLights[i]->setActive(false);
+			}
+		}
 	}
 
 	//Press "SPACE" to JUMP
@@ -656,36 +676,33 @@ void setupTextureMapping()
 	//g_specularStrength[12] // used by skybox
 }
 
-void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel)
+void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, ModelContainer *terrain)
 {
 	glm::mat4 sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
 
 	//ben sphere
-	/*
 	sphereModel->bind();
 	shader->setMat4("model", ben->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 	
-	*/
+	ben->draw(MODE, shader);
 
-	/*
 	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
 	//sean sphere
 	sphereModel->bind();
 	shader->setMat4("model", sean->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 	sean->draw(MODE, shader);
-
 
 	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
 	//isa sphere
 	sphereModel->bind();
 	shader->setMat4("model", isa->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 	isa->draw(MODE, shader);
 
@@ -694,7 +711,7 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 3.75f, 0.0f));
 	sphereModel->bind();
 	shader->setMat4("model", ziming->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 	ziming->draw(MODE, shader);
 
@@ -703,13 +720,11 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
 	sphereModel->bind();
 	shader->setMat4("model", wayne->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_TRIANGLES, 0, sphereModel->getVAVertexCount()));
+	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 	wayne->draw(MODE, shader);
-	
-	*/
 
-	ben->draw(MODE, shader);
+	terrain->draw(MODE, shader);
 }
 
 void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader)
@@ -757,7 +772,7 @@ void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light)
 	glLineWidth(1.0f);
 }
 
-void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid)
+void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid, ModelContainer *terrain)
 {
 	// Render Depth of Scene to Texture (from the light's perspective)
 	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
@@ -772,12 +787,12 @@ void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
 	// Rendering Models and Grid with the DepthShader
-	RenderScene(shader, ben, sean, isa, ziming, wayne, sphereModel);
+	RenderScene(shader, ben, sean, isa, ziming, wayne, sphereModel, terrain);
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid)
+void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid, ModelContainer *terrain)
 {
 	// Render Scene as Normal using the Generated Depth/Shadow map  
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -792,7 +807,7 @@ void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean,
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 	
 	// Rendering Models and Grid with modelShader
-	RenderScene(shader, ben, sean, isa, ziming, wayne, sphereModel);
+	RenderScene(shader, ben, sean, isa, ziming, wayne, sphereModel,terrain);
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, depthMap);

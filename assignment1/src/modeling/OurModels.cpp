@@ -8,11 +8,10 @@
 
 #include "../utils/SimplexNoise.h"
 
+//vertex grid && indices from example: https://www.youtube.com/watch?v=l6PEfzQVpvM&fbclid=IwAR0TkM569m6FsOe30NcF_5qdPV8wGODo2qeTYbzT2rkkLCjqLWWu-2J0VXI
 static void createTerrain(ModelContainer* modelContainer, Shader* shader, int VERTEX_COUNT, int SIZE)
 {
-	//const int VERTEX_COUNT = 200;
-	//const int SIZE = 20;
-	int count = VERTEX_COUNT * VERTEX_COUNT;
+
 	std::vector<glm::vec3>  vertices_temp;
 	std::vector<glm::vec3>  vertices;
 	std::vector<glm::vec2>  textureCoords;
@@ -33,10 +32,7 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader, int VE
 		}
 		for (int j = 0; j<VERTEX_COUNT; j++) {
 
-			if (i == j) {
-
-				//if (i > VERTEX_COUNT / 2) {
-					
+			if (i == j) {	
 				if (smooth >2.0f) {
 					smooth *= 0.99;
 				}
@@ -47,64 +43,17 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader, int VE
 						//nothing
 					}
 					else {
-						//if (smooth >2.0f) {
-							//smooth *= 0.75;
-					//	}
 					}
-				//}
-				//else {
-					/*
-						if (i > VERTEX_COUNT / 2 - offset / 2 &&
-						i < VERTEX_COUNT / 2 + offset / 2 &&
-						j > VERTEX_COUNT / 2 - offset / 2 &&
-						j < VERTEX_COUNT / 2 + offset / 2) {
-						//nothing
-					}
-					else {
-						if (smooth < 12.0f) {
-							smooth *= 1.15;
-							//smooth *= 0.60;
-						}
-					}
-					*/
-				
-					
-				//}
-
-
-				/*
-				if (i > VERTEX_COUNT / 2 - offset/2 &&
-					i < VERTEX_COUNT / 2 + offset/2 &&
-					j > VERTEX_COUNT / 2 - offset/2 &&
-					j < VERTEX_COUNT / 2 + offset/2) {
-					//smooth = 10.0f;
-
-					if (smooth > smoothInitial / 4) {
-						smooth *= 0.70;
-					}
-					else {
-						//smooth *= 1.05;
-					}
-				}
-				else {
-					if (smooth > 1) {
-						//smooth *= 1.05;
-						smooth *= 0.99;
-					}
-				}
-				*/
 			}
 			float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 			float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
 			vertices_temp.push_back(glm::vec3(x,
-								//(float)(rand()%5),
 								SimplexNoise::noise(x,z)/smooth,
-								//height->generateHeight (x,z),
 								z));
 			normals_temp.push_back(glm::vec3(0, 1, 0));
 		}
 	}
-	int pointer = 0;
+
 	for (int gz = 0; gz<VERTEX_COUNT - 1; gz++) {
 		for (int gx = 0; gx<VERTEX_COUNT - 1; gx++) {
 			int topLeft = (gz*VERTEX_COUNT) + gx;
@@ -122,15 +71,14 @@ static void createTerrain(ModelContainer* modelContainer, Shader* shader, int VE
 
 	for (unsigned int i = 0; i < indices.size(); i++)
 	{
-		//unsigned int index = 3; //fetch right index of vertex
 		glm::vec3 vertex = vertices_temp[indices[i]];
 		glm::vec3 vertexNormal = normals_temp[indices[i]];
 		vertices.push_back(vertex);
 		normals.push_back(vertexNormal);
 	}
 	
-	Model* terrain = new Model(true, false, false, false, "terrain");
-	//return loader.loadToVAO(vertices, textureCoords, normals, indices);
+	//Model* terrain = new Model(true, false, false, false, "terrain");
+	Model* terrain = new Model(true, true, false, true, "7", shader, 0);
 	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), vertices, textureCoords, normals);
 	terrain->addPolygon(loadedShape);
 	modelContainer->addModel(terrain);
