@@ -13,6 +13,12 @@ struct Material {
 	float shininess;
 };
 
+struct NoTex {
+	vec3 diffuse;
+	vec3 specular;
+	float shininess;
+};
+
 struct AssimpMat {
 	sampler2D diffuse;
 	sampler2D specular;
@@ -40,6 +46,7 @@ uniform Material material;
 uniform PointLight pointLight;
 uniform AssimpMat assimpMat;
 uniform float loaded;
+uniform NoTex noTex;
 
 
 
@@ -61,7 +68,103 @@ void main()
 vec3 CalculateLightingLoaded(PointLight lightSource, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
 	
-	if(loaded == 1)
+	if(loaded == 0)
+	{
+
+		// Calculate direction
+		vec3 lightDir = normalize(lightSource.position - fragPos);
+
+		// Account for diffuse lighting
+		float diff = max(dot(normal, lightDir), 0.0);
+
+		// Account for specular lighting
+		vec3 reflectDir = reflect(-lightDir, normal);  
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), noTex.shininess);
+	
+		// Account for distance
+		float distance = length(lightSource.position - fragPos);
+		float attenuation = 1.0 / (lightSource.constant + lightSource.linear * distance + lightSource.quadratic * (distance * distance));   
+
+		vec3 ambient;
+		vec3 diffuse;
+
+		// Combine everything to calculate fragment color
+		if(useTextures == 1)
+		{
+			ambient = lightSource.ambient * noTex.diffuse;
+			diffuse = lightSource.diffuse * diff * noTex.diffuse;
+		}
+		else
+		{
+			ambient = lightSource.ambient * vec3(1.0,0.0,0.0);
+			diffuse = lightSource.diffuse * diff * vec3(1.0,0.0,0.0);
+		}
+		vec3 specular = lightSource.specular * (spec * noTex.specular); 
+
+		ambient *= attenuation;
+		diffuse *= attenuation;
+		specular *= attenuation;
+
+
+
+		if (useShadows)
+		{
+			float shadow = ShadowCalculation(FragPosLightSpace);  
+
+			return (ambient + (1.0 - shadow) * (diffuse + specular));
+		}
+
+		return (ambient + diffuse + specular);
+
+	}
+
+	else if(loaded == 1){
+
+		// Calculate direction
+		vec3 lightDir = normalize(lightSource.position - fragPos);
+
+		// Account for diffuse lighting
+		float diff = max(dot(normal, lightDir), 0.0);
+
+		// Account for specular lighting
+		vec3 reflectDir = reflect(-lightDir, normal);  
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+	
+		// Account for distance
+		float distance = length(lightSource.position - fragPos);
+		float attenuation = 1.0 / (lightSource.constant + lightSource.linear * distance + lightSource.quadratic * (distance * distance));   
+
+		vec3 ambient;
+		vec3 diffuse;
+
+		// Combine everything to calculate fragment color
+		if(useTextures == 1)
+		{
+			ambient = lightSource.ambient * vec3(texture(material.diffuse, v_TexCoord));
+			diffuse = lightSource.diffuse * diff * vec3(texture(material.diffuse, v_TexCoord));
+		}
+		else
+		{
+			ambient = lightSource.ambient * vec3(0.5,0.5,0.5);
+			diffuse = lightSource.diffuse * diff * vec3(0.5,0.5,0.5);
+		}
+		vec3 specular = lightSource.specular * (spec * material.specular); 
+
+		ambient *= attenuation;
+		diffuse *= attenuation;
+		specular *= attenuation;
+
+		if (useShadows)
+		{
+			float shadow = ShadowCalculation(FragPosLightSpace);  
+
+			return (ambient + (1.0 - shadow) * (diffuse + specular));
+		}
+
+		return (ambient + diffuse + specular);
+	}
+
+	else if(loaded == 2)
 	{
 
 		// Calculate direction
@@ -109,55 +212,6 @@ vec3 CalculateLightingLoaded(PointLight lightSource, vec3 normal, vec3 fragPos, 
 
 		return (ambient + diffuse + specular);
 
-	}
-
-
-
-
-	else{
-
-		// Calculate direction
-		vec3 lightDir = normalize(lightSource.position - fragPos);
-
-		// Account for diffuse lighting
-		float diff = max(dot(normal, lightDir), 0.0);
-
-		// Account for specular lighting
-		vec3 reflectDir = reflect(-lightDir, normal);  
-		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	
-		// Account for distance
-		float distance = length(lightSource.position - fragPos);
-		float attenuation = 1.0 / (lightSource.constant + lightSource.linear * distance + lightSource.quadratic * (distance * distance));   
-
-		vec3 ambient;
-		vec3 diffuse;
-
-		// Combine everything to calculate fragment color
-		if(useTextures == 1)
-		{
-			ambient = lightSource.ambient * vec3(texture(material.diffuse, v_TexCoord));
-			diffuse = lightSource.diffuse * diff * vec3(texture(material.diffuse, v_TexCoord));
-		}
-		else
-		{
-			ambient = lightSource.ambient * vec3(0.5,0.5,0.5);
-			diffuse = lightSource.diffuse * diff * vec3(0.5,0.5,0.5);
-		}
-		vec3 specular = lightSource.specular * (spec * material.specular); 
-
-		ambient *= attenuation;
-		diffuse *= attenuation;
-		specular *= attenuation;
-
-		if (useShadows)
-		{
-			float shadow = ShadowCalculation(FragPosLightSpace);  
-
-			return (ambient + (1.0 - shadow) * (diffuse + specular));
-		}
-
-		return (ambient + diffuse + specular);
 	}
 }
 

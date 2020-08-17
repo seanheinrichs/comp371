@@ -39,6 +39,7 @@ sand: 	https://gallery.yopriceville.com/Backgrounds/Background_Beach_Sand#.XzsmF
 #include "utils/objloader.cpp"
 #include "utils/renderHelpers.h"
 #include "Opengl_a/Shader.h"
+#include "Opengl_a/Material.h"
 #include "Common.h"
 
 #include <GL/glew.h>    
@@ -127,6 +128,7 @@ glm::vec3 activeLightSource(0.0f, 3.0f, -0.1f);
 
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
+Material* g_materials = new Material[32];
 Texture* g_textures = new Texture[32];
 float *g_shininess = new float[32];
 glm::vec3 *g_specularStrength = new glm::vec3[32];
@@ -699,17 +701,29 @@ void setupTextureMapping()
 	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);
 	//g_specularStrength[11] // used by shadow map
 	//g_specularStrength[12] // used by skybox
+
+	g_materials[0] = Material(g_specularStrength[0], g_textures[0], g_shininess[0]);
+	g_materials[1] = Material(g_specularStrength[1], g_textures[1], g_shininess[1]);
+	g_materials[2] = Material(g_specularStrength[2], g_textures[2], g_shininess[2]);
+	g_materials[3] = Material(g_specularStrength[3], g_textures[3], g_shininess[3]);
+	g_materials[4] = Material(g_specularStrength[4], g_textures[4], g_shininess[4]);
+	g_materials[5] = Material(g_specularStrength[5], g_textures[5], g_shininess[5]);
+	g_materials[6] = Material(g_specularStrength[6], g_textures[6], g_shininess[6]);
+	g_materials[7] = Material(g_specularStrength[7], g_textures[7], g_shininess[7]);
+	g_materials[8] = Material(g_specularStrength[8], g_textures[8], g_shininess[8]);
+	g_materials[9] = Material(g_specularStrength[9], g_textures[9], g_shininess[9]);
+	g_materials[10] = Material(g_specularStrength[10], g_textures[10], g_shininess[10]);
+	g_materials[11] = Material(g_specularStrength[11], g_textures[11], g_shininess[11]);
+	g_materials[12] = Material(g_specularStrength[12], g_textures[12], g_shininess[12]);
 }
 
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model *terrain)
 {
 	bindTextures();
 	shader->use();
-	shader->setFloat("loaded", 0);
-	
-	shader->setFloat("loaded", 1);
+
+
 	ben->draw(MODE, shader);
-	shader->setFloat("loaded", 0);
 
 	sean->draw(MODE, shader);
 
@@ -720,8 +734,6 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	wayne->draw(MODE, shader);
 
 	terrain->draw(MODE, shader);
-
-	shader->setFloat("loaded", 0);
 
 	wayne->draw(MODE, shader);
 }
