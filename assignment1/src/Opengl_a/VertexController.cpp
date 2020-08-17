@@ -357,3 +357,17 @@ std::map<std::string, glm::vec3> VertexController::getMinMax()
 	return map;
 
 }
+
+
+void VertexController::appendVertices(std::vector<Vertex> newVertices) 
+{
+	vertices.insert(vertices.end(), newVertices.begin(), newVertices.end());
+}
+
+
+void VertexController::print()
+{
+	for (std::vector<Vertex>::iterator it = vertices.begin(); it < vertices.end(); it++)
+		std::cout << (*it).toString() << std::endl;
+}
+

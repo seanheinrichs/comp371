@@ -22,4 +22,7 @@ public:
 	std::vector<VertexComponent> vertexComponents;
 	Vertex();
 	void addVertexComponent(VertexComponent vc);
+	std::string toString();
+
+	
 };

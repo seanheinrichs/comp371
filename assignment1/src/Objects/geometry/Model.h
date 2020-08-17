@@ -19,6 +19,7 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include "polygon.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "../../opengl_a/Shader.h"
+#include "../../Opengl_a/Texture.h"
 
 // Container to hold the Axis-Aligned Boundary Box
 struct AABB
@@ -33,24 +34,37 @@ public:
 	virtual void setVertexController(bool position, bool texture, bool color, bool normal);
 	virtual void transform(glm::mat4 transmat);
 	std::vector<Polygon*> polygons;
+	std::vector<Texture> textures;
+	void insertTextures(std::vector<Texture> tex);
 	void addPolygon(Polygon* poly);
 	Model(bool position = true, bool texture = false, bool color = false, bool normal = false, std::string name = "default", Shader* shader = nullptr, int textureIndex = -1);
 	Model();
 
 	void addRotation(float radians, glm::vec3 axis);
+	void addRotationX(float radians);
+	void addRotationY(float radians);
+	void addRotationZ(float radians);
+	void setRotation(float radians, glm::vec3 axis);
 	void addShearMatrix(glm::vec2 shear, char axis);
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
 	void Reposition(glm::vec3 position);
 	void setupShearMatrix();
 	void resetShear();
+	void addModel(Model m);
+	void print();
+	bool textureEquals(Model comp);
 
-	glm::mat4 getRotation();
+	glm::mat4 getRotation(float angle,glm::vec3 rotateVec);
+	glm::mat4 getRotationX();
+	glm::mat4 getRotationY();
+	glm::mat4 getRotationZ();
 	glm::mat4 getReposition();
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
 	glm::mat4 getModelMatrix(bool shear = false);
 	glm::mat4 getShearMatrix();
+
 
 	virtual float* getVertexArray();
 	virtual int getVAFloatCount();
@@ -83,7 +97,7 @@ public:
 	glm::vec2 shearX;
 	glm::vec2 shearY;
 	glm::vec2 shearZ;
-	float rotate_angle;
+	float rotate_angle, rotate_angleX, rotate_angleY, rotate_angleZ;
 
 	// Collision Components
 	AABB aabb;

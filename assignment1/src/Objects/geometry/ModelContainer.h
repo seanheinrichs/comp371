@@ -26,17 +26,28 @@ public:
 	
 	void Reposition(glm::vec3 position);
 	void addRotation(float radians, glm::vec3 axis);
+	void addRotationX(float radians);
+	void addRotationY(float radians);
+	void addRotationZ(float radians);
 	void addScale(glm::vec3 scale);
 	void addTranslation(glm::vec3 translate);
 	void addRotation(float radians, glm::vec3 axis, std::string name);
+	void setRotation(float radians, glm::vec3 axis);
 	void addScale(glm::vec3 scale, std::string name); 
 	void addShearMatrix(glm::vec2 shear, char axis);
 	void addTranslation(glm::vec3 translate, std::string name);
 	void setupShearMatrix();
 	void resetShear();
+	void setVertexController(bool position, bool texture, bool color, bool normal);
+	void print();
+
+	void optimizeModels();
 
 	glm::mat4 getShearMatrix();
 	glm::mat4 getRotation();
+	glm::mat4 getRotationX();
+	glm::mat4 getRotationY();
+	glm::mat4 getRotationZ();
 	glm::mat4 getTranslation();
 	glm::mat4 getScale();
 	glm::mat4 getModelMatrix(bool shear = false);
@@ -52,5 +63,5 @@ public:
 	glm::vec2 shearY;
 	glm::vec2 shearZ;
 
-	float rotate_angle;
+	float rotate_angle, rotate_angleX, rotate_angleY, rotate_angleZ;
 };

@@ -100,7 +100,7 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	glm::mat4 rotate;
 	
 	// [Create A Model]
-	Model* A = new Model(true, true, false, true, "a", shader, 5);
+	Model* A = new Model(true, true, false, true, "a", shader, 11);
 	Shape* cb1 = new Shape(glm::vec3(-1.0, 0.5, 0.0));
 	Shape* cb2 = new Shape(glm::vec3(-2.0, 2.5, 0.0));
 	Shape* cb3 = new Shape(glm::vec3(-2.0, 4.5, 0.0));
@@ -117,7 +117,7 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	A->addPolygon(cb4);
 	
 	// [Create 7 Model]
-	Model* seven = new Model(true, true, false, true, "7", shader, 0);
+	Model* seven = new Model(true, true, false, true, "7", shader, 12);
 
 	Shape * cb5 = new Shape(glm::vec3(1.0f, 2.0f, 0.0f));
 	Shape * cb6 = new Shape(glm::vec3(2.0f, 4.5f, 0.0f));

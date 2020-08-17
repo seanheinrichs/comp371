@@ -35,6 +35,7 @@ public:
 	VertexController(std::vector<Vertex> verts, bool position = true, bool texture = false, bool color = false, bool normal = false);
 
 	void appendVertex(Vertex& ver);
+	void appendVertices(std::vector<Vertex> newVertices);
 
 	int getVertexByteSize(Vertex vert);
 	int getVertexFloatCount(Vertex vert);
@@ -47,6 +48,7 @@ public:
 
 	void transform(glm::mat4 transmat);
 	void transformOne(glm::mat4 transmat, VertexComponent& vc);
+	void print();
 
 	
 

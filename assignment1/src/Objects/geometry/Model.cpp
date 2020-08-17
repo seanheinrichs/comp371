@@ -39,10 +39,11 @@ Model::Model(bool position, bool texture, bool color, bool normal, std::string n
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
-
 	aabb.min = glm::vec4(0.0f);
 	aabb.max = glm::vec4(0.0f);
-
+	rotate_angleX = 0.0;
+	rotate_angleY = 0.0;
+	rotate_angleZ = 0.0;
 	shearX = glm::vec2(0.0f, 0.0f);
 	shearY = glm::vec2(0.0f, 0.0f);
 	shearZ = glm::vec2(0.0f, 0.0f);
@@ -64,6 +65,9 @@ Model::Model()
 	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
+	rotate_angleX = 0.0;
+	rotate_angleY = 0.0;
+	rotate_angleZ = 0.0;
 
 	aabb.min = glm::vec4(0.0f);
 	aabb.max = glm::vec4(0.0f);
@@ -138,6 +142,61 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 	setAABB();
 }
 
+
+
+
+
+
+
+
+void Model::setRotation(float degrees, glm::vec3 axis)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->setRotation(degrees, axis);
+	}
+
+	rotate_vec = axis;
+	rotate_angle = degrees;
+}
+
+void Model::addRotationX(float degrees)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addRotationX(degrees);
+	}
+
+	rotate_angleX += degrees;
+}
+
+void Model::addRotationY(float degrees)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addRotationY(degrees);
+	}
+
+	rotate_angleY += degrees;
+}
+
+void Model::addRotationZ(float degrees)
+{
+	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	{
+		if (dynamic_cast<Model*>(*it) != NULL)
+			dynamic_cast<Model*>(*it)->addRotationZ(degrees);
+	}
+
+	rotate_angleZ += degrees;
+}
+
+
+
+
 //Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
 void Model::addScale(glm::vec3 scale)
 {
@@ -152,6 +211,7 @@ void Model::addScale(glm::vec3 scale)
 		scale_vec.y += scale.y;
 		scale_vec.z += scale.z;
 	}
+
 	else {
 		scale_vec.x = 0.2f;
 		scale_vec.y = 0.2f;
@@ -233,10 +293,28 @@ void Model::Reposition(glm::vec3 position)
 }
 
 //Method that returns the rotation matrix
-glm::mat4 Model::getRotation() 
+glm::mat4 Model::getRotation(float angle, glm::vec3 rotateVec)
 {
-	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), rotate_vec);
+	return glm::rotate(glm::mat4(1.0f), glm::radians(angle), rotateVec);
 }
+
+
+//Method that returns the rotation matrix
+glm::mat4 Model::getRotationX()
+{
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angleX), glm::vec3(1.0, 0.0, 0.0));
+}
+
+glm::mat4 Model::getRotationY()
+{
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angleY), glm::vec3(0.0, 1.0, 0.0));
+}
+
+glm::mat4 Model::getRotationZ()
+{
+	return glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angleZ), glm::vec3(0.0, 0.0, 1.0));
+}
+
 
 //Method that returns the translation matrix
 glm::mat4 Model::getTranslation() 
@@ -267,11 +345,8 @@ glm::mat4 Model::getShearMatrix()
 //Method that calculates the transformation matrix of the model
 glm::mat4 Model::getModelMatrix(bool shear)
 {
-	if (rotate_vec.x == 0 && rotate_vec.y == 0 && rotate_vec.z == 0)
-		return getTranslation() *  getScale();
-	else
-		return 
-		getTranslation() * getRotation() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
+
+	return getTranslation() * getRotationX() * getRotationY() * getRotationZ() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
 }
 
 //Method that adds a polygon object to the list of polygons that this model is composed of
@@ -416,13 +491,28 @@ void Model::draw(int mode, Shader* shaderProg)
 {
 	shaderProg->use();
 	this->bind();
-	if (textureIndex == -1)
+	
+	if (textures.size() > 0)
+	{
+		for (std::vector<Texture>::iterator it = textures.begin(); it < textures.end(); it++) 
+		{
+			if ((*it).type == "texture_diffuse")
+			{
+				shaderProg->setInt("assimpMat.diffuse", (*it).renderer_id-1);
+			}
+			else if ((*it).type == "texture_specular")
+			{
+				shaderProg->setInt("assimpMat.specular", (*it).renderer_id-1);
+			}
+		}
+		shaderProg->setFloat("assimpMat.shininess", 225);
+	}
+	else if (textureIndex == -1)
 	{
 		shaderProg->setInt("fill", textureIndex);
 	}
 	else
 	{
-		g_textures[textureIndex].bind(g_texLocations[textureIndex]);
 		shaderProg->setFloat("material.shininess", g_shininess[textureIndex]);
 		shaderProg->setVec3("material.specular", g_specularStrength[textureIndex]);
 		shaderProg->setInt("material.diffuse", textureIndex);
@@ -432,6 +522,7 @@ void Model::draw(int mode, Shader* shaderProg)
 
 }
 
+
 void Model::setAABB()
 {
 	std::map<std::string, glm::vec3> map = getMinMax();
@@ -439,3 +530,37 @@ void Model::setAABB()
 	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
 	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
 }
+
+void Model::insertTextures(std::vector<Texture> tex)
+{
+	textures.insert(textures.end(), tex.begin(), tex.end());
+}
+
+
+void Model::addModel(Model m) 
+{
+	polygons.insert(polygons.end(), m.polygons.begin(), m.polygons.end());
+}
+
+void Model::print()
+{
+	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
+		(*it)->print();
+}
+
+bool Model::textureEquals(Model comp) 
+{
+	if (textures.size() != comp.textures.size())
+		return false;
+
+	bool isEqual = true;
+	std::vector<Texture>::iterator it = textures.begin();
+	std::vector<Texture>::iterator it2 = comp.textures.begin();
+	for (; it < textures.end(); it++, it2++) 
+	{
+		if (!(*it).equals((*it2)))
+			isEqual = false;
+	}
+	return isEqual;
+}
+

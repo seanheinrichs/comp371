@@ -19,6 +19,7 @@ class VertexComponent;
 class Shape : public Polygon {
 
 public:
+	Shape();
 	Shape(glm::vec3 origin_a);
 	Shape(glm::vec3 origin_a,
 		std::vector<glm::vec3> & in_vertices,
@@ -35,6 +36,9 @@ public:
 	virtual void setBoolean(bool position, bool texture, bool color, bool normal);
 	virtual Vertex getSampleVertex();
 	virtual std::map<std::string, glm::vec3> getMinMax();
+	virtual void print();
+
+
 
 
 	glm::vec3 origin;

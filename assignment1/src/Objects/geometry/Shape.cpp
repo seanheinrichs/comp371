@@ -6,6 +6,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "../../Opengl_a/VertexComponent.h"
 
+//Default Shape 
+Shape::Shape()
+{
+	vc = new VertexController(true, false, false);
+}
 
 //Shape constructor that passes a vec3 as the original position--> CUBE CONSTRUCTOR
 Shape::Shape(glm::vec3 origin_a)
@@ -348,4 +353,9 @@ float* Shape::getVertexArray()
 std::map<std::string, glm::vec3> Shape::getMinMax()
 {
 	return vc->getMinMax();
+}
+
+void Shape::print() 
+{
+	vc->print();
 }
