@@ -37,8 +37,8 @@ public:
 		// Add all the vertical lines
 		for (int i = -100; i <= 100; i += 2)
 		{
-			meshVertices.push_back(glm::vec3(float(i) / 100, 1.0f, 0.0f));
-			meshVertices.push_back(glm::vec3(float(i) / 100, -1.0f, 0.0f));
+			meshVertices.push_back(glm::vec3(float(i) / 100, 10.0f, 0.0f));
+			meshVertices.push_back(glm::vec3(float(i) / 100, -15.0f, 10.0f));
 		}
 
 		// Add all the horizontal lines

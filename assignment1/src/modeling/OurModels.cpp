@@ -4,7 +4,85 @@
 #include "../Objects/geometry/Shape.h"
 #include "../Opengl_a/Shader.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/glm.hpp>
 
+#include "../utils/SimplexNoise.h"
+
+//vertex grid && indices from example: https://www.youtube.com/watch?v=l6PEfzQVpvM&fbclid=IwAR0TkM569m6FsOe30NcF_5qdPV8wGODo2qeTYbzT2rkkLCjqLWWu-2J0VXI
+static void createTerrain(ModelContainer* modelContainer, Shader* shader, int VERTEX_COUNT, int SIZE)
+{
+
+	std::vector<glm::vec3>  vertices_temp;
+	std::vector<glm::vec3>  vertices;
+	std::vector<glm::vec2>  textureCoords;
+	std::vector<glm::vec3> normals;
+	std::vector<glm::vec3> normals_temp;
+
+	std::vector<int> indices;
+
+	int relief = (rand() % 6);
+	float smooth = 20.0f;
+	float smoothInitial = smooth;
+	float offset = VERTEX_COUNT / 3;
+	int vertexPointer = 0;
+
+	for (int i = 0; i<VERTEX_COUNT; i++) {
+		if (smooth >2.0f) {
+			smooth *= 0.995;
+		}
+		for (int j = 0; j<VERTEX_COUNT; j++) {
+
+			if (i == j) {	
+				if (smooth >2.0f) {
+					smooth *= 0.99;
+				}
+					if (i > VERTEX_COUNT / 2 - offset / 2 &&
+						i < VERTEX_COUNT / 2 + offset / 2 &&
+						j > VERTEX_COUNT / 2 - offset / 2 &&
+						j < VERTEX_COUNT / 2 + offset / 2) {
+						//nothing
+					}
+					else {
+					}
+			}
+			float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
+			float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
+			vertices_temp.push_back(glm::vec3(x,
+								SimplexNoise::noise(x,z)/smooth,
+								z));
+			normals_temp.push_back(glm::vec3(0, 1, 0));
+		}
+	}
+
+	for (int gz = 0; gz<VERTEX_COUNT - 1; gz++) {
+		for (int gx = 0; gx<VERTEX_COUNT - 1; gx++) {
+			int topLeft = (gz*VERTEX_COUNT) + gx;
+			int topRight = topLeft + 1;
+			int bottomLeft = ((gz + 1)*VERTEX_COUNT) + gx;
+			int bottomRight = bottomLeft + 1;
+			indices.push_back(topLeft);
+			indices.push_back(bottomLeft);
+			indices.push_back(topRight);
+			indices.push_back(topRight);
+			indices.push_back(bottomLeft);
+			indices.push_back(bottomRight);
+		}
+	}
+
+	for (unsigned int i = 0; i < indices.size(); i++)
+	{
+		glm::vec3 vertex = vertices_temp[indices[i]];
+		glm::vec3 vertexNormal = normals_temp[indices[i]];
+		vertices.push_back(vertex);
+		normals.push_back(vertexNormal);
+	}
+	
+	//Model* terrain = new Model(true, false, false, false, "terrain");
+	Model* terrain = new Model(true, true, false, true, "7", shader, 0);
+	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), vertices, textureCoords, normals);
+	terrain->addPolygon(loadedShape);
+	modelContainer->addModel(terrain);
+}
 //this method has for arguments the extracted data from the objloader and creates a model with this data
 static void createShape(Model * model,
 	std::vector<glm::vec3> & in_vertices,
