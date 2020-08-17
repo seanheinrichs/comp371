@@ -150,6 +150,7 @@ glm::vec3 *g_specularStrength = new glm::vec3[32];
 int main(void)
 {
 	time_t startTime = time(new time_t());
+	std::cout << "cpp version: "<< __cplusplus << std::endl;
 
 
 	/* Initialize GLFW */
@@ -226,15 +227,15 @@ int main(void)
 	terrain->bindArrayBuffer();
 
 
-
-	ModelContainer* ben = loadModel("../Assets/Models/backpack.obj");
+	ModelContainer* ben = loadModel("../Assets/Models/container/container.obj");
+	std::cout << ben->models.size() << std::endl;
 	ben->optimizeModels();
 	ben->setVertexController(true, true, false, true);
 
 	for (std::vector<Model *>::iterator it = ben->models.begin(); it < ben->models.end(); it++)
 		(*it)->textureIndex = 11; 
 
-	ben->print();
+	//ben->print();
 	std::cout << ben->models.size() << std::endl;
 	
 
@@ -334,7 +335,7 @@ int main(void)
 	terrain->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
 	terrain->addTranslation(glm::vec3(0.0f-SIZE/2, 0.50f, 0.0f-SIZE/2));
 
-	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	ben->addScale(glm::vec3(0.002f, 0.002f, 0.002f));
 	ben->addTranslation(glm::vec3(0.0f, 0.4f, 0.0f));
 	ben->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -384,7 +385,7 @@ int main(void)
 
 	bindTextures();
 
-	std::cout << "it took " << difftime(time(new time_t), startTime) << "seconds to reach rendering" << std::endl;
+	std::cout << "it took " << difftime(time(new time_t), startTime) << " seconds to reach rendering" << std::endl;
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -630,7 +631,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	// Press 'J' to scale DOWN the model
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 	{
-		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
+		models[selected]->addScale(glm::vec3(-0.0001f, -0.0001f, -0.0001f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
@@ -837,11 +838,7 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	glm::mat4 sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
 	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
 
-	//ben sphere
-	sphereModel->bind();
-	shader->setMat4("model", ben->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
-	
+
 	shader->setFloat("loaded", 1);
 	ben->draw(MODE, shader);
 	shader->setFloat("loaded", 0);

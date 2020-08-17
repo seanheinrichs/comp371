@@ -12,19 +12,15 @@ class Texture
 
 public: 
 	unsigned int renderer_id;
-	std::string filePath;
 	unsigned char* localBuffer;
 	int width, height, BPP;
-
-	std::string id, type, path;
-
+	std::string filePath, id, type, path;
 	bool bound;
 
+	bool equals(Texture comp);
 	void setBound(bool value);
-	
-
 	void TextureFromFile(const char* path);
-	Texture(const std::string& path);
+	Texture(const std::string& path, std::string type  = "texture_diffuse");
 	Texture();
 	~Texture();
 

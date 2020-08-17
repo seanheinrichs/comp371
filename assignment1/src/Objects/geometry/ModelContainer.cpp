@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <glm/gtx/transform2.hpp>
+#include <iostream>
 
 
 void ModelContainer::bindArrayBuffer()
@@ -340,18 +341,22 @@ void ModelContainer::optimizeModels()
 			bool found = false;
 			for (std::vector<Model *>::iterator it2 = m.begin(); it2 < m.end(); it2++)
 			{
-				if ((*it2)->textureIndex == (*it)->textureIndex) {
+				if ((*it2)->textureEquals(*it)) {
 					(*it2)->addModel((**it));
 					found = true;
 					break;
 				}
 			}
 
-			if (found = false) 
+			if (found == false) {
+
 				m.push_back(*it);
+			}
 
 		}
 	}
+
+	std::cout << m.size() << std::endl;
 
 
 	models = m;

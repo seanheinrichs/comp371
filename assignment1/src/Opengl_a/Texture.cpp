@@ -68,7 +68,7 @@ void Texture::TextureFromFile(const char* path)
 *Read texture image and create the texture itself in opengl
 *
 */
-Texture::Texture(const std::string& path) : filePath(path), localBuffer(nullptr), width(0), height(0), BPP(0)
+Texture::Texture(const std::string& path, std::string type) : filePath(path), localBuffer(nullptr), width(0), height(0), BPP(0), type(type)
 {
 	int texIndex = -1; 
 	for (unsigned int i = 0; i < MAX_TEX; i++)
@@ -126,5 +126,11 @@ void Texture::setBound(bool value)
 
 void Texture::unbind() const
 {
-	GLCall(glBindTexture(GL_TEXTURE_2D,0))
+	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
+
+bool Texture::equals(Texture comp) 
+{
+	return renderer_id == comp.renderer_id && path == comp.path;
 }

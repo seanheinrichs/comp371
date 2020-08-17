@@ -294,6 +294,7 @@ void Model::addScale(glm::vec3 scale)
 		scale_vec.y += scale.y;
 		scale_vec.z += scale.z;
 	}
+
 	else {
 		scale_vec.x = 0.2f;
 		scale_vec.y = 0.2f;
@@ -574,21 +575,17 @@ void Model::draw(int mode, Shader* shaderProg)
 	shaderProg->use();
 	this->bind();
 	
-	if (textures.size() > 10)
+	if (textures.size() > 0)
 	{
 		for (std::vector<Texture>::iterator it = textures.begin(); it < textures.end(); it++) 
 		{
 			if ((*it).type == "texture_diffuse")
 			{
-				//std::cout << "texture_diffuse at :" << (*it).path << std::endl;
-
-				shaderProg->setFloat("assimpMat.diffuse", (*it).renderer_id);
+				shaderProg->setInt("assimpMat.diffuse", (*it).renderer_id-1);
 			}
 			else if ((*it).type == "texture_specular")
 			{
-				//std::cout << "texture_specular at :" << (*it).path << std::endl;
-
-				shaderProg->setFloat("assimpMat.specular", (*it).renderer_id);
+				shaderProg->setInt("assimpMat.specular", (*it).renderer_id-1);
 			}
 		}
 		shaderProg->setFloat("assimpMat.shininess", 225);
@@ -633,3 +630,20 @@ void Model::print()
 	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
 		(*it)->print();
 }
+
+bool Model::textureEquals(Model comp) 
+{
+	if (textures.size() != comp.textures.size())
+		return false;
+
+	bool isEqual = true;
+	std::vector<Texture>::iterator it = textures.begin();
+	std::vector<Texture>::iterator it2 = comp.textures.begin();
+	for (; it < textures.end(); it++, it2++) 
+	{
+		if (!(*it).equals((*it2)))
+			isEqual = false;
+	}
+	return isEqual;
+}
+

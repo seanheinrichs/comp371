@@ -53,6 +53,7 @@ public:
 	void resetShear();
 	void addModel(Model m);
 	void print();
+	bool textureEquals(Model comp);
 
 	glm::mat4 getRotation(float angle,glm::vec3 rotateVec);
 	glm::mat4 getRotationX();
