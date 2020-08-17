@@ -1,13 +1,13 @@
 /*
 	COMP 371 - Section CC
-	Practical Assignment #2
+	Practical Assignment #3
 	Written By:
 		Benjamin Therien (40034572)
 		Sean Heinrichs (40075789)
 		Wayne Huras (40074423)
 		Isabelle Gourchette (40008121)
 		Ziming Wang (40041601)
-	Due:  July 27th, 2020
+	Due:  August 21st, 2020
 */
 
 
@@ -58,12 +58,9 @@ in main: #include <glm/gtx/transform2.hpp>
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
 
 /* Function Declarations */
-void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights);
-void setModelColor(int modelIndex, Shader* modelShader);
+void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights, bool collision);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 void setupTextureMapping();
-void setModelColor(int modelIndex, Shader * modelShader);
-float RandomFloat(float a, float b);
 void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel);
 void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader);
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
@@ -75,6 +72,8 @@ unsigned int loadTexture(const char *path);
 unsigned int loadCubemap(std::vector<std::string> faces);
 void loadSkybox(Shader &skyboxShader);
 void drawSkybox(Shader &skyboxShader);
+float distanceFromCamera(glm::vec3 cameraPos, AABB aabb);
+bool checkCollision(ModelContainer** models);
 
 /* Global Constants */
 unsigned int WINDOW_WIDTH = 1024;
@@ -86,6 +85,7 @@ const unsigned int SHADOW_HEIGHT = 1024;
 Camera camera = Camera(glm::vec3(0.0f, 0.3f, 2.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+bool collision = false;
 glm::mat4 model, projection, view;
 
 // Initialize variables used for rotations
@@ -334,8 +334,12 @@ int main(void)
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		collision = false;
+
+		collision = checkCollision(models);
+
 		// Event Handling
-		processInput(window, models, pointLights);
+		processInput(window, models, pointLights, collision);
 
 		// Render
 		GLCall(glClearColor(RED, BLUE, GREEN, 1.0f));
@@ -431,69 +435,10 @@ int main(void)
 }
 
 // Event handling functions
-void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights)
+void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights, bool collision)
 {
 
 	float cameraSpeed = 1.0 * deltaTime;
-
-	//// [Camera FPS Movement]
-
-	//// Press "G" to move FORWARD
-	//if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-	//{
-	//	camera.moveForward(cameraSpeed);
-	//}
-
-	//// Press "V" to move BACKWARDS
-	//if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
-	//{
-	//	camera.moveBackward(cameraSpeed);
-	//}
-
-	//// Press "C" to move LEFT
-	//if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-	//{
-	//	camera.moveLeft(cameraSpeed);
-	//}
-
-	//// // Press "B" to move RIGHT
-	//if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
-	//{
-	//	camera.moveRight(cameraSpeed);
-	//}
-
-	// [World Rotation]
-
-	// Press "LEFT ARROW" to rotate about the positive x-axis in a anti-clockwise direction
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-	{
-		rX += 0.5f;
-	}
-
-	// Press "RIGHT ARROW" to rotate about the negative x-axis in a anti-clockwise direction
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-	{
-		rX -= 0.5f;
-	}
-
-	// Press "UP ARROW" to rotate about the positive y-axis in a anti-clockwise direction
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-	{
-		rY -= 0.5f;
-	}
-
-	// Press "DOWN ARROW" to rotate about the negative y-axis in a anti-clockwise direction
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-	{
-		rY += 0.5f;
-	}
-
-	// Press "HOME" to reset to initial world position
-	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
-	{
-		rY = 0;
-		rX = 0;
-	}
 
 	// [Render Mode]
 
@@ -517,90 +462,8 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 
 	// [Model Selection]
 
-	// Press "1" to select MODEL 0 (N 3)
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && (selected != 0))
-	{
-		selected = 0;
-		for (int i = 0; i < 5; i++)
-		{
-			if (i == selected) {
-				pointLights[i]->setActive(true);
-				activeLightSource = pointLights[i]->getPosition();
-			}
-			else {
-				pointLights[i]->setActive(false);
-			}
-		}
-	}
-
-	// Press "2" to select MODEL 1 (A 7)
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && (selected != 1))
-	{
-		selected = 1;
-		for (int i = 0; i < 5; i++)
-		{
-			if (i == selected) {
-				pointLights[i]->setActive(true);
-				activeLightSource = pointLights[i]->getPosition();
-			}
-			else {
-				pointLights[i]->setActive(false);
-			}
-		}
-	}
-
-	// Press "3" to select MODEL 2 (A 0)
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && (selected != 2))
-	{
-		selected = 2;
-		for (int i = 0; i < 5; i++)
-		{
-			if (i == selected) {
-				pointLights[i]->setActive(true);
-				activeLightSource = pointLights[i]->getPosition();
-			}
-			else {
-				pointLights[i]->setActive(false);
-			}
-		}
-	}
-
-	// Press "4" to select MODEL 3 (M 4)
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && (selected != 3))
-	{
-		selected = 3;
-		for (int i = 0; i < 5; i++)
-		{
-			if (i == selected) {
-				pointLights[i]->setActive(true);
-				activeLightSource = pointLights[i]->getPosition();
-			}
-			else {
-				pointLights[i]->setActive(false);
-			}
-		}
-	}
-
-	// Press "5" to select MODEL 4 (Y 7)
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && (selected != 4))
-	{
-		selected = 4;
-		for (int i = 0; i < 5; i++)
-		{
-			if (i == selected) {
-				pointLights[i]->setActive(true);
-				activeLightSource = pointLights[i]->getPosition();
-			}
-			else {
-				pointLights[i]->setActive(false);
-			}
-		}
-	}
-
-	// [Translation]
-
 	// Press "W" to move FORWARD
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !collision)
 	{
 		camera.moveForward(cameraSpeed);
 	}
@@ -639,156 +502,28 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	// Press "SHIFT + W" to move FORWARD faster
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		camera.moveForward(cameraSpeed * 4.0);
+		if (!collision) 
+		{
+			camera.moveForward(cameraSpeed * 1.5);
+		}
 	}
 
 	// Press "SHIFT + S" to move BACKWARD faster
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		camera.moveBackward(cameraSpeed * 4.0);
+		camera.moveBackward(cameraSpeed * 1.5);
 	}
 
 	// Press "SHIFT + D" to move RIGHT faster
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		camera.moveRight(cameraSpeed * 4.0);
+		camera.moveRight(cameraSpeed * 1.5);
 	}
 
 	// Press "SHIFT + A" to move LEFT faster
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		camera.moveLeft(cameraSpeed * 4.0);
-	}
-
-	// [Rotation]
-
-	// Press 'SHIFT + A' to rotate the model to the left 5 degrees about y-axis
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addRotation(5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	}
-
-	// Press 'SHIFT + D' to rotate the model to the right 5 degrees about y-axis
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addRotation(-5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	}
-
-	// [Scale]
-
-	// Press 'U' to scale UP the model
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
-	{
-		models[selected]->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	}
-
-	// Press 'J' to scale DOWN the model
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-	{
-		models[selected]->addScale(glm::vec3(-0.01f, -0.01f, -0.01f));
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->resetShear();
-	}
-
-	// [Shearing]
-	//X AXIS
-	// Press 'P' to shear
-	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'x');
-	}
-	// Press 'O' to shear
-	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.0f), 'x');
-	}
-
-	//Y AXIS
-	// Press 'k' to shear
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'y');
-	}
-	// Press 'l' to shear
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(-0.0f, -0.02f), 'y');
-	}
-
-	//Z AXIS
-	// Press 'N' to shear
-	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'z');
-	}
-	// Press 'M' to shear
-	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.0f), 'z');
-	}
-
-	// Press '[' to shear
-	if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
-	}
-	// Press '{' to shear
-	if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
-	}
-
-	// Press ']' to shear
-	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.02f), 'z');
-	}
-	// Press '}' to shear
-	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.02f), 'z');
-	}
-
-
-	// Press ';' to shear
-	if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.02f), 'y');
-	}
-	// Press ':' to shear
-	if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.02f), 'y');
-	}
-
-	// Press '/' to shear
-	if (glfwGetKey(window, GLFW_KEY_SLASH) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'x');
-
-	}
-	// Press '?' to shear
-	if (glfwGetKey(window, GLFW_KEY_SLASH) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'x');
-	}
-
-	// Press '.' to shear
-	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'y');
-	}
-	// Press '>' to shear
-	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'y');
+		camera.moveLeft(cameraSpeed * 1.5);
 	}
 
 	// [Texture Toggle]
@@ -820,51 +555,8 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	}
 }
 
-
-//Method to generate random float between a & b
-float RandomFloat(float a, float b) {
-	float random = ((float)rand()) / (float)RAND_MAX;
-	float diff = b - a;
-	float r = random * diff;
-	return a + r;
-}
-
-void setModelColor(int modelIndex, Shader* modelShader)
-{
-	selected == modelIndex ? modelShader->setVec3("modelColor", 0.6f, 0.0f, 0.8f) : modelShader->setVec3("modelColor", 0.75f, 0.75f, 0.75f);
-}
-
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 {
-	//const float SENSITIVITY = 0.05f;
-
-	//xOffset = xPos - previousXPos;
-	//yOffset = previousYPos - yPos;
-
-	//previousXPos = xPos;
-	//previousYPos = yPos;
-
-	//// Limit speed of camera movement
-	//xOffset *= SENSITIVITY;
-	//yOffset *= SENSITIVITY;
-
-	//// Pan camera when holding the right mouse button
-	//if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-	//{
-	//	camera.panCamera(xOffset);
-	//}
-
-	//// Tilt camera when holding the middle mouse button
-	//if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
-	//{
-	//	camera.tiltCamera(yOffset);
-	//}
-
-	//// Zoom camera when holding the left mouse button
-	//if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	//{
-	//	camera.zoomCamera(yOffset);
-	//}
 	if (firstMouse)
 	{
 		previousXPos = xPos;
@@ -1248,4 +940,46 @@ void drawSkybox(Shader &skyboxShader)
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS); // set depth function back to default
+}
+
+float distanceFromCamera(glm::vec3 cameraPos, AABB aabb)
+{
+	float sqDist = 0.0f;
+	float cameraPositions[3] = { cameraPos.x, cameraPos.y, cameraPos.z };
+
+	for (int i = 0; i < 3; i++)
+	{
+		// For each axis, count any excess distance outside box extents
+		float cameraVector = cameraPositions[i];
+
+		if (cameraVector < aabb.min[i])
+		{
+			sqDist += (aabb.min[i] - cameraVector) * (aabb.min[i] - cameraVector);
+		}
+		else if (cameraVector > aabb.max[i])
+		{
+			sqDist += (cameraVector - aabb.max[i]) * (cameraVector - aabb.max[i]);
+		}
+	}
+
+	return glm::sqrt(sqDist);
+}
+
+// TODO: If performance is taking a hit after all additional models are added. This method should only calculate collision for models close to the camera
+// TODO: Check asimp imports
+bool checkCollision(ModelContainer** models)
+{
+	bool collisionDetected = false;
+
+	// Check our models (letters and numbers)
+	for (int i = 0; i < 5; i++)
+	{
+		// Check if Number has collision
+		collisionDetected ? true : collisionDetected = distanceFromCamera(camera.position, models[i]->models[0]->getAABB()) < 0.2f ? true : false;
+
+		// Check if Letter has collision
+		collisionDetected ? true : collisionDetected = distanceFromCamera(camera.position, models[i]->models[1]->getAABB()) < 0.2f ? true : false;
+	}
+
+	return collisionDetected;
 }

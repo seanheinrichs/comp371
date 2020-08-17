@@ -23,7 +23,6 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include "../../Opengl_a/Texture.h"
 #include <glm/gtx/transform2.hpp>
 
-
 //Model constructor, setting up position, texture and color components
 Model::Model(bool position, bool texture, bool color, bool normal, std::string name, Shader* shader, int textureIndex)
 {
@@ -34,11 +33,16 @@ Model::Model(bool position, bool texture, bool color, bool normal, std::string n
 	Model::texture = texture;
 	Model::color = color;
 	Model::normal = normal;
+	
 	origin = glm::vec3(0.0f);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
+
+	aabb.min = glm::vec4(0.0f);
+	aabb.max = glm::vec4(0.0f);
+
 	shearX = glm::vec2(0.0f, 0.0f);
 	shearY = glm::vec2(0.0f, 0.0f);
 	shearZ = glm::vec2(0.0f, 0.0f);
@@ -61,13 +65,14 @@ Model::Model()
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotate_angle = 0.0;
 
+	aabb.min = glm::vec4(0.0f);
+	aabb.max = glm::vec4(0.0f);
 
 	shearX = glm::vec2(0.0f, 0.0f);
 	shearY = glm::vec2(0.0f, 0.0f);
 	shearZ = glm::vec2(0.0f, 0.0f);
 
 	setupShearMatrix();
-	
 }
 
 void Model::resetShear() 
@@ -128,6 +133,9 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 	rotate_vec.y += axis.y;
 	rotate_vec.z += axis.z;
 	rotate_angle += degrees;
+
+	// Update AABB (Collision)
+	setAABB();
 }
 
 //Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
@@ -150,6 +158,8 @@ void Model::addScale(glm::vec3 scale)
 		scale_vec.z = 0.2f;
 	}
 
+	// Update AABB (Collision)
+	setAABB();
 }
 
 //Method that updates the values of the x-y-z components of the translation vector used to calculate the model transformation matrix
@@ -161,9 +171,14 @@ void Model::addTranslation(glm::vec3 translate)
 			dynamic_cast<Model*>(*it)->addTranslation(translate);
 	}
 
+
+
 	Model::translate_vec.x += translate.x;
 	Model::translate_vec.y += translate.y;
 	Model::translate_vec.z += translate.z;
+
+	// Update AABB (Collision)
+	setAABB();
 }
 
 //adds shears to model according to the axis passed, which will determine around which axis it will shear
@@ -212,6 +227,9 @@ void Model::Reposition(glm::vec3 position)
 	Model::translate_vec.x = position.x;
 	Model::translate_vec.y = position.y;
 	Model::translate_vec.z = position.z;
+
+	// Update AABB (Collision)
+	setAABB();
 }
 
 //Method that returns the rotation matrix
@@ -348,6 +366,7 @@ std::map<std::string, glm::vec3> Model::getMinMax()
 	std::map<std::string, glm::vec3> map;
 	map["min"] = glm::vec3(0.0f);
 	map["max"] = glm::vec3(0.0f);
+
 	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
 	{
 		std::map<std::string, glm::vec3> temp = (**it).getMinMax();
@@ -369,6 +388,7 @@ std::map<std::string, glm::vec3> Model::getMinMax()
 		if (map["min"].z > temp["min"].z)
 			map["min"].z = temp["min"].z;
 	}
+
 	return map;
 }
 
@@ -409,4 +429,12 @@ void Model::draw(int mode, Shader* shaderProg)
 	}
 	shaderProg->setMat4("model", this->getModelMatrix(true));
 	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
+}
+
+void Model::setAABB()
+{
+	std::map<std::string, glm::vec3> map = getMinMax();
+
+	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
+	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
 }
