@@ -135,9 +135,9 @@ glm::mat4 lightView(1.0f);
 unsigned int skyboxVAO, skyboxVBO, cubemapTexture;
 
 // Variables used for Fog / Sky Color (Fog/ClearColor)
-const float RED = 0.5;
-const float BLUE = 0.5;
-const float GREEN = 0.5;
+const float RED = 0.84;
+const float BLUE = 0.80;
+const float GREEN = 0.7;
 
 //globals used for selecting render mode and models
 GLenum MODE = GL_TRIANGLES;
@@ -1062,47 +1062,47 @@ void loadSkybox(Shader &skyboxShader)
 	// skybox START // Credit - https://learnopengl.com/Advanced-OpenGL/Cubemaps
 	float skyboxVertices[] = {
 		// positions          
-		-37.5f,  37.5f, -37.5f,
-		-37.5f, -37.5f, -37.5f,
-		 37.5f, -37.5f, -37.5f,
-		 37.5f, -37.5f, -37.5f,
-		 37.5f,  37.5f, -37.5f,
-		-37.5f,  37.5f, -37.5f,
+		-35.7f,  35.7f, -35.7f,
+		-35.7f, -35.7f, -35.7f,
+		 35.7f, -35.7f, -35.7f,
+		 35.7f, -35.7f, -35.7f,
+		 35.7f,  35.7f, -35.7f,
+		-35.7f,  35.7f, -35.7f,
 
-		-37.5f, -37.5f,  37.5f,
-		-37.5f, -37.5f, -37.5f,
-		-37.5f,  37.5f, -37.5f,
-		-37.5f,  37.5f, -37.5f,
-		-37.5f,  37.5f,  37.5f,
-		-37.5f, -37.5f,  37.5f,
+		-35.7f, -35.7f,  35.7f,
+		-35.7f, -35.7f, -35.7f,
+		-35.7f,  35.7f, -35.7f,
+		-35.7f,  35.7f, -35.7f,
+		-35.7f,  35.7f,  35.7f,
+		-35.7f, -35.7f,  35.7f,
 
-		 37.5f, -37.5f, -37.5f,
-		 37.5f, -37.5f,  37.5f,
-		 37.5f,  37.5f,  37.5f,
-		 37.5f,  37.5f,  37.5f,
-		 37.5f,  37.5f, -37.5f,
-		 37.5f, -37.5f, -37.5f,
+		 35.7f, -35.7f, -35.7f,
+		 35.7f, -35.7f,  35.7f,
+		 35.7f,  35.7f,  35.7f,
+		 35.7f,  35.7f,  35.7f,
+		 35.7f,  35.7f, -35.7f,
+		 35.7f, -35.7f, -35.7f,
 
-		-37.5f, -37.5f,  37.5f,
-		-37.5f,  37.5f,  37.5f,
-		 37.5f,  37.5f,  37.5f,
-		 37.5f,  37.5f,  37.5f,
-		 37.5f, -37.5f,  37.5f,
-		-37.5f, -37.5f,  37.5f,
+		-35.7f, -35.7f,  35.7f,
+		-35.7f,  35.7f,  35.7f,
+		 35.7f,  35.7f,  35.7f,
+		 35.7f,  35.7f,  35.7f,
+		 35.7f, -35.7f,  35.7f,
+		-35.7f, -35.7f,  35.7f,
 
-		-37.5f,  37.5f, -37.5f,
-		 37.5f,  37.5f, -37.5f,
-		 37.5f,  37.5f,  37.5f,
-		 37.5f,  37.5f,  37.5f,
-		-37.5f,  37.5f,  37.5f,
-		-37.5f,  37.5f, -37.5f,
+		-35.7f,  35.7f, -35.7f,
+		 35.7f,  35.7f, -35.7f,
+		 35.7f,  35.7f,  35.7f,
+		 35.7f,  35.7f,  35.7f,
+		-35.7f,  35.7f,  35.7f,
+		-35.7f,  35.7f, -35.7f,
 
-		-37.5f, -37.5f, -37.5f,
-		-37.5f, -37.5f,  37.5f,
-		 37.5f, -37.5f, -37.5f,
-		 37.5f, -37.5f, -37.5f,
-		-37.5f, -37.5f,  37.5f,
-		 37.5f, -37.5f,  37.5f
+		-35.7f, -35.7f, -35.7f,
+		-35.7f, -35.7f,  35.7f,
+		 35.7f, -35.7f, -35.7f,
+		 35.7f, -35.7f, -35.7f,
+		-35.7f, -35.7f,  35.7f,
+		 35.7f, -35.7f,  35.7f
 	};
 	// skybox VAO
 
@@ -1120,12 +1120,12 @@ void loadSkybox(Shader &skyboxShader)
 
 	std::vector<std::string> faces
 	{
-		"comp371/assignment1/src/Resources/skybox/right.jpg",
-		"comp371/assignment1/src/Resources/skybox/left.jpg",
-		"comp371/assignment1/src/Resources/skybox/top.jpg",
-		"comp371/assignment1/src/Resources/skybox/bottom.jpg",
-		"comp371/assignment1/src/Resources/skybox/front.jpg",
-		"comp371/assignment1/src/Resources/skybox/back.jpg"
+		"comp371/assignment1/src/Resources/skybox/desert_1/right.png",
+		"comp371/assignment1/src/Resources/skybox/desert_1/left.png",
+		"comp371/assignment1/src/Resources/skybox/desert_1/top.png",
+		"comp371/assignment1/src/Resources/skybox/desert_1/bottom.png",
+		"comp371/assignment1/src/Resources/skybox/desert_1/front.png",
+		"comp371/assignment1/src/Resources/skybox/desert_1/back.png"
 	};
 	cubemapTexture = loadCubemap(faces);
 
