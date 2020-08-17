@@ -10,22 +10,8 @@
 	Due:  August 21st, 2020
 */
 
-
-
-/*
-Info for spheres
-place Assets/Models/planet.obj is same directory as solutions file
-add
-_SCL_SECURE_NO_WARNINGS
-_CRT_SECURE_NO_WARNINGS
-in properties/ C/C++ / Prepocessor / Proprocessor Definitions
-Info for shear:
-in main: #include <glm/gtx/transform2.hpp>
-*/
-
 #define _SCL_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
-
 
 #include <ctime>
 #include <iostream>
@@ -43,6 +29,7 @@ in main: #include <glm/gtx/transform2.hpp>
 #include "utils/AssimpTranslation.h"
 #include "Objects/geometry/Polygon.h"
 #include "Objects/Grid.hpp"
+#include "Objects/Terrain.hpp"
 #include "Objects/Camera.h"
 #include "Objects/lighting/Light.h"
 #include "modeling/OurModels.cpp"
@@ -61,7 +48,6 @@ in main: #include <glm/gtx/transform2.hpp>
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/node/parse.h>
 
-
 // for Skybox
 #include "utils/stb_image.h"
 #include <vector>
@@ -74,14 +60,10 @@ in main: #include <glm/gtx/transform2.hpp>
 void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights, bool collision);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 void setupTextureMapping();
-void setModelColor(int modelIndex, Shader * modelShader);
-float RandomFloat(float a, float b);
-void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, ModelContainer *terrain);
-void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader);
+void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model *terrain);
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
-void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light);
-void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid, ModelContainer *terrain);
-void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid, ModelContainer *terrain);
+void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid, Model *terrain);
+void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid, Model *terrain);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 unsigned int loadTexture(const char *path);
 unsigned int loadCubemap(std::vector<std::string> faces);
@@ -95,15 +77,9 @@ unsigned int WINDOW_WIDTH = 1024;
 unsigned int WINDOW_HEIGHT = 768;
 const unsigned int SHADOW_WIDTH = 1024;
 const unsigned int SHADOW_HEIGHT = 1024;
-const unsigned int VERTEX_COUNT_TERRAIN = 100;
-const unsigned int SIZE = 10;
-
-
-
-
 
 /* Camera Setup */
-Camera camera = Camera(glm::vec3(0.0f, 1.0f, 5.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+Camera camera = Camera(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool collision = false;
@@ -225,19 +201,6 @@ int main(void)
 	//extracting data from obj files
 	bool extraction = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
 
-
-	Model * sphereModel = new Model(true, false, false, false, "sphere");
-	//creating a model with the vertices data extracted from object loader
-	createShape(sphereModel, vertices, uvs, normals);
-	sphereModel->bindArrayBuffer(true, sphereModel);
-
-	/*WILL BE REFACTORED*/
-	ModelContainer * terrain = new ModelContainer();
-	//creating a model with the vertices data extracted from object loader
-	createTerrain(terrain, &modelShader, VERTEX_COUNT_TERRAIN, SIZE);
-	terrain->bindArrayBuffer();
-
-
 	ModelContainer* ben = loadModel("../Assets/Models/container/container.obj");
 	std::cout << ben->models.size() << std::endl;
 	ben->optimizeModels();
@@ -248,8 +211,6 @@ int main(void)
 
 	//ben->print();
 	std::cout << ben->models.size() << std::endl;
-	
-
 	//ModelContainer* ben = new ModelContainer();
 	//createBensModel(ben, &modelShader);
 
@@ -267,9 +228,6 @@ int main(void)
 	createZimingsModel(ziming, &modelShader);
 	ziming->bindArrayBuffer();
 
-
-
-
 	ModelContainer* wayne = new ModelContainer();
 	createWaynesModel(wayne, &modelShader);
 	wayne->bindArrayBuffer();
@@ -277,6 +235,14 @@ int main(void)
 	Model* light = new Model(true, false, false, true, "light", &lightShader, -1);
 	createLightModel(light);
 	light->bindArrayBuffer(true, light);
+
+	// [Terrain] - vertex grid && indices from example: https://www.youtube.com/watch?v=l6PEfzQVpvM&fbclid=IwAR0TkM569m6FsOe30NcF_5qdPV8wGODo2qeTYbzT2rkkLCjqLWWu-2J0VXI
+	Terrain * t = new Terrain();
+	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
+
+	Model* terrain = new Model(true, true, false, true, "terrain", &modelShader, 0);
+	terrain->addPolygon(loadedShape);
+	terrain->bindArrayBuffer(true, terrain);
 
 	// [Point Lights]
 
@@ -290,8 +256,6 @@ int main(void)
 
 	// [Grid]
 
-
-
 	Grid mainGrid = Grid();
 
 	unsigned int grid_VAOs[3], grid_VBOs[3], grid_EBO;
@@ -299,15 +263,6 @@ int main(void)
 	GLCall(glGenBuffers(3, grid_VBOs));
 	GLCall(glGenBuffers(1, &grid_EBO));
 
-
-	// [Grid Mesh] 
-	/*
-	GLCall(glBindVertexArray(grid_VAOs[0]));
-	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[0]));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, mainGrid.meshVertices.size() * sizeof(glm::vec3), &mainGrid.meshVertices.front(), GL_STATIC_DRAW));
-	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
-	GLCall(glEnableVertexAttribArray(0));
-	*/
 	// [Grid Floor] 
 	GLCall(glBindVertexArray(grid_VAOs[1]));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[1]));
@@ -318,15 +273,6 @@ int main(void)
 	GLCall(glEnableVertexAttribArray(1));  // Texture
 	GLCall(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float))));
 	GLCall(glEnableVertexAttribArray(2));  // Normals
-
-	// [Coordinate Axis]
-	GLCall(glBindVertexArray(grid_VAOs[2]));
-	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[2]));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.axisVertices), mainGrid.axisVertices, GL_STATIC_DRAW));
-	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0));
-	GLCall(glEnableVertexAttribArray(0));
-	GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))));
-	GLCall(glEnableVertexAttribArray(1));
 
 	Light** pointLights = new Light*[5];
 	pointLights[0] = bensPL;
@@ -341,15 +287,13 @@ int main(void)
 	models[2] = isa;
 	models[3] = ziming;
 	models[4] = wayne;
-	models[5] = terrain;
 
 	terrain->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
-	terrain->addTranslation(glm::vec3(0.0f-SIZE/2, 0.50f, 0.0f-SIZE/2));
+	terrain->addTranslation(glm::vec3(0.0f - 5, 0.50f, 0.0f - 5));
 
 	ben->addScale(glm::vec3(0.002f, 0.002f, 0.002f));
 	ben->addTranslation(glm::vec3(0.0f, 0.4f, 0.0f));
 	ben->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
-
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
@@ -357,7 +301,6 @@ int main(void)
 	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
 	wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
-
 
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
@@ -406,9 +349,14 @@ int main(void)
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		// Check Collision
 		collision = false;
-
 		collision = checkCollision(models);
+
+		// Set camera y value
+		float terrainHeight;
+		terrainHeight = t->getHeightOfTerrain(camera.position.x, camera.position.z, terrain);
+		camera.position.y = terrainHeight + 1.0f;
 
 		// Event Handling
 		processInput(window, models, pointLights, collision);
@@ -448,14 +396,14 @@ int main(void)
 		modelShader.setMat4("view", view);
 
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
-		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid, terrain);
+		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, grid_VAOs, mainGrid, terrain);
 
 		// Reset Viewport
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
-		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, sphereModel, grid_VAOs, mainGrid, terrain);
+		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, grid_VAOs, mainGrid, terrain);
 
 		// [Objects Not Affected by Light Source Go Below]
 
@@ -480,9 +428,6 @@ int main(void)
 			}
 		}
 
-		// Rendering 5x5 XYZ Axes
-		RenderAxes(&lightShader, grid_VAOs, light);
-
 		// Draw Skybox as last item
 		drawSkybox(skyboxShader);
 
@@ -499,7 +444,6 @@ int main(void)
 	isa->deallocate();
 	ziming->deallocate();
 	light->deallocate();
-	sphereModel->deallocate();
 	terrain->deallocate();
 	glDeleteVertexArrays(1, &skyboxVAO);
 	glDeleteBuffers(1, &skyboxVAO);
@@ -620,99 +564,6 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	{
 		camera.moveLeft(cameraSpeed * 1.5);
 	}
-
-	// [Rotation]
-
-	// Press 'SHIFT + A' to rotate the model to the left 5 degrees about y-axis
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addRotation(5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	}
-
-	// Press 'SHIFT + D' to rotate the model to the right 5 degrees about y-axis
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addRotation(-5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	}
-
-	// [Scale]
-
-	// Press 'U' to scale UP the model
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
-	{
-		models[selected]->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	}
-
-	// Press 'J' to scale DOWN the model
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-	{
-		models[selected]->addScale(glm::vec3(-0.0001f, -0.0001f, -0.0001f));
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->resetShear();
-	}
-
-	// [Shearing]
-	//X AXIS
-	// Press 'P' to shear
-	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'x');
-	}
-	// Press 'O' to shear
-	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.0f), 'x');
-	}
-
-	//Y AXIS
-	// Press 'k' to shear
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'y');
-	}
-	// Press 'l' to shear
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(-0.0f, -0.02f), 'y');
-	}
-
-	//Z AXIS
-	// Press 'N' to shear
-	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.0f), 'z');
-	}
-	// Press 'M' to shear
-	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.0f), 'z');
-	}
-
-	// Press '[' to shear
-	if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.0f, 0.02f), 'z');
-	}
-	// Press '{' to shear
-	if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.0f, -0.02f), 'z');
-	}
-
-	// Press ']' to shear
-	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(0.02f, 0.02f), 'z');
-	}
-	// Press '}' to shear
-	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		models[selected]->addShearMatrix(glm::vec2(-0.02f, -0.02f), 'z');
-	}
-
 	
 	// [Texture Toggle]
 
@@ -845,43 +696,19 @@ void setupTextureMapping()
 	//g_specularStrength[12] // used by skybox
 }
 
-void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, ModelContainer *terrain)
+void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model *terrain)
 {
 	bindTextures();
 	shader->use();
 	shader->setFloat("loaded", 0);
-	glm::mat4 sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
-	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.25f, 0.0f));
-
-
+	
 	shader->setFloat("loaded", 1);
 	ben->draw(MODE, shader);
 	shader->setFloat("loaded", 0);
 
-	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
-	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
-	//sean sphere
-	sphereModel->bind();
-	shader->setMat4("model", sean->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
-
 	sean->draw(MODE, shader);
 
-	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.25f, 1.25f, 1.25f));
-	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 4.5f, 0.0f));
-	//isa sphere
-	sphereModel->bind();
-	shader->setMat4("model", isa->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
-
 	isa->draw(MODE, shader);
-
-	//ziming sphere
-	sphereTransform = glm::scale(glm::mat4(1.0f), glm::vec3(2.25f, 2.25f, 2.25f));
-	sphereTransform = glm::translate(sphereTransform, glm::vec3(0.0f, 3.75f, 0.0f));
-	sphereModel->bind();
-	shader->setMat4("model", ziming->getModelMatrix() * sphereTransform);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 
 	ziming->draw(MODE, shader);
 
@@ -925,21 +752,7 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 
 }
 
-void RenderAxes(Shader* shader, unsigned int grid_VAOs[], Model *light)
-{
-	// [Coordinate Axis]
-
-	glLineWidth(5.0f);
-	glBindVertexArray(grid_VAOs[2]);
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 0.05f, 1.0f));
-	shader->setMat4("model", model);
-	shader->setInt("fill", 0);
-	glDrawArrays(GL_LINES, 0, 6);
-	glLineWidth(1.0f);
-}
-
-void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid, ModelContainer *terrain)
+void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid, Model *terrain)
 {
 	// Render Depth of Scene to Texture (from the light's perspective)
 	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
@@ -954,12 +767,12 @@ void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
 	// Rendering Models and Grid with the DepthShader
-	RenderScene(shader, ben, sean, isa, ziming, wayne, sphereModel, terrain);
+	RenderScene(shader, ben, sean, isa, ziming, wayne, terrain);
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model* sphereModel, unsigned int grid_VAOs[], Grid mainGrid, ModelContainer *terrain)
+void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid, Model *terrain)
 {
 	// Render Scene as Normal using the Generated Depth/Shadow map  
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -974,7 +787,7 @@ void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean,
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 	
 	// Rendering Models and Grid with modelShader
-	RenderScene(shader, ben, sean, isa, ziming, wayne, sphereModel,terrain);
+	RenderScene(shader, ben, sean, isa, ziming, wayne,terrain);
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
