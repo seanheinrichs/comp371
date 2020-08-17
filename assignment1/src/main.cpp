@@ -108,6 +108,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool collision = false;
 glm::mat4 model, projection, view;
+char prevKey;
 
 // Initialize variables used for rotations
 float previousXPos = WINDOW_WIDTH / 2.0f;
@@ -537,26 +538,30 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	// [Model Selection]
 
 	// Press "W" to move FORWARD
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !collision)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (!collision || (collision && prevKey != 'W')))
 	{
+		prevKey = 'W';
 		camera.moveForward(cameraSpeed);
 	}
 
 	// Press "S" to move BACKWARD
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && (!collision || (collision && prevKey != 'S')))
 	{
+		prevKey == 'S';
 		camera.moveBackward(cameraSpeed);
 	}
 
 	// Press "A" to move LEFT
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (!collision || (collision && prevKey != 'A')))
 	{
+		prevKey = 'A';
 		camera.moveLeft(cameraSpeed);
 	}
 
 	// Press "D" to move RIGHT
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && (!collision || (collision && prevKey != 'D')))
 	{
+		prevKey = 'D';
 		camera.moveRight(cameraSpeed);
 	}
 	
