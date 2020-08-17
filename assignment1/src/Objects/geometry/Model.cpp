@@ -142,13 +142,6 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 	setAABB();
 }
 
-
-
-
-
-
-
-
 void Model::setRotation(float degrees, glm::vec3 axis)
 {
 	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
@@ -194,9 +187,6 @@ void Model::addRotationZ(float degrees)
 	rotate_angleZ += degrees;
 }
 
-
-
-
 //Method that updates the values of the x-y-z components of the scale vector used to calculate the model transformation matrix
 void Model::addScale(glm::vec3 scale)
 {
@@ -210,12 +200,6 @@ void Model::addScale(glm::vec3 scale)
 		scale_vec.x += scale.x;
 		scale_vec.y += scale.y;
 		scale_vec.z += scale.z;
-	}
-
-	else {
-		scale_vec.x = 0.2f;
-		scale_vec.y = 0.2f;
-		scale_vec.z = 0.2f;
 	}
 
 	// Update AABB (Collision)
