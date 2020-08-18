@@ -23,11 +23,12 @@ static void createShape(Model * model,
 /* Static methods to create our Models */
 static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 {
-  glm::mat4 scale;
+	glm::mat4 scale;
 	glm::mat4 rotate;
+	glm::mat4 translate;
 	
 	// [Create A Model]
-	Model* A = new Model(true, true, false, true, "a", shader, &g_materials[0]);
+	Model* A = new Model(true, true, false, true, "a", shader, &g_materials[15]);
 	Shape* cb1 = new Shape(glm::vec3(-1.0, 0.5, 0.0));
 	Shape* cb2 = new Shape(glm::vec3(-2.0, 2.5, 0.0));
 	Shape* cb3 = new Shape(glm::vec3(-2.0, 4.5, 0.0));
@@ -44,7 +45,7 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	A->addPolygon(cb4);
 	
 	// [Create 7 Model]
-	Model* seven = new Model(true, true, false, true, "7", shader, &g_materials[5]);
+	Model* seven = new Model(true, true, false, true, "7", shader, &g_materials[14]);
 
 	Shape * cb5 = new Shape(glm::vec3(1.0f, 2.0f, 0.0f));
 	Shape * cb6 = new Shape(glm::vec3(2.0f, 4.5f, 0.0f));
@@ -63,9 +64,13 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	seven->addPolygon(cb7);
 
 	// Set initial position
-	//rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//A->transform(rotate);
-	//seven->transform(rotate);
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -2.0f, 0.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	A->transform(rotate);
+	seven->transform(translate);
+	seven->transform(rotate);
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	seven->transform(rotate);
 
 	// Add to model container
 	modelContainer->addModel(A);

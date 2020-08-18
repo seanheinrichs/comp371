@@ -1,3 +1,5 @@
+//  vertex grid && indices from example: https://www.youtube.com/watch?v=l6PEfzQVpvM&fbclid=IwAR0TkM569m6FsOe30NcF_5qdPV8wGODo2qeTYbzT2rkkLCjqLWWu-2J0VXI
+
 #pragma once
 
 #include "./geometry/Model.h"
@@ -13,6 +15,7 @@ class Terrain
 {
 public:
 	// Constructors & Destructors
+
 	Terrain()
 	{
 		for (int i = 0; i < VERTEX_COUNT; i++)
