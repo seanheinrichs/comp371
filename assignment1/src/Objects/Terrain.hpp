@@ -34,8 +34,9 @@ public:
 				float y = SimplexNoise::noise(x, z) / smooth;
 
 				heights[j][i] = y;
-
+				float mapping = (glm::pow((x*x + z*z), (1/2)));
 				vertices_temp.push_back(glm::vec3(x, y, z));
+				textureCoords_temp.push_back(glm::vec2(x*mapping, z*mapping));
 				normals_temp.push_back(glm::vec3(0, 1, 0));
 			}
 		}
@@ -61,6 +62,8 @@ public:
 		{
 			glm::vec3 vertex = vertices_temp[indices[i]];
 			glm::vec3 vertexNormal = normals_temp[indices[i]];
+			glm::vec2 vertexTexture = textureCoords_temp[indices[i]];
+			textureCoords.push_back(vertexTexture);
 			vertices.push_back(vertex);
 			normals.push_back(vertexNormal);
 		}
@@ -124,6 +127,7 @@ public:
 	std::vector<glm::vec3> vertices_temp;
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> textureCoords;
+	std::vector<glm::vec2> textureCoords_temp;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec3> normals_temp;
 

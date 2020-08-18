@@ -42,8 +42,9 @@ void Shape::setUpLoadedObj(
 	{
 		Vertex * v = new Vertex();
 		v->addVertexComponent(VertexComponent(POSITION, in_vertices.at(i)));
+		v->addVertexComponent(VertexComponent(TEXTURE, in_uvs.at(i)));
+		v->addVertexComponent(VertexComponent(NORMAL, in_normals.at(i)));
 		vc->appendVertex(*v);
-		//v.addVertexComponent(VertexComponent(NORMAL, in_normals.at(i)));
 	}
 }
 
