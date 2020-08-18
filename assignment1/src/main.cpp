@@ -209,36 +209,46 @@ int main(void)
 	//extracting data from obj files
 	bool extraction = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
 
-	//ModelContainer* ben = loadModel("../Assets/Models/palmtree/palmtree.obj");
-	//std::cout << ben->models.size() << std::endl;
-	//ben->optimizeModels();
-	//ben->setVertexController(true, true, false, true);
 
-	//for (std::vector<Model *>::iterator it = ben->models.begin(); it < ben->models.end(); it++)
-	//	(*it)->textureIndex = 11; 
-	//	std::cout << ben->models.size() << std::endl;
-
-	//ben->print();
+	ModelContainer* accarrier = loadModel("../Assets/Models/accarrier/accarrier.obj", true);
+	std::cout << accarrier->models.size() << std::endl;
+	accarrier->optimizeModels();
+	accarrier->setVertexController(true, true, false, true);
+	accarrier->addTranslation(glm::vec3(0.0f, -0.5f, -10.0f));
+	accarrier->addScale(glm::vec3(0.01f, 0.01f, 0.01f));
+	accarrier->addRotationY(90);
 
 	ModelContainer* ben = new ModelContainer();
 	createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
+	ben->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
+	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 
 	ModelContainer* sean = new ModelContainer();
 	createSeansModel(sean, &modelShader);
 	sean->bindArrayBuffer();
+	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
 
 	ModelContainer* isa = new ModelContainer();
 	createIsabellesModel(isa, &modelShader);
 	isa->bindArrayBuffer();
+	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
 
 	ModelContainer* ziming = new ModelContainer();
 	createZimingsModel(ziming, &modelShader);
 	ziming->bindArrayBuffer();
+	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
 
 	ModelContainer* wayne = new ModelContainer();
 	createWaynesModel(wayne, &modelShader);
 	wayne->bindArrayBuffer();
+	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
+	wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
+
 
 	// [Terrain]
 
@@ -250,6 +260,9 @@ int main(void)
 	terrain->addPolygon(loadedShape);
 	terrain->bindArrayBuffer(true, terrain);
 	terrainC->addModel(terrain);
+	terrainC->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
+	terrainC->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
+
 
 	// [Lighting]
 
@@ -273,6 +286,7 @@ int main(void)
 		0.032,						
 		true						
 	);
+
 
 	// [Grid]
 
@@ -301,24 +315,6 @@ int main(void)
 	models[3] = ziming;
 	models[4] = wayne;
 
-	terrain->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
-	terrain->addTranslation(glm::vec3(-15.0f, 0.1f, -15.0f));
-
-	ben->addScale(glm::vec3(1.5f, 1.5f, 1.5f));
-	ben->addTranslation(glm::vec3(0.0f, 2.0f, 467.0f));
-	//ben->addRotation(0, glm::vec3(1.0f, 0.0f, 0.0f));
-
-	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	sean->addTranslation(glm::vec3(-5.0f, 0.0f, 0.0f));
-
-	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
-
-	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
-
-	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
 
 	// Skybox load
 	loadSkybox(skyboxShader);
@@ -357,6 +353,7 @@ int main(void)
 	models3d.push_back(isa);
 	models3d.push_back(ziming);
 	models3d.push_back(terrainC);
+	models3d.push_back(accarrier);
 
 	/* Sound */
 	irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
