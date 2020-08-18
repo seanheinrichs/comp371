@@ -756,6 +756,7 @@ void setupTextureMapping()
 	g_texLocations[30] = GL_TEXTURE30;
 	g_texLocations[31] = GL_TEXTURE31;
 
+
 	g_textures[0] = Texture("comp371/assignment1/src/Resources/sand.jpg");
 	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
 	g_textures[2] = Texture("comp371/assignment1/src/Resources/chrome.png");
@@ -772,6 +773,8 @@ void setupTextureMapping()
 	//g_textures[12] // used by skybox
 	g_textures[14] = Texture("comp371/assignment1/src/Resources/rustedmetal.jpg");
 	g_textures[15] = Texture("comp371/assignment1/src/Resources/oldwood.jpg");
+	g_textures[16] = Texture("comp371/assignment1/src/Resources/blocs2.jpg");
+	g_textures[17] = Texture("comp371/assignment1/src/Resources/blocs.jpg");
 
 
 	g_shininess[0] = 2.0f;
@@ -790,6 +793,8 @@ void setupTextureMapping()
 	g_shininess[12] = 64.0f; // used by skybox
 	g_shininess[14] = 2.0f;
 	g_shininess[15] = 64.0f;
+	g_shininess[16] = 64.0f;
+	g_shininess[17] = 64.0f;
 
 	g_specularStrength[0] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[1] =	glm::vec3(1.0f, 1.0f, 1.0f);
@@ -809,6 +814,8 @@ void setupTextureMapping()
 	//g_specularStrength[12] // used by skybox
 	g_specularStrength[14] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[15] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[16] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[17] = glm::vec3(0.1f, 0.1f, 0.1f);
 
 	g_materials[0] = Material(g_specularStrength[0], g_textures[0], g_shininess[0]);
 	g_materials[1] = Material(g_specularStrength[1], g_textures[1], g_shininess[1]);
@@ -825,6 +832,8 @@ void setupTextureMapping()
 	g_materials[12] = Material(g_specularStrength[12], g_textures[12], g_shininess[12]);
 	g_materials[14] = Material(g_specularStrength[14], g_textures[14], g_shininess[14]);
 	g_materials[15] = Material(g_specularStrength[15], g_textures[15], g_shininess[15]);
+	g_materials[16] = Material(g_specularStrength[16], g_textures[16], g_shininess[16]);
+	g_materials[17] = Material(g_specularStrength[17], g_textures[17], g_shininess[17]);
 }
 
 void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d)

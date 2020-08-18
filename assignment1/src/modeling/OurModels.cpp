@@ -228,7 +228,7 @@ static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 	glm::mat4 translate;
 	
 	// [Create A Model]
-	Model* A = new Model(true, true, false, true, "a", shader, &g_materials[8]);
+	Model* A = new Model(true, true, false, true, "a", shader, &g_materials[16]);
 	//A
 	Shape * Shape1 = new Shape(glm::vec3(1.0f, 0.5f, 0.0f));
 	Shape * Shape2 = new Shape(glm::vec3(2.0f, 2.5f, 0.0f));
@@ -248,7 +248,7 @@ static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(35.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	A->transform(rotate);
   	// [Create 0 Model]
-	Model* zero = new Model(true, true, false, true, "0", shader, &g_materials[3]);
+	Model* zero = new Model(true, true, false, true, "0", shader, &g_materials[17]);
 
 	//0
 	Shape * Shape5 = new Shape(glm::vec3(-1.0f , 0.5f, 8.50f));
