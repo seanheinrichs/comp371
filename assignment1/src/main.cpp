@@ -208,10 +208,10 @@ int main(void)
 
 
 	
-	ModelContainer* ben = loadModel("../Assets/Models/palmtree/palmtree.obj");
-	std::cout << ben->models.size() << std::endl;
-	ben->optimizeModels();
-	ben->setVertexController(true, true, false, true);
+	//ModelContainer* ben = loadModel("../Assets/Models/palmtree/palmtree.obj");
+	//std::cout << ben->models.size() << std::endl;
+	//ben->optimizeModels();
+	//ben->setVertexController(true, true, false, true);
 
 	//for (std::vector<Model *>::iterator it = ben->models.begin(); it < ben->models.end(); it++)
 	//	(*it)->textureIndex = 11; 
@@ -219,9 +219,8 @@ int main(void)
 	
 	//ben->print();
 	
-	//ModelContainer* ben = new ModelContainer();
-	//createBensModel(ben, &modelShader);
-
+	ModelContainer* ben = new ModelContainer();
+	createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
 
 	ModelContainer* sean = new ModelContainer();
@@ -244,7 +243,8 @@ int main(void)
 	createLightModel(light);
 	light->bindArrayBuffer(true, light);
 
-	// [Terrain] - vertex grid && indices from example: https://www.youtube.com/watch?v=l6PEfzQVpvM&fbclid=IwAR0TkM569m6FsOe30NcF_5qdPV8wGODo2qeTYbzT2rkkLCjqLWWu-2J0VXI
+	// [Terrain]
+	
 	Terrain * t = new Terrain();
 	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
 
@@ -253,6 +253,7 @@ int main(void)
 	terrain->addPolygon(loadedShape);
 	terrain->bindArrayBuffer(true, terrain);
 	terrainC->addModel(terrain);
+	
 	// [Point Lights]
 
 	Light* bensPL = new Light(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
@@ -298,18 +299,19 @@ int main(void)
 	models[4] = wayne;
 
 	terrain->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
-	terrain->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
+	terrain->addTranslation(glm::vec3(-15.0f, 0.1f, -15.0f));
 
 	ben->addScale(glm::vec3(1.5f, 1.5f, 1.5f));
 	ben->addTranslation(glm::vec3(0.0f, 2.0f, 467.0f));
 	//ben->addRotation(0, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
+	sean->addTranslation(glm::vec3(-5.0f, 0.0f, 0.0f));
+	//sean->addRotation(90, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
-	wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
+	//wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
@@ -368,7 +370,7 @@ int main(void)
 
 		// Check Collision
 		collision = false;
-		//collision = checkCollision(models);
+		collision = checkCollision(models);
 
 		// Set camera y value
 		float terrainHeight;
@@ -452,7 +454,6 @@ int main(void)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
 
 	// De-allocate resources 
 	ben->deallocate();
@@ -653,10 +654,6 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 			models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, 0.1f));
 
 	}
-	//TRANSLATE
-
-
-
 
 	// [Scale]
 
@@ -676,8 +673,6 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	{
 		models[selected]->resetShear();
 	}
-
-	
 	
 	// [Texture Toggle]
 
@@ -775,6 +770,8 @@ void setupTextureMapping()
 	//g_textures[13] = Texture("C:\\Users\\Benjamin Therien\\Documents\\comp371\\models\\backpack\\diffuse.jpg");
 	//g_textures[11] // used by shadow map
 	//g_textures[12] // used by skybox
+	g_textures[14] = Texture("comp371/assignment1/src/Resources/rustedmetal.jpg");
+	g_textures[15] = Texture("comp371/assignment1/src/Resources/oldwood.jpg");
 
 
 	g_shininess[0] = 2.0f;
@@ -791,6 +788,8 @@ void setupTextureMapping()
 	g_shininess[13] = 64.0f;
 	g_shininess[11] = 64.0f;// used by shadow map
 	g_shininess[12] = 64.0f; // used by skybox
+	g_shininess[14] = 2.0f;
+	g_shininess[15] = 64.0f;
 
 	g_specularStrength[0] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[1] =	glm::vec3(1.0f, 1.0f, 1.0f);
@@ -808,6 +807,8 @@ void setupTextureMapping()
 	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);
 	//g_specularStrength[11] // used by shadow map
 	//g_specularStrength[12] // used by skybox
+	g_specularStrength[14] = glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[15] = glm::vec3(0.1f, 0.1f, 0.1f);
 
 	g_materials[0] = Material(g_specularStrength[0], g_textures[0], g_shininess[0]);
 	g_materials[1] = Material(g_specularStrength[1], g_textures[1], g_shininess[1]);
@@ -822,6 +823,8 @@ void setupTextureMapping()
 	g_materials[10] = Material(g_specularStrength[10], g_textures[10], g_shininess[10]);
 	g_materials[11] = Material(g_specularStrength[11], g_textures[11], g_shininess[11]);
 	g_materials[12] = Material(g_specularStrength[12], g_textures[12], g_shininess[12]);
+	g_materials[14] = Material(g_specularStrength[14], g_textures[14], g_shininess[14]);
+	g_materials[15] = Material(g_specularStrength[15], g_textures[15], g_shininess[15]);
 }
 
 void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d)
@@ -851,7 +854,7 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 	GLCall(glBindVertexArray(grid_VAOs[1]));
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(15.0f, 15.0f, 15.0f));
+	model = glm::scale(model, glm::vec3(35.0f, 35.0f, 35.0f));
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
 	g_textures[10].bind(g_texLocations[10]);
 	shader->setFloat("material.shininess", g_shininess[10]);
