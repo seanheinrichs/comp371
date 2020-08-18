@@ -206,8 +206,9 @@ int main(void)
 	//extracting data from obj files
 	bool extraction = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
 
+
 	/*
-	ModelContainer* ben = loadModel("../Assets/Models/container/container.obj");
+	ModelContainer* ben = loadModel("../Assets/Models/palmtree/palmtree.obj");
 	std::cout << ben->models.size() << std::endl;
 	ben->optimizeModels();
 	ben->setVertexController(true, true, false, true);
@@ -298,7 +299,7 @@ int main(void)
 	terrain->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
 	terrain->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
 
-	ben->addScale(glm::vec3(0.002f, 0.002f, 0.002f));
+	ben->addScale(glm::vec3(1.2f, 1.2f, 1.2f));
 	ben->addTranslation(glm::vec3(0.0f, 0.4f, 0.0f));
 	ben->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -571,6 +572,103 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	{
 		camera.moveLeft(cameraSpeed * 1.5);
 	}
+
+	// [Rotation]
+
+	// Press 'SHIFT + A' to rotate the model to the left 5 degrees about y-axis
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addRotation(5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	// Press 'SHIFT + D' to rotate the model to the right 5 degrees about y-axis
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->addRotation(-5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+	
+
+	//TRANSLATE
+
+	// Press "SHIFT + A" to move the selected model to the LEFT
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+			models[selected]->addTranslation(glm::vec3(0.8f, 0.0f, 0.0f));
+		else
+			models[selected]->addTranslation(glm::vec3(0.1f, 0.0f, 0.0f));
+	}
+
+	// Press "SHIFT + D" to move the selected model to the RIGHT
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+			models[selected]->addTranslation(glm::vec3(-0.8f, 0.0f, 0.0f));
+		else
+			models[selected]->addTranslation(glm::vec3(-0.1f, 0.0f, 0.0f));
+	}
+
+	// Press "SHIFT + W" to move the selected model UP
+	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+			models[selected]->addTranslation(glm::vec3(0.0f, 0.8f, 0.0f));
+		else
+			models[selected]->addTranslation(glm::vec3(0.0f, 0.1f, 0.0f));
+	}
+
+	// Press "SHIFT + S" to move the selected model DOWN
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+			models[selected]->addTranslation(glm::vec3(0.0f,  -0.8f, 0.0f ));
+		else
+			models[selected]->addTranslation(glm::vec3(0.0f, -0.1f, 0.0f));
+	}
+
+	// Press "SHIFT + Q" to move the selected model DOWN
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+			models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, -0.8f));
+		else
+			models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, -0.1f));
+	}
+
+	// Press "SHIFT + E" to move the selected model DOWN
+	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+	{
+		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+			models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, 0.8f));
+		else
+			models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, 0.1f));
+
+	}
+	//TRANSLATE
+
+
+
+
+	// [Scale]
+
+	// Press 'U' to scale UP the model
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+	{
+		models[selected]->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	}
+
+	// Press 'J' to scale DOWN the model
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	{
+		models[selected]->addScale(glm::vec3(-0.0001f, -0.0001f, -0.0001f));
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		models[selected]->resetShear();
+	}
+
+	
 	
 	// [Texture Toggle]
 
@@ -722,12 +820,11 @@ void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, Mode
 	bindTextures();
 	shader->use();
 
-
 	ben->draw(MODE, shader);
-
 	sean->draw(MODE, shader);
 
 	isa->draw(MODE, shader);
+
 
 	ziming->draw(MODE, shader);
 

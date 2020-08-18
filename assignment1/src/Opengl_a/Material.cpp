@@ -50,6 +50,7 @@ void Material::setShader(Shader* shader)
 	if (type == TEXTURE_OFF) 
 	{
 		shader->setInt("loaded", (int)TEXTURE_OFF);
+		//shader->setInt("loaded", 0);
 		shader->setFloat("noTex.shininess", Ns);
 		shader->setVec3("noTex.specular", ks);
 		shader->setVec3("noTex.diffuse", kd);
@@ -57,6 +58,7 @@ void Material::setShader(Shader* shader)
 	else if (type == TEXTURE_D) 
 	{
 		shader->setInt("loaded", (int)TEXTURE_D);
+		//shader->setInt("loaded", 1);
 		shader->setFloat("material.shininess", Ns);
 		shader->setVec3("material.specular", ks);
 		for (std::vector<Texture>::iterator it = textures.begin(); it < textures.end(); it++)
@@ -70,6 +72,7 @@ void Material::setShader(Shader* shader)
 	else if (type == TEXTURE_DS) 
 	{
 		shader->setInt("loaded", (int)TEXTURE_DS);
+		//shader->setInt("loaded", 2);
 		for (std::vector<Texture>::iterator it = textures.begin(); it < textures.end(); it++)
 		{
 			if ((*it).type == "texture_diffuse")

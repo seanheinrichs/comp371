@@ -45,7 +45,7 @@ uniform vec3 lightPos;
 uniform Material material;
 uniform PointLight pointLight;
 uniform AssimpMat assimpMat;
-uniform float loaded;
+uniform int loaded;
 uniform NoTex noTex;
 
 
@@ -70,7 +70,6 @@ vec3 CalculateLightingLoaded(PointLight lightSource, vec3 normal, vec3 fragPos, 
 	
 	if(loaded == 0)
 	{
-
 		// Calculate direction
 		vec3 lightDir = normalize(lightSource.position - fragPos);
 
@@ -166,7 +165,6 @@ vec3 CalculateLightingLoaded(PointLight lightSource, vec3 normal, vec3 fragPos, 
 
 	else if(loaded == 2)
 	{
-
 		// Calculate direction
 		vec3 lightDir = normalize(lightSource.position - fragPos);
 
@@ -212,7 +210,13 @@ vec3 CalculateLightingLoaded(PointLight lightSource, vec3 normal, vec3 fragPos, 
 
 		return (ambient + diffuse + specular);
 
-	}
+}
+
+else
+{
+	return vec3(0.5f, 0.5f, 0.5f);
+}
+
 }
 
 
