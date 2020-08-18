@@ -63,10 +63,10 @@ sand: 	https://gallery.yopriceville.com/Backgrounds/Background_Beach_Sand#.XzsmF
 void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights, bool collision);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 void setupTextureMapping();
-void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model *terrain);
+void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d);
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
-void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid, Model *terrain);
-void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid, Model *terrain);
+void ShadowFirstPass(Shader* shader, std::vector<ModelContainer*> models3d, unsigned int grid_VAOs[], Grid mainGrid);
+void ShadowSecondPass(Shader* shader, std::vector<ModelContainer*> models3d, unsigned int grid_VAOs[], Grid mainGrid);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 unsigned int loadTexture(const char *path);
 unsigned int loadCubemap(std::vector<std::string> faces);
@@ -80,7 +80,7 @@ unsigned int WINDOW_WIDTH = 1024;
 unsigned int WINDOW_HEIGHT = 768;
 const unsigned int SHADOW_WIDTH = 1024;
 const unsigned int SHADOW_HEIGHT = 1024;
-float SENSITIVITY = 0.1f;
+float SENSITIVITY = 0.9f;
 
 /* Camera Setup */
 Camera camera = Camera(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -207,20 +207,20 @@ int main(void)
 	bool extraction = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
 
 
-	/*
+	
 	ModelContainer* ben = loadModel("../Assets/Models/palmtree/palmtree.obj");
 	std::cout << ben->models.size() << std::endl;
 	ben->optimizeModels();
 	ben->setVertexController(true, true, false, true);
 
-	for (std::vector<Model *>::iterator it = ben->models.begin(); it < ben->models.end(); it++)
-		(*it)->textureIndex = 11; 
-		std::cout << ben->models.size() << std::endl;
-	*/
+	//for (std::vector<Model *>::iterator it = ben->models.begin(); it < ben->models.end(); it++)
+	//	(*it)->textureIndex = 11; 
+	//	std::cout << ben->models.size() << std::endl;
+	
 	//ben->print();
 	
-	ModelContainer* ben = new ModelContainer();
-	createBensModel(ben, &modelShader);
+	//ModelContainer* ben = new ModelContainer();
+	//createBensModel(ben, &modelShader);
 
 	ben->bindArrayBuffer();
 
@@ -248,10 +248,11 @@ int main(void)
 	Terrain * t = new Terrain();
 	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
 
-	Model* terrain = new Model(true, true, false, true, "terrain", &modelShader, 0);
+	ModelContainer* terrainC = new ModelContainer();
+	Model* terrain = new Model(true, true, false, true, "terrain", &modelShader, &g_materials[0]);
 	terrain->addPolygon(loadedShape);
 	terrain->bindArrayBuffer(true, terrain);
-
+	terrainC->addModel(terrain);
 	// [Point Lights]
 
 	Light* bensPL = new Light(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
@@ -299,9 +300,9 @@ int main(void)
 	terrain->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
 	terrain->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
 
-	ben->addScale(glm::vec3(1.2f, 1.2f, 1.2f));
-	ben->addTranslation(glm::vec3(0.0f, 0.4f, 0.0f));
-	ben->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
+	ben->addScale(glm::vec3(1.5f, 1.5f, 1.5f));
+	ben->addTranslation(glm::vec3(0.0f, 2.0f, 467.0f));
+	//ben->addRotation(0, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
@@ -349,6 +350,14 @@ int main(void)
 
 	std::cout << "it took " << difftime(time(new time_t), startTime) << " seconds to reach rendering" << std::endl;
 
+	std::vector<ModelContainer*> models3d;
+	models3d.push_back(ben);
+	models3d.push_back(sean);
+	models3d.push_back(wayne);
+	models3d.push_back(isa);
+	models3d.push_back(ziming);
+	models3d.push_back(terrainC);
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -359,7 +368,7 @@ int main(void)
 
 		// Check Collision
 		collision = false;
-		collision = checkCollision(models);
+		//collision = checkCollision(models);
 
 		// Set camera y value
 		float terrainHeight;
@@ -404,14 +413,14 @@ int main(void)
 		modelShader.setMat4("view", view);
 
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
-		ShadowFirstPass(&depthShader, ben, sean, isa, ziming, wayne, grid_VAOs, mainGrid, terrain);
+		ShadowFirstPass(&depthShader, models3d, grid_VAOs, mainGrid);
 
 		// Reset Viewport
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
-		ShadowSecondPass(&modelShader, ben, sean, isa, ziming, wayne, grid_VAOs, mainGrid, terrain);
+		ShadowSecondPass(&modelShader, models3d, grid_VAOs, mainGrid);
 
 		// [Objects Not Affected by Light Source Go Below]
 
@@ -708,8 +717,8 @@ void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 		firstMouse = false;
 	}
 
-	float xoffset = xPos - previousXPos * SENSITIVITY;
-	float yoffset = previousYPos - yPos * SENSITIVITY;
+	float xoffset = (xPos - previousXPos) * SENSITIVITY;
+	float yoffset = (previousYPos - yPos) * SENSITIVITY;
 
 	previousXPos = xPos;
 	previousYPos = yPos;
@@ -815,24 +824,13 @@ void setupTextureMapping()
 	g_materials[12] = Material(g_specularStrength[12], g_textures[12], g_shininess[12]);
 }
 
-void RenderScene(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, Model *terrain)
+void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d)
 {
 	bindTextures();
 	shader->use();
+	for(std::vector<ModelContainer*>::iterator it = models3d.begin(); it < models3d.end(); it++)
+		(*it)->draw(MODE, shader);
 
-	ben->draw(MODE, shader);
-	sean->draw(MODE, shader);
-
-	isa->draw(MODE, shader);
-
-
-	ziming->draw(MODE, shader);
-
-	wayne->draw(MODE, shader);
-
-	terrain->draw(MODE, shader);
-
-	wayne->draw(MODE, shader);
 }
 
 void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader)
@@ -866,7 +864,7 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 
 }
 
-void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid, Model *terrain)
+void ShadowFirstPass(Shader* shader, std::vector<ModelContainer*> models3d, unsigned int grid_VAOs[], Grid mainGrid)
 {
 	// Render Depth of Scene to Texture (from the light's perspective)
 	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
@@ -881,12 +879,12 @@ void ShadowFirstPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
 	// Rendering Models and Grid with the DepthShader
-	RenderScene(shader, ben, sean, isa, ziming, wayne, terrain);
+	RenderScene(shader, models3d);
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean, ModelContainer *isa, ModelContainer *ziming, ModelContainer *wayne, unsigned int grid_VAOs[], Grid mainGrid, Model *terrain)
+void ShadowSecondPass(Shader* shader, std::vector<ModelContainer*> models3d, unsigned int grid_VAOs[], Grid mainGrid)
 {
 	// Render Scene as Normal using the Generated Depth/Shadow map  
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -901,7 +899,7 @@ void ShadowSecondPass(Shader* shader, ModelContainer *ben, ModelContainer *sean,
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 	
 	// Rendering Models and Grid with modelShader
-	RenderScene(shader, ben, sean, isa, ziming, wayne,terrain);
+	RenderScene(shader, models3d);
 	RenderGrid(shader, grid_VAOs, mainGrid);
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, depthMap);

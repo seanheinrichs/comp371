@@ -507,40 +507,13 @@ void Model::draw(int mode, Shader* shaderProg)
 	this->bind();
 	this->material->setShader(shaderProg);
 	
-		/*
-	if (textures.size() > 0)
-	{
-		for (std::vector<Texture>::iterator it = textures.begin(); it < textures.end(); it++) 
-		{
-			if ((*it).type == "texture_diffuse")
-			{
-				shaderProg->setInt("assimpMat.diffuse", (*it).renderer_id-1);
-			}
-			else if ((*it).type == "texture_specular")
-			{
-				shaderProg->setInt("assimpMat.specular", (*it).renderer_id-1);
-			}
-		}
-		shaderProg->setFloat("assimpMat.shininess", 225);
-	}
-	else if (textureIndex == -1)
-	{
-		shaderProg->setInt("fill", textureIndex);
-	}
-	else
-	{
-		shaderProg->setFloat("material.shininess", g_shininess[textureIndex]);
-		shaderProg->setVec3("material.specular", g_specularStrength[textureIndex]);
-		shaderProg->setInt("material.diffuse", textureIndex);
-	}
-	*/
 
 	if (textureIndex == -1)
 	{
 	shaderProg->setInt("fill", textureIndex);
 	}
 
-	shaderProg->setMat4("model", this->getModelMatrix(true));
+	shaderProg->setMat4("model", this->getModelMatrix(false));
 	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
 
 }
