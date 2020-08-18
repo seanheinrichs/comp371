@@ -14,12 +14,10 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 
 #pragma once
 #include "binder.h"
-#include <vector>
 #include <glm/glm.hpp>
 #include "polygon.h"
 #include <glm/gtc/type_ptr.hpp>
-#include "../../opengl_a/Shader.h"
-#include "../../Opengl_a/Texture.h"
+#include "../../Opengl_a/Material.h"
 
 // Container to hold the Axis-Aligned Boundary Box
 struct AABB
@@ -28,15 +26,17 @@ struct AABB
 	glm::vec4 max;
 };
 
-class Model : public Polygon, public Binder
+class Model: public Polygon, public Binder
 {
 public:
 	virtual void setVertexController(bool position, bool texture, bool color, bool normal);
 	virtual void transform(glm::mat4 transmat);
 	std::vector<Polygon*> polygons;
 	std::vector<Texture> textures;
+	Material* material;
 	void insertTextures(std::vector<Texture> tex);
 	void addPolygon(Polygon* poly);
+	Model(bool position, bool texture, bool color, bool normal, std::string name, Shader* shader, Material* material);
 	Model(bool position = true, bool texture = false, bool color = false, bool normal = false, std::string name = "default", Shader* shader = nullptr, int textureIndex = -1);
 	Model();
 

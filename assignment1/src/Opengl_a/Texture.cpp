@@ -100,7 +100,7 @@ Texture::Texture(const std::string& path, std::string type) : filePath(path), lo
 	
 }
 
-Texture::Texture() : filePath(""), localBuffer(nullptr), width(0), height(0), BPP(0) {}
+Texture::Texture() : filePath(""), localBuffer(nullptr), width(0), height(0), BPP(0), type("texture_diffuse") {}
 
 Texture::~Texture() {}
 

@@ -5,8 +5,10 @@
 #include "../Opengl_a/Shader.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
+#include "../Common.h"
 
 #include "../utils/SimplexNoise.h"
+
 
 //this method has for arguments the extracted data from the objloader and creates a model with this data
 static void createShape(Model * model,
@@ -25,7 +27,7 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	glm::mat4 rotate;
 	
 	// [Create A Model]
-	Model* A = new Model(true, true, false, true, "a", shader, 11);
+	Model* A = new Model(true, true, false, true, "a", shader, &g_materials[0]);
 	Shape* cb1 = new Shape(glm::vec3(-1.0, 0.5, 0.0));
 	Shape* cb2 = new Shape(glm::vec3(-2.0, 2.5, 0.0));
 	Shape* cb3 = new Shape(glm::vec3(-2.0, 4.5, 0.0));
@@ -42,7 +44,7 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	A->addPolygon(cb4);
 	
 	// [Create 7 Model]
-	Model* seven = new Model(true, true, false, true, "7", shader, 12);
+	Model* seven = new Model(true, true, false, true, "7", shader, &g_materials[5]);
 
 	Shape * cb5 = new Shape(glm::vec3(1.0f, 2.0f, 0.0f));
 	Shape * cb6 = new Shape(glm::vec3(2.0f, 4.5f, 0.0f));
@@ -75,7 +77,7 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 	
 
 	// [Create Y Model]
-	Model* Y = new Model(true, true, false, true, "y", shader, 6);
+	Model* Y = new Model(true, true, false, true, "y", shader, &g_materials[6]);
   
   // Y model
 	Shape *cb1 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -129,7 +131,7 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 	Y->addPolygon(cb6);
 
 	// [Create 7 Model]
-	Model* seven = new Model(true, true, false, true, "7", shader, 1);
+	Model* seven = new Model(true, true, false, true, "7", shader, &g_materials[1]);
   
   // 7 model
 	Shape *cb7 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -178,7 +180,7 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 
 static void createBensModel(ModelContainer* modelContainer, Shader* shader)
 {
-	Model* three = new Model(true, true, false, true, "3", shader, 2);
+	Model* three = new Model(true, true, false, true, "3", shader, &g_materials[2]);
 
 	three->addPolygon(new Shape(glm::vec3(6.0f, 3.5f, 0.0f)));
 	three->addPolygon(new Shape(glm::vec3(6.5f, 3.5f, 0.0f)));
@@ -206,7 +208,7 @@ static void createBensModel(ModelContainer* modelContainer, Shader* shader)
 	cb->transform(scale);
 	cb1->transform(scale);
 	cb2->transform(transform);
-	Model* N = new Model(true, true, false, true, "n", shader, 7);
+	Model* N = new Model(true, true, false, true, "n", shader, &g_materials[7]);
 	N->addPolygon(cb);
 	N->addPolygon(cb1);
 	N->addPolygon(cb2);
@@ -222,7 +224,7 @@ static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 	glm::mat4 rotate;
 	
 	// [Create A Model]
-	Model* A = new Model(true, true, false, true, "a", shader, 8);
+	Model* A = new Model(true, true, false, true, "a", shader, &g_materials[8]);
 	//A
 	Shape * Shape1 = new Shape(glm::vec3(-1.0f, 0.5f, 0.0f));
 	Shape * Shape2 = new Shape(glm::vec3(-2.0f, 2.5f, 0.0f));
@@ -238,7 +240,7 @@ static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 	A->addPolygon(Shape4);
   
   	// [Create 0 Model]
-	Model* zero = new Model(true, true, false, true, "0", shader, 3);
+	Model* zero = new Model(true, true, false, true, "0", shader, &g_materials[3]);
 
 	//0
 	Shape * Shape5 = new Shape(glm::vec3(1.0f , 0.5f, 0.0f));
@@ -270,7 +272,7 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 	glm::mat4 rotate;
 	
 	// [Create M Model]
-	Model* M = new Model(true, true, false, true, "m", shader, 9);
+	Model* M = new Model(true, true, false, true, "m", shader, &g_materials[9]);
 
 	Shape * cb1 = new Shape(glm::vec3(-5.0f, 0.5f, 0.0f));
 	Shape * cb2 = new Shape(glm::vec3(-4.0f, 3.5f, 0.0f));
@@ -291,7 +293,7 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 	M->addPolygon(cb5);
 
 	// [Create 4 Model]
-	Model* four = new Model(true, true, false, true, "4", shader, 4);
+	Model* four = new Model(true, true, false, true, "4", shader, &g_materials[4]);
 
 	Shape * cb6 = new Shape(glm::vec3(1.0f, 0.83f, 0.0f)); 
 	Shape * cb7 = new Shape(glm::vec3(2.0f, 1.5f, 0.0f));

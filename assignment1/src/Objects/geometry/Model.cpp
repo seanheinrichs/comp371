@@ -21,6 +21,7 @@ vaByteSize: the number Bytes required to contain the vertices of all the polygon
 #include <GL/glew.h> 
 #include "../../utils/GL_Error.h"
 #include "../../Opengl_a/Texture.h"
+#include "../../Opengl_a/Material.h"
 #include <glm/gtx/transform2.hpp>
 
 //Model constructor, setting up position, texture and color components
@@ -33,7 +34,36 @@ Model::Model(bool position, bool texture, bool color, bool normal, std::string n
 	Model::texture = texture;
 	Model::color = color;
 	Model::normal = normal;
+	Model::material = &g_materials[textureIndex];
 	
+	origin = glm::vec3(0.0f);
+	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
+	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+	rotate_angle = 0.0;
+	aabb.min = glm::vec4(0.0f);
+	aabb.max = glm::vec4(0.0f);
+	rotate_angleX = 0.0;
+	rotate_angleY = 0.0;
+	rotate_angleZ = 0.0;
+	shearX = glm::vec2(0.0f, 0.0f);
+	shearY = glm::vec2(0.0f, 0.0f);
+	shearZ = glm::vec2(0.0f, 0.0f);
+
+	setupShearMatrix();
+}
+
+Model::Model(bool position, bool texture, bool color, bool normal, std::string name, Shader* shader, Material* material)
+{
+	Model::textureIndex = textureIndex;
+	Model::shader = shader;
+	Model::name = name;
+	Model::position = position;
+	Model::texture = texture;
+	Model::color = color;
+	Model::normal = normal;
+	Model::material = material;
+
 	origin = glm::vec3(0.0f);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 1.0f);
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -475,33 +505,15 @@ void Model::draw(int mode, Shader* shaderProg)
 {
 	shaderProg->use();
 	this->bind();
+	this->material->setShader(shaderProg);
 	
-	if (textures.size() > 0)
+
+	if (textureIndex == -1)
 	{
-		for (std::vector<Texture>::iterator it = textures.begin(); it < textures.end(); it++) 
-		{
-			if ((*it).type == "texture_diffuse")
-			{
-				shaderProg->setInt("assimpMat.diffuse", (*it).renderer_id-1);
-			}
-			else if ((*it).type == "texture_specular")
-			{
-				shaderProg->setInt("assimpMat.specular", (*it).renderer_id-1);
-			}
-		}
-		shaderProg->setFloat("assimpMat.shininess", 225);
+	shaderProg->setInt("fill", textureIndex);
 	}
-	else if (textureIndex == -1)
-	{
-		shaderProg->setInt("fill", textureIndex);
-	}
-	else
-	{
-		shaderProg->setFloat("material.shininess", g_shininess[textureIndex]);
-		shaderProg->setVec3("material.specular", g_specularStrength[textureIndex]);
-		shaderProg->setInt("material.diffuse", textureIndex);
-	}
-	shaderProg->setMat4("model", this->getModelMatrix(true));
+
+	shaderProg->setMat4("model", this->getModelMatrix(false));
 	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
 
 }
@@ -535,6 +547,11 @@ void Model::print()
 bool Model::textureEquals(Model comp) 
 {
 	if (textures.size() != comp.textures.size())
+		return false;
+	if (comp.material == nullptr)
+		return false; 
+
+	if(!material->equals(comp.material))
 		return false;
 
 	bool isEqual = true;

@@ -10,6 +10,7 @@
 #include "../Objects/geometry/ModelContainer.h"
 #include "../Objects/geometry/shape.h"
 #include "../Opengl_a/Vertex.h"
+#include "../Opengl_a/Material.h"
 #include "../Opengl_a/Texture.h"
 #include "../Opengl_a/VertexComponent.h"
 #define MAX_TEX 32
@@ -46,7 +47,8 @@ static std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType 
 
 static Model* processMesh(aiMesh *mesh, const aiScene *scene, std::string directory)
 {
-	Model* model = new Model(true, true, false, true, "new model");
+	Material* mat = new Material();
+	Model* model = new Model(true, true, false, true, "new model", nullptr, mat);
 	Shape* shape = new Shape();
 
 	//vector<Vertex> vertices;
@@ -109,6 +111,9 @@ static Model* processMesh(aiMesh *mesh, const aiScene *scene, std::string direct
 	// process material
 	if (mesh->mMaterialIndex >= 0)
 	{
+		aiColor3D color(0.f, 0.f, 0.f);
+		float shininess;
+
 		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 		std::vector<Texture> diffuseMaps = loadMaterialTextures(
 			material,
@@ -116,19 +121,33 @@ static Model* processMesh(aiMesh *mesh, const aiScene *scene, std::string direct
 			"texture_diffuse",
 			directory);
 
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		mat->textures.insert(mat->textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 		std::vector<Texture> specularMaps = loadMaterialTextures(
 			material,
 			aiTextureType_SPECULAR,
 			"texture_specular",
 			directory);
 
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+		mat->textures.insert(mat->textures.end(), specularMaps.begin(), specularMaps.end());
+
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+		mat->kd = glm::vec3(color.r, color.b, color.g);
+
+		material->Get(AI_MATKEY_COLOR_AMBIENT, color);
+		mat->ka = glm::vec3(color.r, color.b, color.g);
+
+		material->Get(AI_MATKEY_COLOR_SPECULAR, color);
+		mat->ks = glm::vec3(color.r, color.b, color.g);
+
+		material->Get(AI_MATKEY_SHININESS, shininess);
+		mat->Ns = shininess;
+
+		mat->type = TEXTURE_DS;
+
 	}
 
-
 	model->addPolygon(shape);
-	model->textures = textures;
+	//model->textures = textures;
 
 	return model;
 }
