@@ -79,8 +79,6 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 
 static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 {
-	
-
 	// [Create Y Model]
 	Model* Y = new Model(true, true, false, true, "y", shader, &g_materials[6]);
   

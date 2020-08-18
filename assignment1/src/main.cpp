@@ -370,12 +370,8 @@ int main(void)
 
 		// Check Collision
 		collision = false;
-		//collision = checkCollision(models);
+		collision = checkCollision(models);
 
-		std::cout << "camera.position.x" << camera.position.x << std::endl;
-		std::cout << "camera.position.y" << camera.position.y << std::endl;
-		std::cout << "camera.position.z" << camera.position.z << std::endl;
-				  
 		// Set camera y value
 		float terrainHeight;
 		terrainHeight = t->getHeightOfTerrain(camera.position.x, camera.position.z, terrain);
