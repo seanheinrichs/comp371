@@ -30,14 +30,14 @@ static Texture getTexture(const char* path, std::string typeName)
 
 static std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName, std::string directory)
 {
-	std::filesystem::path path(directory);
+	//std::filesystem::path path(directory);
 	std::vector<Texture> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 	{
 		aiString str;
 		mat->GetTexture(type, i, &str);
-		path /= str.C_Str();
-		Texture texture = getTexture(path.string().c_str(), typeName);
+		directory+= "/"+ std::string(str.C_Str());
+		Texture texture = getTexture(directory.c_str(), typeName);
 		textures.push_back(texture);
 	}
 	return textures;

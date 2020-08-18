@@ -1,6 +1,6 @@
 Variables:
-- name: WINDOW_WIDTH
-  value: 1024
+- name: SENSITIVITY
+  value: 10
 - name: WINDOW_HEIGHT
   value: 768
 - name: SHADOW_WIDTH

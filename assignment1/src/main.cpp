@@ -8,6 +8,8 @@
 		Isabelle Gourchette (40008121)
 		Ziming Wang (40041601)
 	Due:  August 21st, 2020
+
+sand: 	https://gallery.yopriceville.com/Backgrounds/Background_Beach_Sand#.XzsmF2hKiUk
 */
 
 #define _SCL_SECURE_NO_WARNINGS
@@ -77,6 +79,7 @@ unsigned int WINDOW_WIDTH = 1024;
 unsigned int WINDOW_HEIGHT = 768;
 const unsigned int SHADOW_WIDTH = 1024;
 const unsigned int SHADOW_HEIGHT = 1024;
+float SENSITIVITY = 0.1f;
 
 /* Camera Setup */
 Camera camera = Camera(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -201,6 +204,7 @@ int main(void)
 	//extracting data from obj files
 	bool extraction = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
 
+	/*
 	ModelContainer* ben = loadModel("../Assets/Models/container/container.obj");
 	std::cout << ben->models.size() << std::endl;
 	ben->optimizeModels();
@@ -208,11 +212,12 @@ int main(void)
 
 	for (std::vector<Model *>::iterator it = ben->models.begin(); it < ben->models.end(); it++)
 		(*it)->textureIndex = 11; 
-
+		std::cout << ben->models.size() << std::endl;
+	*/
 	//ben->print();
-	std::cout << ben->models.size() << std::endl;
-	//ModelContainer* ben = new ModelContainer();
-	//createBensModel(ben, &modelShader);
+	
+	ModelContainer* ben = new ModelContainer();
+	createBensModel(ben, &modelShader);
 
 	ben->bindArrayBuffer();
 
@@ -289,7 +294,7 @@ int main(void)
 	models[4] = wayne;
 
 	terrain->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
-	terrain->addTranslation(glm::vec3(0.0f - 5, 0.50f, 0.0f - 5));
+	terrain->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
 
 	ben->addScale(glm::vec3(0.002f, 0.002f, 0.002f));
 	ben->addTranslation(glm::vec3(0.0f, 0.4f, 0.0f));
@@ -603,8 +608,8 @@ void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 		firstMouse = false;
 	}
 
-	float xoffset = xPos - previousXPos;
-	float yoffset = previousYPos - yPos;
+	float xoffset = xPos - previousXPos * SENSITIVITY;
+	float yoffset = previousYPos - yPos * SENSITIVITY;
 
 	previousXPos = xPos;
 	previousYPos = yPos;
@@ -647,7 +652,7 @@ void setupTextureMapping()
 	g_texLocations[30] = GL_TEXTURE30;
 	g_texLocations[31] = GL_TEXTURE31;
 
-	g_textures[0] = Texture("comp371/assignment1/src/Resources/bmv_2.png");
+	g_textures[0] = Texture("comp371/assignment1/src/Resources/sand.jpg");
 	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
 	g_textures[2] = Texture("comp371/assignment1/src/Resources/chrome.png");
 	g_textures[3] = Texture("comp371/assignment1/src/Resources/speaker_holes.png");
@@ -657,7 +662,7 @@ void setupTextureMapping()
 	g_textures[7] = Texture("comp371/assignment1/src/Resources/box3.png");
 	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
 	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
-	g_textures[10] = Texture("comp371/assignment1/src/Resources/grid_floor.jpg");
+	g_textures[10] = Texture("comp371/assignment1/src/Resources/water.jpg");
 	//g_textures[13] = Texture("C:\\Users\\Benjamin Therien\\Documents\\comp371\\models\\backpack\\diffuse.jpg");
 	//g_textures[11] // used by shadow map
 	//g_textures[12] // used by skybox
@@ -739,7 +744,7 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 	GLCall(glBindVertexArray(grid_VAOs[1]));
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+	model = glm::scale(model, glm::vec3(15.0f, 15.0f, 15.0f));
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
 	g_textures[10].bind(g_texLocations[10]);
 	shader->setFloat("material.shininess", g_shininess[10]);
