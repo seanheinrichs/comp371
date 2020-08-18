@@ -50,6 +50,7 @@ sand: 	https://gallery.yopriceville.com/Backgrounds/Background_Beach_Sand#.XzsmF
 #include <yaml-cpp/parser.h>
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/node/parse.h>
+#include <irrKlang.h>
 
 // for Skybox
 #include "utils/stb_image.h"
@@ -118,6 +119,10 @@ unsigned int skyboxVAO, skyboxVBO, cubemapTexture;
 const float RED = 0.84;
 const float BLUE = 0.80;
 const float GREEN = 0.7;
+
+// Variables used for Sound
+bool isDay = true;
+bool isWalking = false;
 
 //globals used for selecting render mode and models
 GLenum MODE = GL_TRIANGLES;
@@ -360,9 +365,45 @@ int main(void)
 	models3d.push_back(ziming);
 	models3d.push_back(terrainC);
 
+	// Sound
+	irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
+	irrklang::ISound* daySound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/guitar-oriental.mp3", true, false, true);
+	daySound->setVolume(0.5f);
+	irrklang::ISound* windSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/wind.wav", true, false, true);
+	irrklang::ISound* walkingSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/footsteps.mp3", true, false, true);
+	irrklang::ISound* nightSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/night_sounds.mp3", true, false, true);
+
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
+		// Sound
+		if (isWalking) {
+			if (walkingSound->getIsPaused()) {
+				walkingSound->setIsPaused(false);
+			}
+		}
+		else if (!isWalking) {
+			if (!walkingSound->getIsPaused()) {
+				walkingSound->setIsPaused(true);
+			}
+		}
+		if (isDay) {
+			if (daySound->getIsPaused()) {
+				daySound->setIsPaused(false);
+			}
+			if (!nightSound->getIsPaused()) {
+				nightSound->setIsPaused(true);
+			}
+		}
+		else if (!isDay) {
+			if (!daySound->getIsPaused()) {
+				daySound->setIsPaused(true);
+			}
+			if (nightSound->getIsPaused()) {
+				nightSound->setIsPaused(false);
+			}
+		}
+
 		// Set frame for Camera (taken from LearnOpenGL)
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -700,6 +741,30 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	if (useShadows && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = false;
+	}
+
+	// Set isWalking to determine if footstep sounds should play
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		isWalking = true;
+	}
+
+	// Set isWalking to determine if footstep sounds should play
+	if (!glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS &&
+		!glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS &&
+		!glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS &&
+		!glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		isWalking = false;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+		isDay = true;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+		isDay = false;
 	}
 }
 
