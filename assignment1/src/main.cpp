@@ -364,8 +364,6 @@ int main(void)
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
 	{
-
-		//activeLightSource = camera.position + glm::vec3(3.0f, 0.0f, 0.0f);
 		// Sound
 		if (isWalking) {
 			if (walkingSound->getIsPaused()) {
@@ -422,21 +420,6 @@ int main(void)
 		modelShader.setBool("useShadows", useShadows);
 		modelShader.setBool("useFlashlight", useFlashlight);
 		modelShader.setVec3("viewPos", camera.position);
-
-		// DEBUG START HERE
-
-		//modelShader.setVec3("spotLight.position", 35.0f, 5.0f, -30.0f);
-		//modelShader.setVec3("spotLight.direction", -5.75f, 0.0f, 5.0f);
-		//modelShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-		//modelShader.setVec3("spotLight.diffuse", 0.5f, 0.5f, 0.5f);
-		//modelShader.setVec3("spotLight.specular", 0.5f, 0.5f, 0.5f);
-		//modelShader.setFloat("spotLight.constant", 1.0f);
-		//modelShader.setFloat("spotLight.linear", 0.0014);
-		//modelShader.setFloat("spotLight.quadratic", 0.000007);
-		//modelShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(25.5f)));
-		//modelShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(27.0f)));
-
-		// DEBUG END HERE
 
 		// Set Light Properties
 		isDay ? dayTimeDirectionalLight->setShaderValues(&modelShader, false) : nightTimeDirectionalLight->setShaderValues(&modelShader, false);
