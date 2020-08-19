@@ -19,16 +19,16 @@ Light::Light(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec)
 // SpotLight (Default)
 Light::Light(glm::vec3 startingPos, bool active)
 {
-	Light::direction = glm::vec3(-20.0f, 2.0f, 20.0f);
+	Light::direction = glm::vec3(-5.75f, 0.0f, 5.0f);
 	Light::position = startingPos;
 
-	Light::ambient = glm::vec3(0.8f, 0.8f, 0.8f);
+	Light::ambient = glm::vec3(0.0f, 0.0f, 0.0f);
 	Light::diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	Light::specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	Light::specular = glm::vec3(0.1f, 0.1f, 0.1f);
 
 	Light::constant = 1.0f;
-	Light::linear = 0.022f;
-	Light::quadratic = 0.0019f;
+	Light::linear = 0.0014f;
+	Light::quadratic = 0.000007f;
 
 	Light::active = active;
 }

@@ -113,9 +113,10 @@ Texture::~Texture() {}
 */
 void Texture::bind(unsigned int slot) const 
 {
-	
-	GLCall(glActiveTexture(g_texLocations[renderer_id-1]));
-	GLCall(glBindTexture(GL_TEXTURE_2D, renderer_id));
+	if (renderer_id - 1 != 11) {
+		GLCall(glActiveTexture(g_texLocations[renderer_id-1]));
+		GLCall(glBindTexture(GL_TEXTURE_2D, renderer_id));
+	}
 	//g_textures[renderer_id].bound = true;
 }
 
