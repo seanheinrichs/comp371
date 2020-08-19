@@ -35,3 +35,9 @@ Variables:
   value: 1
 - name: useShadows
   value: true
+  #set to BIG or SMALL
+- name: terrainSize
+  value: SMALL
+  #set to SMOOTH or HILLS
+- name: terrainTopography
+  value: SMOOTH

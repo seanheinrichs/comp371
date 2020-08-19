@@ -116,6 +116,12 @@ glm::mat4 lightView(1.0f);
 // Variables used for Skybox
 unsigned int skyboxVAO, skyboxVBO, cubemapTexture;
 
+//Variables for terrain
+float TERRAIN_SMOOTHNESS = 0.99;
+bool TERRAIN_BIG_SIZE = false;
+int TERRAIN_SIZE = 10;
+int VERTEX_COUNT_TERRAIN = 100;
+
 // Variables used for Fog / Sky Color (Fog/ClearColor)
 const float RED = 0.84;
 const float BLUE = 0.80;
@@ -141,8 +147,25 @@ int main(void)
 
 	for (std::size_t i = 0; i < config["Variables"].size(); i++) {
 		std::cout << config["Variables"][i]["name"].as<std::string>() << " = " << config["Variables"][i]["value"].as<std::string>() << "\n";
-	}
 
+		if (config["Variables"][i]["name"].as<std::string>().compare("terrainSize")==0) {
+			if (config["Variables"][i]["value"].as<std::string>().compare("SMALL")==0) {
+				TERRAIN_BIG_SIZE = false;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("BIG")==0) {
+				TERRAIN_BIG_SIZE = true;
+			}
+		} 
+		else if (config["Variables"][i]["name"].as<std::string>().compare("terrainTopography")==0) {
+			if (config["Variables"][i]["value"].as<std::string>().compare("SMOOTH")==0) {
+				TERRAIN_SMOOTHNESS = 0.99;
+			}
+			else if(config["Variables"][i]["value"].as<std::string>().compare("HILLS")==0) {
+				TERRAIN_SMOOTHNESS = 0.95;
+			}
+		}
+	}
+	
 	time_t startTime = time(new time_t());
 	std::cout << "cpp version: "<< __cplusplus << std::endl;
 
@@ -246,8 +269,8 @@ int main(void)
 	light->bindArrayBuffer(true, light);
 
 	// [Terrain]
-	
-	Terrain * t = new Terrain();
+	//Terrain(int _VERTEX_COUNT, int _SIZE, float smoothValDecrease)
+	Terrain * t = new Terrain(VERTEX_COUNT_TERRAIN, TERRAIN_SIZE, TERRAIN_SMOOTHNESS);
 	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
 
 	ModelContainer* terrainC = new ModelContainer();
@@ -303,28 +326,37 @@ int main(void)
 	models[4] = wayne;
 	models[5] = terrainC;
 
-	terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
-	terrain->addTranslation(glm::vec3(-15.0f, 0.1f, -15.0f));
 
+	if (TERRAIN_BIG_SIZE) {
+		terrain->addScale(glm::vec3(6.0f, 6.0f, 6.0f));
+		terrain->addTranslation(glm::vec3(-30.0f, 0.5f, -30.0f));
+	}
+	else {
+		terrain->addScale(glm::vec3(3.0, 3.0, 3.0));
+		terrain->addTranslation(glm::vec3(-30.0f, 0.5f, -30.0f));
+	}
+
+	/*
 	float terrainHeightBen;
 	float x = ben->getX();
 	float z = ben->getZ();
 	terrainHeightBen = t->getHeightOfTerrain(x, z, terrain);
 
+	*/
 	ben->addScale(glm::vec3(1.5f, 1.5f, 1.5f));
-	ben->addTranslation(glm::vec3(0.0f, 2.0f+ terrainHeightBen, 467.0f));
+	ben->addTranslation(glm::vec3(0.0f, 2.0f, 467.0f));
 	//ben->addRotation(0, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	sean->addTranslation(glm::vec3(-5.0f, 0.0f+ terrainHeightBen, 0.0f));
+	sean->addTranslation(glm::vec3(-5.0f, 0.0f, 0.0f));
 	//sean->addRotation(90, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	wayne->addTranslation(glm::vec3(-4.0f, 0.0f+ terrainHeightBen, -4.0f));
+	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
 	//wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
 
-	isa->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
-	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
+	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	isa->addTranslation(glm::vec3(3.5f, 1.50f, 4.0f));
 
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
@@ -386,8 +418,7 @@ int main(void)
 		float terrainHeight;
 		terrainHeight = t->getHeightOfTerrain(camera.position.x, camera.position.z, terrain);
 
-
-		camera.position.y = terrainHeight + 1.0f;
+		camera.position.y = terrainHeight + 2.0f;
 	
 	
 		//wayne->addTranslation(glm::vec3(0.0f, terrainHeightBen +1.0f, 0.0f));
