@@ -40,6 +40,7 @@ public:
 	Model(bool position = true, bool texture = false, bool color = false, bool normal = false, std::string name = "default", Shader* shader = nullptr, int textureIndex = -1);
 	Model();
 
+	void drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat);
 	void addRotation(float radians, glm::vec3 axis);
 	void addRotationX(float radians);
 	void addRotationY(float radians);
