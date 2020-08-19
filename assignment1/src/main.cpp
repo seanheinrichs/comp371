@@ -69,7 +69,6 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid);
 void ShadowFirstPass(Shader* shader, std::vector<ModelContainer*> models3d, unsigned int grid_VAOs[], Grid mainGrid);
 void ShadowSecondPass(Shader* shader, std::vector<ModelContainer*> models3d, unsigned int grid_VAOs[], Grid mainGrid);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-unsigned int loadTexture(const char *path);
 unsigned int loadCubemap(std::vector<std::string> faces);
 void loadSkybox(Shader &skyboxShader);
 void drawSkybox(Shader &skyboxShader);
@@ -113,12 +112,12 @@ glm::mat4 lightProjection(1.0f);
 glm::mat4 lightView(1.0f);
 
 // Variables used for Skybox
-unsigned int skyboxVAO, skyboxVBO, cubemapTexture;
+unsigned int skyboxVAO, skyboxVBO, cubemapTexture_day, cubemapTexture_night;
 
 // Variables used for Fog / Sky Color (Fog/ClearColor)
-const float RED = 0.84;
-const float BLUE = 0.80;
-const float GREEN = 0.7;
+const float RED = 1.0;
+const float BLUE = 0.0;
+const float GREEN = 0.0;
 
 // Variables used for Sound
 bool isDay = true;
@@ -422,8 +421,8 @@ int main(void)
 		processInput(window, models, pointLights, collision);
 
 		// Render
-		//GLCall(glClearColor(RED, BLUE, GREEN, 1.0f));
-		GLCall(glClearColor(0, 0, 0, 1.0f));
+		GLCall(glClearColor(RED, BLUE, GREEN, 1.0f));
+		//GLCall(glClearColor(0, 0, 0, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		// Start Using Model Shader
@@ -488,7 +487,7 @@ int main(void)
 			}
 		}
 
-		// Draw Skybox as last item
+		// Draw Skybox as last item		
 		drawSkybox(skyboxShader);
 
 		// Swap Buffers and Poll for Events
@@ -804,7 +803,7 @@ void setupTextureMapping()
 	g_texLocations[13] = GL_TEXTURE13;
 	g_texLocations[14] = GL_TEXTURE14;
 	g_texLocations[15] = GL_TEXTURE15;
-	g_texLocations[16] = GL_TEXTURE16;
+	g_texLocations[16] = GL_TEXTURE16; // used by skybox
 	g_texLocations[17] = GL_TEXTURE17;
 	g_texLocations[18] = GL_TEXTURE18;
 	g_texLocations[19] = GL_TEXTURE19;
@@ -837,7 +836,7 @@ void setupTextureMapping()
 	//g_textures[12] // used by skybox
 	g_textures[14] = Texture("comp371/assignment1/src/Resources/rustedmetal.jpg");
 	g_textures[15] = Texture("comp371/assignment1/src/Resources/oldwood.jpg");
-
+	//g_textures[16] // used by skybox
 
 	g_shininess[0] = 2.0f;
 	g_shininess[1] = 2.0f;
@@ -855,6 +854,7 @@ void setupTextureMapping()
 	g_shininess[12] = 64.0f; // used by skybox
 	g_shininess[14] = 2.0f;
 	g_shininess[15] = 64.0f;
+	g_shininess[16] = 64.0f; // used by skybox
 
 	g_specularStrength[0] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[1] =	glm::vec3(1.0f, 1.0f, 1.0f);
@@ -867,13 +867,12 @@ void setupTextureMapping()
 	g_specularStrength[8] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[9] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
-	g_specularStrength[11] = glm::vec3(0.5f, 0.5f, 0.5f);
-	g_specularStrength[12] = glm::vec3(0.5f, 0.5f, 0.5f);
+	g_specularStrength[11] = glm::vec3(0.5f, 0.5f, 0.5f);// used by shadow map
+	g_specularStrength[12] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
 	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);
-	//g_specularStrength[11] // used by shadow map
-	//g_specularStrength[12] // used by skybox
 	g_specularStrength[14] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[15] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
 
 	g_materials[0] = Material(g_specularStrength[0], g_textures[0], g_shininess[0]);
 	g_materials[1] = Material(g_specularStrength[1], g_textures[1], g_shininess[1]);
@@ -890,6 +889,7 @@ void setupTextureMapping()
 	g_materials[12] = Material(g_specularStrength[12], g_textures[12], g_shininess[12]);
 	g_materials[14] = Material(g_specularStrength[14], g_textures[14], g_shininess[14]);
 	g_materials[15] = Material(g_specularStrength[15], g_textures[15], g_shininess[15]);
+	g_materials[16] = Material(g_specularStrength[16], g_textures[16], g_shininess[16]);
 }
 
 void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d)
@@ -983,43 +983,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 // utility function for loading a 2D texture from file CREDIT - https://learnopengl.com/Advanced-OpenGL/Cubemaps
 // ---------------------------------------------------
-unsigned int loadTexture(char const * path)
-{
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-
-	int width, height, nrComponents;
-	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
-	if (data)
-	{
-		GLenum format;
-		if (nrComponents == 1)
-			format = GL_RED;
-		else if (nrComponents == 3)
-			format = GL_RGB;
-		else if (nrComponents == 4)
-			format = GL_RGBA;
-
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		stbi_image_free(data);
-	}
-	else
-	{
-		std::cout << "Texture failed to load at path: " << path << std::endl;
-		stbi_image_free(data);
-	}
-
-	return textureID;
-}
-
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;
@@ -1041,6 +1004,7 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 			stbi_image_free(data);
 		}
 	}
+
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -1111,7 +1075,7 @@ void loadSkybox(Shader &skyboxShader)
 	// -------------
 	stbi_set_flip_vertically_on_load(false);
 
-	std::vector<std::string> faces
+	std::vector<std::string> dayFaces
 	{
 		"comp371/assignment1/src/Resources/skybox/desert_1/right.png",
 		"comp371/assignment1/src/Resources/skybox/desert_1/left.png",
@@ -1120,11 +1084,25 @@ void loadSkybox(Shader &skyboxShader)
 		"comp371/assignment1/src/Resources/skybox/desert_1/front.png",
 		"comp371/assignment1/src/Resources/skybox/desert_1/back.png"
 	};
-	cubemapTexture = loadCubemap(faces);
 
+	std::vector<std::string> nightFaces
+	{
+		"comp371/assignment1/src/Resources/skybox/night_sky/right.png",
+		"comp371/assignment1/src/Resources/skybox/night_sky/left.png",
+		"comp371/assignment1/src/Resources/skybox/night_sky/top.png",
+		"comp371/assignment1/src/Resources/skybox/night_sky/bottom.png",
+		"comp371/assignment1/src/Resources/skybox/night_sky/front.png",
+		"comp371/assignment1/src/Resources/skybox/night_sky/back.png"
+	};
+
+	
+	cubemapTexture_day = loadCubemap(dayFaces);
+	cubemapTexture_night = loadCubemap(nightFaces);
+	
 	skyboxShader.use();
 	skyboxShader.setInt("skybox", 0);
-
+	
+	
 	// skybox END
 }
 
@@ -1138,8 +1116,21 @@ void drawSkybox(Shader &skyboxShader)
 	skyboxShader.setMat4("projection", projection);
 	// skybox cube
 	glBindVertexArray(skyboxVAO);
-	glActiveTexture(GL_TEXTURE12);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+	
+	
+	if (isDay) {
+		skyboxShader.use();
+		skyboxShader.setInt("skybox", 12);
+		glActiveTexture(GL_TEXTURE12);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture_day);
+	}
+	else {
+		skyboxShader.use();
+		skyboxShader.setInt("skybox", 16);
+		glActiveTexture(GL_TEXTURE16);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture_night);
+	}
+	
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS); // set depth function back to default
