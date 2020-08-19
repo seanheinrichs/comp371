@@ -61,7 +61,7 @@ sand: 	https://gallery.yopriceville.com/Backgrounds/Background_Beach_Sand#.XzsmF
 #define	GLFW_DOUBLEBUFFER GLFW_TRUE
 
 /* Function Declarations */
-void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights, bool collision);
+void processInput(GLFWwindow *window, ModelContainer** models, bool collision, irrklang::ISound * walkingSound);
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos);
 void setupTextureMapping();
 void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d);
@@ -75,6 +75,10 @@ void drawSkybox(Shader &skyboxShader);
 float distanceFromCamera(glm::vec3 cameraPos, AABB aabb);
 bool checkCollision(ModelContainer** models);
 
+/* Config Setup */
+YAML::Node config = YAML::LoadFile("comp371/assignment1/src/config.yaml");
+bool isDay = (config["Variables"][0]["value"].as<std::string>().compare("DAY") == 0);
+
 /* Global Constants */
 unsigned int WINDOW_WIDTH = 1024;
 unsigned int WINDOW_HEIGHT = 768;
@@ -83,7 +87,7 @@ const unsigned int SHADOW_HEIGHT = 1024;
 float SENSITIVITY = 0.9f;
 
 /* Camera Setup */
-Camera camera = Camera(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+Camera camera = Camera(glm::vec3(0.0f, 2.0f, -1.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool collision = false;
@@ -95,18 +99,19 @@ float previousXPos = WINDOW_WIDTH / 2.0f;
 float previousYPos = WINDOW_HEIGHT / 2.0f;
 float xOffset = 0.0f;
 float yOffset = 0.0f;
-float rX = 0.0f;
-float rY = 0.0f;
 
 glm::vec3 cameraJump = glm::vec3(0.0f, 2.0f, 0.0f);
 int jumpCounter = 0;
 
 bool firstMouse = true;
 
+// Variables used for Sound
+bool isWalking = false;
+
 // Variables used for light and shadows
 unsigned int depthMapFBO;
 unsigned int depthMap;
-float near_plane = 0.1f, far_plane = 100.0f;
+float near_plane = 1.0f, far_plane = 7.5f;
 glm::mat4 lightSpaceMatrix(1.0f);
 glm::mat4 lightProjection(1.0f);
 glm::mat4 lightView(1.0f);
@@ -119,16 +124,13 @@ const float RED = 1.0;
 const float BLUE = 0.0;
 const float GREEN = 0.0;
 
-// Variables used for Sound
-bool isDay = true;
-bool isWalking = false;
-
 //globals used for selecting render mode and models
 GLenum MODE = GL_TRIANGLES;
 int selected = 0;
 int useTextures = 1;
 bool useShadows = true;
-glm::vec3 activeLightSource(0.0f, 3.0f, -0.1f);
+bool useFlashlight = true;
+glm::vec3 activeLightSource(20.0f, 1.0f, -13.5f);
 
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
@@ -137,16 +139,13 @@ Texture* g_textures = new Texture[32];
 float *g_shininess = new float[32];
 glm::vec3 *g_specularStrength = new glm::vec3[32];
 
+
+
 int main(void)
 {
-	YAML::Node config = YAML::LoadFile("comp371/assignment1/src/Config/config.yaml");
-
-	for (std::size_t i = 0; i < config["Variables"].size(); i++) {
-		std::cout << config["Variables"][i]["name"].as<std::string>() << " = " << config["Variables"][i]["value"].as<std::string>() << "\n";
-	}
 
 	time_t startTime = time(new time_t());
-	std::cout << "cpp version: "<< __cplusplus << std::endl;
+	std::cout << "cpp version: " << __cplusplus << std::endl;
 
 
 	/* Initialize GLFW */
@@ -210,8 +209,6 @@ int main(void)
 	//extracting data from obj files
 	bool extraction = loadOBJ("../Assets/Models/planet.obj", vertices, uvs, normals);
 
-
-	
 	//ModelContainer* ben = loadModel("../Assets/Models/palmtree/palmtree.obj");
 	//std::cout << ben->models.size() << std::endl;
 	//ben->optimizeModels();
@@ -220,9 +217,9 @@ int main(void)
 	//for (std::vector<Model *>::iterator it = ben->models.begin(); it < ben->models.end(); it++)
 	//	(*it)->textureIndex = 11; 
 	//	std::cout << ben->models.size() << std::endl;
-	
+
 	//ben->print();
-	
+
 	ModelContainer* ben = new ModelContainer();
 	createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
@@ -243,30 +240,39 @@ int main(void)
 	createWaynesModel(wayne, &modelShader);
 	wayne->bindArrayBuffer();
 
-	Model* light = new Model(true, false, false, true, "light", &lightShader, -1);
-	createLightModel(light);
-	light->bindArrayBuffer(true, light);
-
 	// [Terrain]
-	
+
 	Terrain * t = new Terrain();
 	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
-
+	
 	ModelContainer* terrainC = new ModelContainer();
 	Model* terrain = new Model(true, true, false, true, "terrain", &modelShader, &g_materials[0]);
 	terrain->addPolygon(loadedShape);
 	terrain->bindArrayBuffer(true, terrain);
 	terrainC->addModel(terrain);
-	
-	// [Point Lights]
 
-	Light* bensPL = new Light(light, glm::vec3(0.0f, 3.0f, -0.1f), true);
-	Light* seansPL = new Light(light, glm::vec3(3.5f, 3.0f, -4.0f), false);
-	Light* waynesPL = new Light(light, glm::vec3(-4.0f, 3.0f, -4.0f), false);
-	Light* isasPL = new Light(light, glm::vec3(3.5f, 3.0f, 4.0f), false);
-	Light* zimingsPL = new Light(light, glm::vec3(-4.0f, 3.0f, 4.0f), false);
+	// [Lighting]
 
-	Light* spotLight = new Light(light, glm::vec3(0.0f, 1.0f, -8.0f), false);
+	Light* dayTimeDirectionalLight = new Light(glm::vec3(20.0f, 3.0f, -20.0f),
+		glm::vec3(0.5f, 0.5f, 0.5f),
+		glm::vec3(0.4f, 0.4f, 0.4f),
+		glm::vec3(0.8f, 0.8f, 0.8f)
+	);
+	Light* dayTimeSpotLight = new Light(glm::vec3(40.0f, 3.0f, -40.0f), false);
+	Light* nightTimeDirectionalLight = new Light(glm::vec3(0.0f, 0.0f, 0.0f),     
+		glm::vec3(0.07f, 0.07f, 0.07f),			
+		glm::vec3(0.4f, 0.4f, 0.4f),				     
+		glm::vec3(0.3f, 0.3f, 0.3f)				
+	); 
+	Light* nightTimeSpotLight = new Light(camera.position,						 
+		camera.front,				
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		0.09f,						 
+		0.032,						
+		true						
+	);
 
 	// [Grid]
 
@@ -277,7 +283,7 @@ int main(void)
 	GLCall(glGenBuffers(3, grid_VBOs));
 	GLCall(glGenBuffers(1, &grid_EBO));
 
-	// [Grid Floor] 
+	// Grid Floor 
 	GLCall(glBindVertexArray(grid_VAOs[1]));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, grid_VBOs[1]));
 	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(mainGrid.floorVertices), mainGrid.floorVertices, GL_STATIC_DRAW));
@@ -287,13 +293,6 @@ int main(void)
 	GLCall(glEnableVertexAttribArray(1));  // Texture
 	GLCall(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float))));
 	GLCall(glEnableVertexAttribArray(2));  // Normals
-
-	Light** pointLights = new Light*[5];
-	pointLights[0] = bensPL;
-	pointLights[1] = seansPL;
-	pointLights[2] = isasPL;
-	pointLights[3] = zimingsPL;
-	pointLights[4] = waynesPL;
 
 	ModelContainer** models = new ModelContainer*[6];
 	models[0] = ben;
@@ -311,20 +310,15 @@ int main(void)
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(-5.0f, 0.0f, 0.0f));
-	//sean->addRotation(90, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
-	//wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
 
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
-
-	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	light->addTranslation(glm::vec3(0.0f, 0.50f, -1.0f));
 
 	// Skybox load
 	loadSkybox(skyboxShader);
@@ -364,13 +358,13 @@ int main(void)
 	models3d.push_back(ziming);
 	models3d.push_back(terrainC);
 
-	// Sound
+	/* Sound */
 	irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 	irrklang::ISound* daySound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/guitar-oriental.mp3", true, false, true);
-	daySound->setVolume(0.5f);
 	irrklang::ISound* windSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/wind.wav", true, false, true);
 	irrklang::ISound* walkingSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/footsteps.mp3", true, false, true);
 	irrklang::ISound* nightSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/night_sounds.mp3", true, false, true);
+	daySound->setVolume(0.5f);
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -418,7 +412,7 @@ int main(void)
 		camera.position.y = terrainHeight + 1.0f;
 
 		// Event Handling
-		processInput(window, models, pointLights, collision);
+		processInput(window, models, collision, walkingSound);
 
 		// Render
 		GLCall(glClearColor(RED, BLUE, GREEN, 1.0f));
@@ -429,30 +423,22 @@ int main(void)
 		modelShader.use();
 		modelShader.setInt("useTextures", useTextures);
 		modelShader.setBool("useShadows", useShadows);
+		modelShader.setBool("useFlashlight", useFlashlight);
 		modelShader.setVec3("viewPos", camera.position);
 
-
 		// Set Light Properties
-		spotLight->setShaderValues(&modelShader, true);
-
-		for (int i = 0; i < 5; i++)
-		{
-			if (pointLights[i]->getActive())
-			{
-				pointLights[i]->setShaderValues(&modelShader, false);
-			}
-		}
+		isDay ? dayTimeDirectionalLight->setShaderValues(&modelShader, false) : nightTimeDirectionalLight->setShaderValues(&modelShader, false);
+		isDay ? dayTimeSpotLight->setShaderValues(&modelShader, true) : nightTimeSpotLight->setFlashLightShaderValues(&modelShader, &camera);
 
 		// Recompute Camera Pipeline
-		modelShader.setMat4("model", model);
-
 		projection = glm::perspective(glm::radians(camera.fieldOfViewAngle), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-		modelShader.setMat4("projection", projection);
-
 		view = camera.calculateViewMatrix();
-		view = glm::rotate(view, glm::radians(rX), glm::vec3(0.0f, 0.0f, -1.0f));
-		view = glm::rotate(view, glm::radians(rY), glm::vec3(-1.0f, 0.0f, 0.0f));
+
+		modelShader.setMat4("projection", projection);
 		modelShader.setMat4("view", view);
+
+		model = glm::mat4(1.0f);
+		modelShader.setMat4("model", model);
 
 		// Render Scene with shadowmap to calculate shadows with depthShader (1ST PASS)
 		ShadowFirstPass(&depthShader, models3d, grid_VAOs, mainGrid);
@@ -471,23 +457,7 @@ int main(void)
 		lightShader.setMat4("projection", projection);
 		lightShader.setMat4("view", view);
 
-		// [Point Lights]
-		lightShader.setInt("fill", -1);
-		for (int i = 0; i < 5; i++)
-		{
-			if (pointLights[i]->getActive())
-			{
-				pointLights[i]->getModel()->bind();
-				model = pointLights[i]->getModel()->getModelMatrix();
-				model = glm::mat4(1.0f);
-				model = glm::translate(model, pointLights[i]->getPosition());
-				model = glm::scale(model, glm::vec3(0.1f));
-				lightShader.setMat4("model", model);
-				GLCall(glDrawArrays(GL_TRIANGLES, 0, pointLights[i]->getModel()->getVAVertexCount()));
-			}
-		}
-
-		// Draw Skybox as last item		
+		// Draw Skybox as last item
 		drawSkybox(skyboxShader);
 
 		// Swap Buffers and Poll for Events
@@ -501,7 +471,6 @@ int main(void)
 	wayne->deallocate();
 	isa->deallocate();
 	ziming->deallocate();
-	light->deallocate();
 	terrain->deallocate();
 	glDeleteVertexArrays(1, &skyboxVAO);
 	glDeleteBuffers(1, &skyboxVAO);
@@ -512,9 +481,8 @@ int main(void)
 }
 
 // Event handling functions
-void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLights, bool collision)
+void processInput(GLFWwindow *window, ModelContainer** models, bool collision, irrklang::ISound* walkingSound)
 {
-
 	float cameraSpeed = 1.0 * deltaTime;
 
 	// [Render Mode]
@@ -544,6 +512,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	{
 		prevKey = 'W';
 		camera.moveForward(cameraSpeed);
+		walkingSound->setPlaybackSpeed(1.0f);
 	}
 
 	// Press "S" to move BACKWARD
@@ -551,6 +520,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	{
 		prevKey == 'S';
 		camera.moveBackward(cameraSpeed);
+		walkingSound->setPlaybackSpeed(1.0f);
 	}
 
 	// Press "A" to move LEFT
@@ -558,6 +528,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	{
 		prevKey = 'A';
 		camera.moveLeft(cameraSpeed);
+		walkingSound->setPlaybackSpeed(1.0f);
 	}
 
 	// Press "D" to move RIGHT
@@ -565,22 +536,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	{
 		prevKey = 'D';
 		camera.moveRight(cameraSpeed);
-	}
-	
-	// Press "6" to select terrain
-	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS && (selected != 5))
-	{
-		selected = 5;
-		for (int i = 0; i < 5; i++)
-		{
-			if (i == selected) {
-				pointLights[i]->setActive(true);
-				activeLightSource = pointLights[i]->getPosition();
-			}
-			else {
-				pointLights[i]->setActive(false);
-			}
-		}
+		walkingSound->setPlaybackSpeed(1.0f);
 	}
 
 	//Press "SPACE" to JUMP
@@ -599,9 +555,10 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	// Press "SHIFT + W" to move FORWARD faster
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		if (!collision) 
+		if (!collision)
 		{
 			camera.moveForward(cameraSpeed * 1.5);
+			walkingSound->setPlaybackSpeed(1.5f);
 		}
 	}
 
@@ -609,18 +566,21 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		camera.moveBackward(cameraSpeed * 1.5);
+		walkingSound->setPlaybackSpeed(1.5f);
 	}
 
 	// Press "SHIFT + D" to move RIGHT faster
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		camera.moveRight(cameraSpeed * 1.5);
+		walkingSound->setPlaybackSpeed(1.5f);
 	}
 
 	// Press "SHIFT + A" to move LEFT faster
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		camera.moveLeft(cameraSpeed * 1.5);
+		walkingSound->setPlaybackSpeed(1.5f);
 	}
 
 	// [Rotation]
@@ -636,7 +596,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	{
 		models[selected]->addRotation(-5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
-	
+
 
 	//TRANSLATE
 
@@ -671,7 +631,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-			models[selected]->addTranslation(glm::vec3(0.0f,  -0.8f, 0.0f ));
+			models[selected]->addTranslation(glm::vec3(0.0f, -0.8f, 0.0f));
 		else
 			models[selected]->addTranslation(glm::vec3(0.0f, -0.1f, 0.0f));
 	}
@@ -713,7 +673,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	{
 		models[selected]->resetShear();
 	}
-	
+
 	// [Texture Toggle]
 
 	// Press 'X' to turn textures OFF
@@ -742,6 +702,20 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 		useShadows = false;
 	}
 
+	// [Flashlight Toggle]
+
+	// Press 'F' to turn the flashlight ON
+	if (!useFlashlight && !isDay && glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useFlashlight = true;
+	}
+
+	// Press 'SHIFT + F' to turn the flashlight OFF
+	if (useFlashlight && !isDay && glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	{
+		useFlashlight = false;
+	}
+
 	// Set isWalking to determine if footstep sounds should play
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ||
 		glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ||
@@ -758,11 +732,16 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 		isWalking = false;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+	// Press Z to set the scene to DAY
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)) 
+	{
 		isDay = true;
+		useFlashlight = true;	// Need to activate spot lighting in shader
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+	// Press SHIFT + Z to set the scene to NIGHT
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)) 
+	{
 		isDay = false;
 	}
 }
@@ -840,7 +819,8 @@ void setupTextureMapping()
 	g_textures[17] = Texture("comp371/assignment1/src/Resources/63_rusty_dirty_metal.jpg");
 	g_textures[18] = Texture("comp371/assignment1/src/Resources/94_rock_stone.jpg"); 
 
-	g_shininess[0] = 2.0f;
+
+	g_shininess[0] = 32.0f;
 	g_shininess[1] = 2.0f;
 	g_shininess[2] = 2.0f;
 	g_shininess[3] = 2.0f;
@@ -854,17 +834,17 @@ void setupTextureMapping()
 	g_shininess[13] = 64.0f;
 	g_shininess[11] = 64.0f;// used by shadow map
 	g_shininess[12] = 64.0f; // used by skybox
-	g_shininess[14] = 2.0f;
-	g_shininess[15] = 64.0f;
+	g_shininess[14] = 128.0f;
+	g_shininess[15] = 256.0f;
 	g_shininess[16] = 64.0f; // used by skybox
 	g_shininess[17] = 2.0f;
 	g_shininess[18] = 2.0f;
 
-	g_specularStrength[0] = glm::vec3(1.0f, 1.0f, 1.0f);
-	g_specularStrength[1] =	glm::vec3(1.0f, 1.0f, 1.0f);
-	g_specularStrength[2] =	glm::vec3(1.0f, 1.0f, 1.0f);
-	g_specularStrength[3] =	glm::vec3(1.0f, 1.0f, 1.0f);
-	g_specularStrength[4] =	glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[0] = glm::vec3(0.5f, 0.5f, 0.5f);
+	g_specularStrength[1] = glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[2] = glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[3] = glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[4] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[5] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[6] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[7] = glm::vec3(0.1f, 0.1f, 0.1f);
@@ -873,12 +853,18 @@ void setupTextureMapping()
 	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
 	g_specularStrength[11] = glm::vec3(0.5f, 0.5f, 0.5f);// used by shadow map
 	g_specularStrength[12] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
+<<<<<<< HEAD
 	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);
 	g_specularStrength[14] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[15] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[16] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
 	g_specularStrength[17] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[18] = glm::vec3(1.0f, 1.0f, 1.0f);
+=======
+	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
+	g_specularStrength[14] = glm::vec3(0.5f, 0.5f, 0.5f);
+	g_specularStrength[15] = glm::vec3(0.3f, 0.3f, 0.3f);
+>>>>>>> add day time and night time lighting to scene
 
 	g_materials[0] = Material(g_specularStrength[0], g_textures[0], g_shininess[0]);
 	g_materials[1] = Material(g_specularStrength[1], g_textures[1], g_shininess[1]);
@@ -904,20 +890,9 @@ void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d)
 {
 	bindTextures();
 	shader->use();
-	for(std::vector<ModelContainer*>::iterator it = models3d.begin(); it < models3d.end(); it++)
+	for (std::vector<ModelContainer*>::iterator it = models3d.begin(); it < models3d.end(); it++)
 		(*it)->draw(MODE, shader);
 
-}
-
-void DrawSphere(Model* sphereModel, ModelContainer *modelInnerSoccerBall, Shader* shader)
-{
-	sphereModel->bind();
-	//	model = ben->getModelMatrix(false)*ben->getTranslationSphere();;
-	glm::mat4 model = modelInnerSoccerBall->getModelMatrix();
-	model = glm::scale(model, glm::vec3(1.25f, 1.25f, 1.25f));
-	model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
-	shader->setMat4("model", model);
-	GLCall(glDrawArrays(GL_LINES, 0, sphereModel->getVAVertexCount()));
 }
 
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
@@ -946,14 +921,14 @@ void ShadowFirstPass(Shader* shader, std::vector<ModelContainer*> models3d, unsi
 	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 	lightView = glm::lookAt(activeLightSource, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 	lightSpaceMatrix = lightProjection * lightView;
-	
+
 	// Start Using Depth Shader
 	shader->use();
 	shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	
+
 	// Rendering Models and Grid with the DepthShader
 	RenderScene(shader, models3d);
 	RenderGrid(shader, grid_VAOs, mainGrid);
@@ -965,7 +940,7 @@ void ShadowSecondPass(Shader* shader, std::vector<ModelContainer*> models3d, uns
 	// Render Scene as Normal using the Generated Depth/Shadow map  
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	// Set the Light Uniforms
 	shader->use();
 	shader->setVec3("viewPos", camera.position);
@@ -973,7 +948,7 @@ void ShadowSecondPass(Shader* shader, std::vector<ModelContainer*> models3d, uns
 	shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
-	
+
 	// Rendering Models and Grid with modelShader
 	RenderScene(shader, models3d);
 	RenderGrid(shader, grid_VAOs, mainGrid);
@@ -988,9 +963,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-
-// utility function for loading a 2D texture from file CREDIT - https://learnopengl.com/Advanced-OpenGL/Cubemaps
-// ---------------------------------------------------
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;
@@ -1012,7 +984,6 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 			stbi_image_free(data);
 		}
 	}
-
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -1103,14 +1074,13 @@ void loadSkybox(Shader &skyboxShader)
 		"comp371/assignment1/src/Resources/skybox/night_sky/back.png"
 	};
 
-	
+
 	cubemapTexture_day = loadCubemap(dayFaces);
 	cubemapTexture_night = loadCubemap(nightFaces);
-	
+
 	skyboxShader.use();
 	skyboxShader.setInt("skybox", 0);
-	
-	
+
 	// skybox END
 }
 
@@ -1125,7 +1095,6 @@ void drawSkybox(Shader &skyboxShader)
 	// skybox cube
 	glBindVertexArray(skyboxVAO);
 	
-	
 	if (isDay) {
 		skyboxShader.use();
 		skyboxShader.setInt("skybox", 12);
@@ -1138,7 +1107,7 @@ void drawSkybox(Shader &skyboxShader)
 		glActiveTexture(GL_TEXTURE16);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture_night);
 	}
-	
+
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS); // set depth function back to default
