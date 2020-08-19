@@ -49,8 +49,9 @@ sand: 	https://gallery.yopriceville.com/Backgrounds/Background_Beach_Sand#.XzsmF
 #include <glm/gtx/transform2.hpp>
 #include <yaml-cpp/parser.h>
 #include <yaml-cpp/yaml.h>
-#include <yaml-cpp/node/parse.h>
+#include <yaml-cpp/node/parse.h>s
 #include <irrKlang.h>
+#include <future>
 
 // for Skybox
 #include "utils/stb_image.h"
@@ -145,6 +146,29 @@ Material* g_materials = new Material[32];
 Texture* g_textures = new Texture[32];
 float *g_shininess = new float[32];
 glm::vec3 *g_specularStrength = new glm::vec3[32];
+static std::mutex ModelMutex;
+
+std::vector<std::future<void>> futures;
+
+static void createTerrain(std::vector<ModelContainer*>* models3d, Shader& shader, Model* terrain)
+{
+	std::cout << "started create terrain" << std::endl;
+	ModelContainer* terrainC = new ModelContainer();
+	Terrain * t = new Terrain();
+	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
+	terrain = new Model(true, true, false, true, "terrain", &shader, &g_materials[0]);
+	terrain->addPolygon(loadedShape);
+	terrain->bindArrayBuffer(true, terrain);
+	terrainC->addModel(terrain);
+	terrainC->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
+	terrainC->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
+
+	//std::cout << "done with create terrain" << std::endl;
+	//std::lock_guard<std::mutex> lock(ModelMutex);
+	models3d->push_back(terrainC);
+
+	std::cout << "done with create terrain" << std::endl;
+}
 
 int main(void)
 {
@@ -179,6 +203,7 @@ int main(void)
 
 	time_t startTime = time(new time_t());
 	std::cout << "cpp version: " << __cplusplus << std::endl;
+	
 
 	/* Initialize GLFW */
 	if (!glfwInit())
@@ -233,43 +258,94 @@ int main(void)
 
 	// [Models]
 
-	//ModelContainer* ben = loadModel("../Assets/Models/palmtree/palmtree.obj");
-	//std::cout << ben->models.size() << std::endl;
-	//ben->optimizeModels();
-	//ben->setVertexController(true, true, false, true);
+
+	std::vector<ModelContainer*> models3d;
+
+
+	//futures.push_back(std::async(std::launch::async, [&models3d, &modelShader, terrain]{createTerrain(&models3d, modelShader, terrain); }));
+
+	// [Terrain]
+	time_t terrainBefore = time(new time_t());
+	ModelContainer* terrainC = new ModelContainer();
+	Terrain * t = new Terrain();
+	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
+	Model* terrain = new Model(true, true, false, true, "terrain",&modelShader, &g_materials[0]);
+	terrain->addPolygon(loadedShape);
+	terrain->bindArrayBuffer(true, terrain);
+	terrainC->addModel(terrain);
+	terrainC->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
+	terrainC->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
+
+	//std::lock_guard<std::mutex> lock(ModelMutex);
+	models3d.push_back(terrainC);
+	std::cout << "it took : " << difftime(time(new time_t), terrainBefore) << " seconds to generate terrain" << std::endl;
+
+	ModelContainer* rock = loadModel("../Assets/Models/rock0/rock0.obj", false);
+	rock->optimizeModels();
+	rock->setVertexController(true, true, false, true);
+	rock->bindArrayBuffer();
+	rock->addTranslation(glm::vec3(0.0f, 1.0f, -1.0f));
+	rock->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	//rock->addRotationY(90);
+	models3d.push_back(rock);
+
+	ModelContainer* palmtree = loadModel("../Assets/Models/palmtree/palmtree.obj", false);
+	palmtree->optimizeModels();
+	palmtree->setVertexController(true, true, false, true);
+	palmtree->bindArrayBuffer();
+	palmtree->addTranslation(glm::vec3(0.0f, 1.0f, -1.0f));
+	palmtree->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	//rock->addRotationY(90);
+	models3d.push_back(palmtree);
+
+	std::vector<glm::mat4> rocks;
+	std::vector<glm::mat4> trees;
+
+
+	for (int i = 0; i < 100; i+=3)
+		for (int j = 0; j < 100; j += 3) {
+			rocks.push_back(rock->getTranslatedModelMatrix(glm::vec3(i-1, t->getHeightOfTerrain(i-1,j+1, terrain), j+1)));
+			trees.push_back(palmtree->getTranslatedModelMatrix(glm::vec3(i, t->getHeightOfTerrain(i,j, terrain), j)));
+
+		}
 
 
 	ModelContainer* accarrier = loadModel("../Assets/Models/accarrier/accarrier.obj", true);
-	std::cout << accarrier->models.size() << std::endl;
 	accarrier->optimizeModels();
 	accarrier->setVertexController(true, true, false, true);
+	accarrier->bindArrayBuffer();
 	accarrier->addTranslation(glm::vec3(0.0f, -0.5f, -10.0f));
 	accarrier->addScale(glm::vec3(0.01f, 0.01f, 0.01f));
 	accarrier->addRotationY(90);
+	models3d.push_back(accarrier);
 
 	ModelContainer* ben = new ModelContainer();
 	createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
 	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	models3d.push_back(ben);
 
 	ModelContainer* sean = new ModelContainer();
 	createSeansModel(sean, &modelShader);
 	sean->bindArrayBuffer();
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sean->addTranslation(glm::vec3(3.5f, 0.0f, -4.0f));
+	models3d.push_back(sean);
 
 	ModelContainer* isa = new ModelContainer();
 	createIsabellesModel(isa, &modelShader);
 	isa->bindArrayBuffer();
 	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
+	models3d.push_back(isa);
 
 	ModelContainer* ziming = new ModelContainer();
 	createZimingsModel(ziming, &modelShader);
 	ziming->bindArrayBuffer();
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
+	models3d.push_back(ziming);
 
 	ModelContainer* wayne = new ModelContainer();
 	createWaynesModel(wayne, &modelShader);
@@ -277,20 +353,7 @@ int main(void)
 	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
 	wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
-
-
-	// [Terrain]
-
-	Terrain * t = new Terrain(VERTEX_COUNT_TERRAIN, TERRAIN_SIZE, TERRAIN_SMOOTHNESS);
-	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
-	
-	ModelContainer* terrainC = new ModelContainer();
-	Model* terrain = new Model(true, true, false, true, "terrain", &modelShader, &g_materials[0]);
-	terrain->addPolygon(loadedShape);
-	terrain->bindArrayBuffer(true, terrain);
-	terrainC->addModel(terrain);
-	terrainC->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
-	terrainC->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
+	models3d.push_back(wayne);
 
 
 	// [Lighting]
@@ -411,14 +474,7 @@ int main(void)
 
 	std::cout << "it took " << difftime(time(new time_t), startTime) << " seconds to reach rendering" << std::endl;
 
-	std::vector<ModelContainer*> models3d;
-	models3d.push_back(ben);
-	models3d.push_back(sean);
-	models3d.push_back(wayne);
-	models3d.push_back(isa);
-	models3d.push_back(ziming);
-	models3d.push_back(terrainC);
-	models3d.push_back(accarrier);
+	
 
 	/* Sound */
 	irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -510,6 +566,17 @@ int main(void)
 
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
 		ShadowSecondPass(&modelShader, models3d, grid_VAOs, mainGrid);
+
+
+		for(std::vector<glm::mat4>::iterator it = rocks.begin(); it < rocks.end(); it++)
+		{
+			rock->drawMod(MODE, &modelShader,*it);
+		}
+		for (std::vector<glm::mat4>::iterator it = trees.begin(); it < trees.end(); it++)
+		{
+			palmtree->drawMod(MODE, &modelShader, *it);
+		}
+
 
 		// [Objects Not Affected by Light Source Go Below]
 
@@ -970,9 +1037,11 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 	model = glm::scale(model, glm::vec3(335.0f, 335.0f, 35.0f));
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
 	g_textures[10].bind(g_texLocations[10]);
-	shader->setFloat("material.shininess", g_shininess[10]);
-	shader->setVec3("material.specular", g_specularStrength[10]);
-	shader->setInt("material.diffuse", 10);
+	//shader->setFloat("loaded", 1);
+	//shader->setFloat("material.shininess", g_shininess[10]);
+	//shader->setVec3("material.specular", g_specularStrength[10]);
+	//shader->setInt("material.diffuse", 10);
+	g_materials[10].setShader(shader);
 	shader->setMat4("model", model);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

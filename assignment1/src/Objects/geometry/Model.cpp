@@ -518,6 +518,23 @@ void Model::draw(int mode, Shader* shaderProg)
 
 }
 
+void Model::drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat)
+{
+	shaderProg->use();
+	this->bind();
+	this->material->setShader(shaderProg);
+
+
+	if (textureIndex == -1)
+	{
+		shaderProg->setInt("fill", textureIndex);
+	}
+
+	shaderProg->setMat4("model", modelmat);
+	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
+
+}
+
 
 void Model::setAABB()
 {

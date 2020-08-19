@@ -92,6 +92,14 @@ void ModelContainer::draw(int mode, Shader* shaderProg)
 	}
 }
 
+void ModelContainer::drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat)
+{
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->drawMod(mode, shaderProg, modelmat);
+	}
+}
+
 void ModelContainer::deallocate()
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -372,5 +380,44 @@ void ModelContainer::print()
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
 		(*it)->print();
+}
+
+glm::mat4 ModelContainer::getTranslatedModelMatrix(glm::vec3 position) 
+{
+	glm::vec3 mid((aabb.max.x + aabb.min.x) / 2, aabb.min.y, (aabb.max.z + aabb.min.z) / 2);
+	glm::vec3 translate(position.x - mid.x, position.y - mid.y, position.z - mid.z);
+	return glm::translate(glm::mat4(1.0f), translate) * getRotationX() * getRotationY() * getRotationZ() * getScale();
+}
+
+void ModelContainer::calculateMinMax()
+{
+	std::map<std::string, glm::vec3> map;
+	map["min"] = glm::vec3(0.0f);
+	map["max"] = glm::vec3(0.0f);
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		std::map<std::string, glm::vec3> temp = (**it).getMinMax();
+		if (map["max"].x < temp["max"].x)
+			map["max"].x = temp["max"].x;
+
+		if (map["max"].y < temp["max"].y)
+			map["max"].y = temp["max"].y;
+
+		if (map["max"].z < temp["max"].z)
+			map["max"].z = temp["max"].z;
+
+		if (map["min"].x > temp["min"].x)
+			map["min"].x = temp["min"].x;
+
+		if (map["min"].y > temp["min"].y)
+			map["min"].y = temp["min"].y;
+
+		if (map["min"].z > temp["min"].z)
+			map["min"].z = temp["min"].z;
+
+	}
+	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix();
+	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix();
+
 }
 
