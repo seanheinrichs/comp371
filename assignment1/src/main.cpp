@@ -853,18 +853,12 @@ void setupTextureMapping()
 	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
 	g_specularStrength[11] = glm::vec3(0.5f, 0.5f, 0.5f);// used by shadow map
 	g_specularStrength[12] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
-<<<<<<< HEAD
 	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);
-	g_specularStrength[14] = glm::vec3(1.0f, 1.0f, 1.0f);
-	g_specularStrength[15] = glm::vec3(0.1f, 0.1f, 0.1f);
+	g_specularStrength[14] = glm::vec3(0.5f, 0.5f, 0.5f);
+	g_specularStrength[15] = glm::vec3(0.3f, 0.3f, 0.3f);
 	g_specularStrength[16] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
 	g_specularStrength[17] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[18] = glm::vec3(1.0f, 1.0f, 1.0f);
-=======
-	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
-	g_specularStrength[14] = glm::vec3(0.5f, 0.5f, 0.5f);
-	g_specularStrength[15] = glm::vec3(0.3f, 0.3f, 0.3f);
->>>>>>> add day time and night time lighting to scene
 
 	g_materials[0] = Material(g_specularStrength[0], g_textures[0], g_shininess[0]);
 	g_materials[1] = Material(g_specularStrength[1], g_textures[1], g_shininess[1]);
