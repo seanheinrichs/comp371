@@ -27,12 +27,10 @@ public:
 
 	float fieldOfViewAngle;
 	glm::vec3 position;
-
-private:
-	// Camera Initialization
 	glm::vec3 front;
 	glm::vec3 up;
 
+private:
 	// Transformation Variables
 	float yawAngle;
 	float pitchAngle;

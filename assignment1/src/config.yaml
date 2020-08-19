@@ -1,0 +1,12 @@
+Variables:
+  # Set the time of day (MORNING, AFTERNOON, NIGHT)
+- name: TIME_OF_DAY
+  value: AFTERNOON
+
+  # Set the textures (1 = ON, 0 = OFF)
+- name: useTextures
+  value: 1
+
+  # Set the shadows (true = ON, false = OFF)
+- name: useShadows
+  value: true
