@@ -10,6 +10,8 @@
 	Due:  August 21st, 2020
 
 sand: 	https://gallery.yopriceville.com/Backgrounds/Background_Beach_Sand#.XzsmF2hKiUk
+container 1: http://downloadtexture.com/assets/images/resources/43/metalcontainers0001-l.jpg
+container 2: https://www.pinterest.ca/pin/688628599250820821/
 */
 
 #define _SCL_SECURE_NO_WARNINGS
@@ -251,6 +253,8 @@ int main(void)
 	ModelContainer* terrainC = new ModelContainer();
 	Model* terrain = new Model(true, true, false, true, "terrain", &modelShader, &g_materials[0]);
 	terrain->addPolygon(loadedShape);
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(5.0f, 5.0f, 5.0f));
+	terrain->transform(scale);
 	terrain->bindArrayBuffer(true, terrain);
 	terrainC->addModel(terrain);
 	
@@ -297,23 +301,29 @@ int main(void)
 	models[2] = isa;
 	models[3] = ziming;
 	models[4] = wayne;
+	models[5] = terrainC;
 
-	terrain->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
+	terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
 	terrain->addTranslation(glm::vec3(-15.0f, 0.1f, -15.0f));
 
+	float terrainHeightBen;
+	float x = ben->getX();
+	float z = ben->getZ();
+	terrainHeightBen = t->getHeightOfTerrain(x, z, terrain);
+
 	ben->addScale(glm::vec3(1.5f, 1.5f, 1.5f));
-	ben->addTranslation(glm::vec3(0.0f, 2.0f, 467.0f));
+	ben->addTranslation(glm::vec3(0.0f, 2.0f+ terrainHeightBen, 467.0f));
 	//ben->addRotation(0, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	sean->addTranslation(glm::vec3(-5.0f, 0.0f, 0.0f));
+	sean->addTranslation(glm::vec3(-5.0f, 0.0f+ terrainHeightBen, 0.0f));
 	//sean->addRotation(90, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
+	wayne->addTranslation(glm::vec3(-4.0f, 0.0f+ terrainHeightBen, -4.0f));
 	//wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
 
-	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	isa->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
 	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
 
 	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
@@ -375,8 +385,21 @@ int main(void)
 		// Set camera y value
 		float terrainHeight;
 		terrainHeight = t->getHeightOfTerrain(camera.position.x, camera.position.z, terrain);
-		camera.position.y = terrainHeight + 1.0f;
 
+
+		camera.position.y = terrainHeight + 1.0f;
+	
+	
+		//wayne->addTranslation(glm::vec3(0.0f, terrainHeightBen +1.0f, 0.0f));
+/*
+sean->addTranslation(glm::vec3(0.0f, terrainHeight + 1.0f, 0.0f));
+wayne->addTranslation(glm::vec3(0.0f, terrainHeight + 1.0f, 0.0f));
+isa->addTranslation(glm::vec3(0.0f, terrainHeight + 1.0f, 0.0f));
+ziming->addTranslation(glm::vec3(0.0f, terrainHeight + 1.0f, 0.0f));
+light->addTranslation(glm::vec3(0.0f, terrainHeight + 1.0f, 0.0f));
+*/
+
+	
 		// Event Handling
 		processInput(window, models, pointLights, collision);
 
@@ -528,20 +551,29 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	}
 	
 	// Press "6" to select terrain
-	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS && (selected != 5))
+	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
 	{
 		selected = 5;
-		for (int i = 0; i < 5; i++)
-		{
-			if (i == selected) {
-				pointLights[i]->setActive(true);
-				activeLightSource = pointLights[i]->getPosition();
-			}
-			else {
-				pointLights[i]->setActive(false);
-			}
-		}
+
 	}
+/*
+// Press "6" to select terrain
+if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS && (selected != 5))
+{
+selected = 5;
+for (int i = 0; i < 5; i++)
+{
+if (i == selected) {
+pointLights[i]->setActive(true);
+activeLightSource = pointLights[i]->getPosition();
+}
+else {
+pointLights[i]->setActive(false);
+}
+}
+}
+
+*/
 
 	//Press "SPACE" to JUMP
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
@@ -660,7 +692,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, Light** pointLigh
 	// Press 'U' to scale UP the model
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
 	{
-		models[selected]->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+		models[selected]->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
 	}
 
 	// Press 'J' to scale DOWN the model

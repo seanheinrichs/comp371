@@ -342,6 +342,16 @@ glm::mat4 Model::getReposition()
 	return glm::translate(glm::mat4(1.0f), translate_vec);
 }
 
+float Model::getX()
+{
+	return Model::translate_vec.x;
+}
+
+float Model::getZ()
+{
+	return Model::translate_vec.z;
+}
+
 //Method that returns the scale matrix
 glm::mat4 Model::getScale() 
 {
