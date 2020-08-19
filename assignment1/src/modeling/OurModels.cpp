@@ -80,7 +80,7 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 {
 	// [Create Y Model]
-	Model* Y = new Model(true, true, false, true, "y", shader, &g_materials[6]);
+	Model* Y = new Model(true, true, false, true, "y", shader, &g_materials[17]);
   
   // Y model
 	Shape *cb1 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -134,11 +134,10 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 	Y->addPolygon(cb6);
 
 	// [Create 7 Model]
-	Model* seven = new Model(true, true, false, true, "7", shader, &g_materials[1]);
+	Model* seven = new Model(true, true, false, true, "7", shader, &g_materials[18]);
   
-  // 7 model
+	// 7 model
 	Shape *cb7 = new Shape(glm::vec3(0.0f, 0.0f, 0.0f));
-
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(1.90f, 2.25f, 0.0f));
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 4.5f, 1.0f));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0));
@@ -172,9 +171,12 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 	seven->addPolygon(cb9);
 
 	// Set initial position
-	//rotate = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//Y->transform(rotate);
-	//seven->transform(rotate);
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -2.0f, 0.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-75.0f), glm::vec3(1.0f, 1.0f, 1.0));;
+	Y->transform(translate * rotate);
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -2.0f, 0.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 1.0f, 1.0));;
+	seven->transform(translate * rotate);
 
 	// Add to model container
 	modelContainer->addModel(Y);

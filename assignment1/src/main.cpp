@@ -837,6 +837,8 @@ void setupTextureMapping()
 	g_textures[14] = Texture("comp371/assignment1/src/Resources/rustedmetal.jpg");
 	g_textures[15] = Texture("comp371/assignment1/src/Resources/oldwood.jpg");
 	//g_textures[16] // used by skybox
+	g_textures[17] = Texture("comp371/assignment1/src/Resources/63_rusty_dirty_metal.jpg");
+	g_textures[18] = Texture("comp371/assignment1/src/Resources/94_rock_stone.jpg"); 
 
 	g_shininess[0] = 2.0f;
 	g_shininess[1] = 2.0f;
@@ -855,6 +857,8 @@ void setupTextureMapping()
 	g_shininess[14] = 2.0f;
 	g_shininess[15] = 64.0f;
 	g_shininess[16] = 64.0f; // used by skybox
+	g_shininess[17] = 2.0f;
+	g_shininess[18] = 2.0f;
 
 	g_specularStrength[0] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[1] =	glm::vec3(1.0f, 1.0f, 1.0f);
@@ -872,7 +876,9 @@ void setupTextureMapping()
 	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);
 	g_specularStrength[14] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[15] = glm::vec3(0.1f, 0.1f, 0.1f);
-	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
+	g_specularStrength[16] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
+	g_specularStrength[17] = glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[18] = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	g_materials[0] = Material(g_specularStrength[0], g_textures[0], g_shininess[0]);
 	g_materials[1] = Material(g_specularStrength[1], g_textures[1], g_shininess[1]);
@@ -890,6 +896,8 @@ void setupTextureMapping()
 	g_materials[14] = Material(g_specularStrength[14], g_textures[14], g_shininess[14]);
 	g_materials[15] = Material(g_specularStrength[15], g_textures[15], g_shininess[15]);
 	g_materials[16] = Material(g_specularStrength[16], g_textures[16], g_shininess[16]);
+	g_materials[17] = Material(g_specularStrength[17], g_textures[17], g_shininess[17]);
+	g_materials[18] = Material(g_specularStrength[18], g_textures[18], g_shininess[18]);
 }
 
 void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d)
