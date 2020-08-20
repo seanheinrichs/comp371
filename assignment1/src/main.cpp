@@ -356,7 +356,7 @@ int main(void)
 
 	float terrainHeightZiming = t->getHeightOfTerrain(ziming->translate_vec.x, ziming->translate_vec.z, terrain);
 	ziming->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
-	ziming->addTranslation(glm::vec3(-4.0f, (terrainHeightZiming + 0.75f), 4.0f));
+	ziming->addTranslation(glm::vec3(-4.0f, (terrainHeightZiming + 0.60f), 4.0f));
 
 	// Skybox load
 	loadSkybox(skyboxShader);

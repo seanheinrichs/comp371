@@ -287,7 +287,7 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 
 	glm::mat4 scale;
 	glm::mat4 rotate;
-	
+	glm::mat4 translate;
 	// [Create M Model]
 	Model* M = new Model(true, true, false, true, "m", shader, &g_materials[9]);
 
@@ -331,9 +331,13 @@ static void createZimingsModel(ModelContainer* modelContainer, Shader* shader)
 	four->addPolygon(cb9);
 
 	// Set initial position
-	//rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//M->transform(rotate);
-	//four->transform(rotate);
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	M->transform(rotate);
+
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	four->transform(rotate);
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	M->transform(rotate);
 
 	// Add to model container
 	modelContainer->addModel(M);
