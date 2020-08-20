@@ -71,6 +71,8 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	seven->transform(rotate);
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	seven->transform(rotate);
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(15.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	A->transform(rotate);
 
 	// Add to model container
 	modelContainer->addModel(A);
