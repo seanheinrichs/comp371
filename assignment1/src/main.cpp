@@ -307,7 +307,7 @@ int main(void)
 	palmtree->optimizeModels();
 	palmtree->setVertexController(true, true, false, true);
 	palmtree->bindArrayBuffer();
-	//palmtree->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
+	palmtree->addTranslation(glm::vec3(-3.0f, 0.0f, 21.0f));
 	palmtree->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	palmtree->calculateMinMax();
 	//palmtree->print();
@@ -337,7 +337,7 @@ int main(void)
 			//  bushes.push_back(bush->getTranslatedModelMatrix(glm::vec3(x2, t->getHeightOfTerrain(x2,z2, terrain), z2)));
 			float x3 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
 			float z3 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
-			if(x3 > terrainC->aabb.min.x && x3 < terrainC->aabb.max.x && z3 > terrainC->aabb.min.z && z3 < terrainC->aabb.max.z)
+			if(x3 > terrainC->aabb.min.x+1 && x3 < terrainC->aabb.max.x-1 && z3 > terrainC->aabb.min.z+1 && z3 < terrainC->aabb.max.z-1)
 				trees.push_back(palmtree->getTranslatedModelMatrix(glm::vec3(x3, t->getHeightOfTerrain(x3,z3, terrain), z3)));
 		}
 
