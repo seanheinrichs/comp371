@@ -111,7 +111,7 @@ bool isWalking = false;
 // Variables used for light and shadows
 unsigned int depthMapFBO;
 unsigned int depthMap;
-float near_plane = 1.0f, far_plane = 7.5f;
+float near_plane = 1.0f, far_plane = 10.0f;
 glm::mat4 lightSpaceMatrix(1.0f);
 glm::mat4 lightProjection(1.0f);
 glm::mat4 lightView(1.0f);
@@ -136,7 +136,7 @@ int selected = 0;
 int useTextures = 1;
 bool useShadows = true;
 bool useFlashlight = true;
-glm::vec3 activeLightSource(20.0f, 1.0f, -13.5f);
+glm::vec3 activeLightSource = glm::vec3(1.0f, 1.0f, -1.5f);
 
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
@@ -145,16 +145,8 @@ Texture* g_textures = new Texture[32];
 float *g_shininess = new float[32];
 glm::vec3 *g_specularStrength = new glm::vec3[32];
 
-
-
 int main(void)
 {
-	//Reading config file for terrain configurations
-	YAML::Node config = YAML::LoadFile("comp371/assignment1/src/config.yaml");
-
-	for (std::size_t i = 0; i < config["Variables"].size(); i++) {
-		std::cout << config["Variables"][i]["name"].as<std::string>() << " = " << config["Variables"][i]["value"].as<std::string>() << "\n";
-
 		if (config["Variables"][i]["name"].as<std::string>().compare("terrainSize") == 0) {
 			if (config["Variables"][i]["value"].as<std::string>().compare("SMALL") == 0) {
 				TERRAIN_BIG_SIZE = 0;
@@ -181,7 +173,6 @@ int main(void)
 
 	time_t startTime = time(new time_t());
 	std::cout << "cpp version: " << __cplusplus << std::endl;
-
 
 	/* Initialize GLFW */
 	if (!glfwInit())
@@ -288,12 +279,12 @@ int main(void)
 
 	// [Lighting]
 
-	Light* dayTimeDirectionalLight = new Light(glm::vec3(20.0f, 3.0f, -20.0f),
+	Light* dayTimeDirectionalLight = new Light(glm::vec3(0.0, 0.0f, 0.0f),
 		glm::vec3(0.5f, 0.5f, 0.5f),
 		glm::vec3(0.4f, 0.4f, 0.4f),
-		glm::vec3(0.8f, 0.8f, 0.8f)
+		glm::vec3(0.3f, 0.3f, 0.3f)
 	);
-	Light* dayTimeSpotLight = new Light(glm::vec3(40.0f, 3.0f, -40.0f), false);
+	Light* dayTimeSpotLight = new Light(glm::vec3(35.0f, 5.0f, -30.0f), false);
 	Light* nightTimeDirectionalLight = new Light(glm::vec3(0.0f, 0.0f, 0.0f),     
 		glm::vec3(0.07f, 0.07f, 0.07f),			
 		glm::vec3(0.4f, 0.4f, 0.4f),				     
@@ -336,7 +327,6 @@ int main(void)
 	models[3] = ziming;
 	models[4] = wayne;
 
-
 	float sizeModel = 0.55f;
 	if (TERRAIN_BIG_SIZE == 0) {
 		terrain->addScale(glm::vec3(6.0f, 6.0f, 6.0f));
@@ -353,7 +343,6 @@ int main(void)
 		terrain->addTranslation(glm::vec3(-5.0, 0.5f, -5.0));
 		sizeModel = 0.15f;
 	}
-
 
 	float terrainHeightBen = t->getHeightOfTerrain(ben->translate_vec.x, ben->translate_vec.z, terrain);
 	ben->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
@@ -791,6 +780,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, bool collision, i
 	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)) 
 	{
 		isDay = true;
+		useShadows = true;
 		useFlashlight = true;	// Need to activate spot lighting in shader
 	}
 
@@ -798,6 +788,7 @@ void processInput(GLFWwindow *window, ModelContainer** models, bool collision, i
 	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)) 
 	{
 		isDay = false;
+		useShadows = false;
 	}
 }
 
@@ -832,7 +823,7 @@ void setupTextureMapping()
 	g_texLocations[8] = GL_TEXTURE8;
 	g_texLocations[9] = GL_TEXTURE9;
 	g_texLocations[10] = GL_TEXTURE10;
-	g_texLocations[11] = GL_TEXTURE11; // used by shadow map
+	//g_texLocations[11] = GL_TEXTURE11; used by shadow map
 	g_texLocations[12] = GL_TEXTURE12; // used by skybox
 	g_texLocations[13] = GL_TEXTURE13;
 	g_texLocations[14] = GL_TEXTURE14;
@@ -866,9 +857,9 @@ void setupTextureMapping()
 	g_textures[8] = Texture("comp371/assignment1/src/Resources/box4.png");
 	g_textures[9] = Texture("comp371/assignment1/src/Resources/box5.png");
 	g_textures[10] = Texture("comp371/assignment1/src/Resources/water.jpg");
-	//g_textures[13] = Texture("C:\\Users\\Benjamin Therien\\Documents\\comp371\\models\\backpack\\diffuse.jpg");
 	//g_textures[11] // used by shadow map
 	//g_textures[12] // used by skybox
+	//g_textures[13] = Texture("C:\\Users\\Benjamin Therien\\Documents\\comp371\\models\\backpack\\diffuse.jpg");
 	g_textures[14] = Texture("comp371/assignment1/src/Resources/rustedmetal.jpg");
 	g_textures[15] = Texture("comp371/assignment1/src/Resources/oldwood.jpg");
 	//g_textures[16] // used by skybox
@@ -889,7 +880,7 @@ void setupTextureMapping()
 	g_shininess[9] = 256.0f;
 	g_shininess[10] = 64.0f;
 	g_shininess[13] = 64.0f;
-	g_shininess[11] = 64.0f;// used by shadow map
+	//g_shininess[11] = 64.0f;// used by shadow map
 	g_shininess[12] = 64.0f; // used by skybox
 	g_shininess[14] = 128.0f;
 	g_shininess[15] = 256.0f;
@@ -910,12 +901,12 @@ void setupTextureMapping()
 	g_specularStrength[8] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[9] = glm::vec3(0.1f, 0.1f, 0.1f);
 	g_specularStrength[10] = glm::vec3(0.5f, 0.5f, 0.5f);
-	g_specularStrength[11] = glm::vec3(0.5f, 0.5f, 0.5f);// used by shadow map
-	g_specularStrength[12] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
+	//g_specularStrength[11] = glm::vec3(0.5f, 0.5f, 0.5f);    used by shadow map
+	g_specularStrength[12] = glm::vec3(0.5f, 0.5f, 0.5f);   // used by skybox
 	g_specularStrength[13] = glm::vec3(0.5f, 0.5f, 0.5f);
 	g_specularStrength[14] = glm::vec3(0.5f, 0.5f, 0.5f);
 	g_specularStrength[15] = glm::vec3(0.3f, 0.3f, 0.3f);
-	g_specularStrength[16] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
+	g_specularStrength[16] = glm::vec3(0.5f, 0.5f, 0.5f);   // used by skybox
 	g_specularStrength[17] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[18] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[19] = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -932,7 +923,7 @@ void setupTextureMapping()
 	g_materials[8] = Material(g_specularStrength[8], g_textures[8], g_shininess[8]);
 	g_materials[9] = Material(g_specularStrength[9], g_textures[9], g_shininess[9]);
 	g_materials[10] = Material(g_specularStrength[10], g_textures[10], g_shininess[10]);
-	g_materials[11] = Material(g_specularStrength[11], g_textures[11], g_shininess[11]);
+	//g_materials[11] = Material(g_specularStrength[11], g_textures[11], g_shininess[11]);
 	g_materials[12] = Material(g_specularStrength[12], g_textures[12], g_shininess[12]);
 	g_materials[14] = Material(g_specularStrength[14], g_textures[14], g_shininess[14]);
 	g_materials[15] = Material(g_specularStrength[15], g_textures[15], g_shininess[15]);
