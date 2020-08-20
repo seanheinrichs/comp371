@@ -36,6 +36,41 @@ public:
 
 				float y = SimplexNoise::noise(x, z) / smooth;
 
+			/*
+				if (x<0.5 && z<0.5) {
+					int h = glm::min(x, z);
+					y-= (0.5 - h) * 2;
+				}
+				else if (x<0.5 && z>SIZE-0.5) {
+					int h = glm::max(0.5 - x, z - (SIZE - 0.5));
+					y -= (h) * 2;
+				}
+				else if (x>SIZE-0.5 && z<0.5) {
+					int h = glm::max(0.5-x, z-(SIZE-0.5));
+					y -= (h) * 2;
+				}
+				else if (x>SIZE-0.5 && z>SIZE-0.5) {
+					int h = glm::min(x, z);
+					y -= (h - (SIZE - 0.5)) * 2;
+				}
+				else
+			*/
+				if (x < 0.5)
+				{
+					y -= (0.5 - x)*2;
+				}
+				else if (z < 0.5)
+				{
+					y -= (0.5 - z)*2;
+				}
+				else if (x > SIZE - 0.5)
+				{
+					y -= (x - (SIZE - 0.5))*2;
+				}
+				else if (z > SIZE - 0.5)
+				{
+					y -= (z - (SIZE - 0.5))*2;
+				}
 				heights[j][i] = y;
 				float mapping = (glm::pow((x*x + z*z), (1/2)));
 				vertices_temp.push_back(glm::vec3(x, y, z));

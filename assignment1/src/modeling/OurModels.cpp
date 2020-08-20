@@ -225,33 +225,40 @@ static void createBensModel(ModelContainer* modelContainer, Shader* shader)
 
 static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 {
-  glm::mat4 scale;
+	glm::mat4 scale;
 	glm::mat4 rotate;
-	
+	glm::mat4 translate;
+
 	// [Create A Model]
-	Model* A = new Model(true, true, false, true, "a", shader, &g_materials[8]);
+	Model* A = new Model(true, true, false, true, "aII", shader, &g_materials[19]);
 	//A
-	Shape * Shape1 = new Shape(glm::vec3(-1.0f, 0.5f, 0.0f));
-	Shape * Shape2 = new Shape(glm::vec3(-2.0f, 2.5f, 0.0f));
-	Shape * Shape3 = new Shape(glm::vec3(-3.0f, 0.5f, 0.0f));
-	Shape * Shape4 = new Shape(glm::vec3(-2.0f, 4.5f, 0.0f));
+	Shape * Shape1 = new Shape(glm::vec3(1.0f, 0.5f, 0.0f));
+	Shape * Shape2 = new Shape(glm::vec3(2.0f, 2.5f, 0.0f));
+	Shape * Shape3 = new Shape(glm::vec3(3.0f, 0.5f, 0.0f));
+	Shape * Shape4 = new Shape(glm::vec3(2.0f, 4.5f, 0.0f));
 
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 5.0f, 1.0f));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5, 0.0f));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	Shape1->transform(scale);
 	Shape3->transform(scale);
 	A->addPolygon(Shape1);
 	A->addPolygon(Shape2);
 	A->addPolygon(Shape3);
 	A->addPolygon(Shape4);
-  
-  	// [Create 0 Model]
-	Model* zero = new Model(true, true, false, true, "0", shader, &g_materials[3]);
+	A->transform(rotate);
+	A->transform(translate);
+
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(35.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	A->transform(rotate);
+	// [Create 0 Model]
+	Model* zero = new Model(true, true, false, true, "0II", shader, &g_materials[20]);
 
 	//0
-	Shape * Shape5 = new Shape(glm::vec3(1.0f , 0.5f, 0.0f));
-	Shape * Shape6 = new Shape(glm::vec3(2.0f, 0.5f, 0.0f));
-	Shape * Shape7 = new Shape(glm::vec3(3.0f, 0.5f, 0.0f));
-	Shape * Shape8 = new Shape(glm::vec3(2.0f, 4.5f, 0.0f));
+	Shape * Shape5 = new Shape(glm::vec3(-1.0f, 0.5f, 8.50f));
+	Shape * Shape6 = new Shape(glm::vec3(-2.0f, 0.5f, 8.50f));
+	Shape * Shape7 = new Shape(glm::vec3(-3.0f, 0.5f, 8.50f));
+	Shape * Shape8 = new Shape(glm::vec3(-2.0f, 4.5f, 8.50f));
 
 	Shape5->transform(scale);
 	Shape7->transform(scale);
@@ -259,11 +266,14 @@ static void createIsabellesModel(ModelContainer* modelContainer, Shader* shader)
 	zero->addPolygon(Shape6);
 	zero->addPolygon(Shape7);
 	zero->addPolygon(Shape8);
-
-	// Set initial position
-	//rotate = glm::rotate(glm::mat4(1.0f), glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//A->transform(rotate);
-	//zero->transform(rotate);
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	zero->transform(rotate);
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-35.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	zero->transform(rotate);
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-35.0f), glm::vec3(1.0f, 0.0f, 1.0f));
+	zero->transform(rotate);
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -6.50f, 0.0f));
+	zero->transform(translate);
 
 	// Add to model container
 	modelContainer->addModel(A);
