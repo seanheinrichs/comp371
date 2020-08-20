@@ -13,6 +13,14 @@ void ModelContainer::bindArrayBuffer()
 	}
 }
 
+void ModelContainer::translateToOrigin()
+{
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->translateToOrigin();
+	}
+}
+
 void ModelContainer::addModel(Model* model) 
 {
 	models.push_back(model);
@@ -386,7 +394,8 @@ glm::mat4 ModelContainer::getTranslatedModelMatrix(glm::vec3 position)
 {
 	glm::vec3 mid((aabb.max.x + aabb.min.x) / 2, aabb.min.y, (aabb.max.z + aabb.min.z) / 2);
 	glm::vec3 translate(position.x - mid.x, position.y - mid.y, position.z - mid.z);
-	return glm::translate(glm::mat4(1.0f), translate) * getRotationX() * getRotationY() * getRotationZ() * getScale();
+	std::cout << "x: " << translate_vec.x << " y: " << translate_vec.y << " z: " << translate_vec.z << std::endl;
+	return glm::translate(glm::mat4(1.0f), translate + translate_vec) * getRotationX() * getRotationY() * getRotationZ() * getScale();
 }
 
 void ModelContainer::calculateMinMax()

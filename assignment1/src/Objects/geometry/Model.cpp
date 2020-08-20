@@ -490,6 +490,7 @@ int Model::getVertexByteSize()
 //Method that translates the model to its origin
 void Model::translateToOrigin()
 {
+	
 	std::map<std::string, glm::vec3> map;
 	map = getMinMax();
 
@@ -499,6 +500,7 @@ void Model::translateToOrigin()
 	temp.z = -(map["min"].z + map["max"].z) / 2;
 
 	transform(glm::translate(glm::mat4(1.0f), temp));
+	
 }
 
 void Model::draw(int mode, Shader* shaderProg)
