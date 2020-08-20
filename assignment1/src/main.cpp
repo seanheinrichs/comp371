@@ -138,6 +138,7 @@ bool useShadows = true;
 bool useFlashlight = true;
 glm::vec3 activeLightSource = glm::vec3(1.0f, 1.0f, -1.5f);
 
+
 /* External linkage for global varibles */
 GLenum* g_texLocations = new GLenum[32];
 Material* g_materials = new Material[32];
@@ -147,13 +148,16 @@ glm::vec3 *g_specularStrength = new glm::vec3[32];
 
 int main(void)
 {
+	//Reading config file for terrain configurations
+	YAML::Node config = YAML::LoadFile("comp371/assignment1/src/config.yaml");
+
 	for (std::size_t i = 0; i < config["Variables"].size(); i++) {
 
 		if (config["Variables"][i]["name"].as<std::string>().compare("terrainSize") == 0) {
-			if (config["Variables"][i]["value"].as<std::string>().compare("SMALL") == 0) {
+			if (config["Variables"][i]["value"].as<std::string>().compare("BIG") == 0) {
 				TERRAIN_BIG_SIZE = 0;
 			}
-			else if (config["Variables"][i]["value"].as<std::string>().compare("BIG") == 0) {
+			else if (config["Variables"][i]["value"].as<std::string>().compare("SMALL") == 0) {
 				TERRAIN_BIG_SIZE = 1;
 			}
 			else if (config["Variables"][i]["value"].as<std::string>().compare("NORMAL") == 0) {
@@ -262,7 +266,7 @@ int main(void)
 
 	// [Terrain]
 
-	Terrain * t = new Terrain();
+	Terrain * t = new Terrain(VERTEX_COUNT_TERRAIN, TERRAIN_SIZE, TERRAIN_SMOOTHNESS);
 	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
 	
 	ModelContainer* terrainC = new ModelContainer();
@@ -324,17 +328,17 @@ int main(void)
 	float sizeModel = 0.55f;
 	if (TERRAIN_BIG_SIZE == 0) {
 		terrain->addScale(glm::vec3(6.0f, 6.0f, 6.0f));
-		terrain->addTranslation(glm::vec3(-30.0f, 0.5f, -30.0f));
+		terrain->addTranslation(glm::vec3(-30.0f, 0.0f, -30.0f));
 		sizeModel = 0.55f;
 	}
 	else if (TERRAIN_BIG_SIZE == 1) {
 		terrain->addScale(glm::vec3(3.0, 3.0, 3.0));
-		terrain->addTranslation(glm::vec3(-15.0f, 0.5f, -15.0f));
+		terrain->addTranslation(glm::vec3(-15.0f, 0.0f, -15.0f));
 		sizeModel = 0.25f;
 	}
 	else if (TERRAIN_BIG_SIZE == 2) {
 		terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
-		terrain->addTranslation(glm::vec3(-5.0, 0.5f, -5.0));
+		terrain->addTranslation(glm::vec3(-5.0, 0.0f, -5.0));
 		sizeModel = 0.15f;
 	}
 
