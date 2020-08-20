@@ -119,6 +119,12 @@ glm::mat4 lightView(1.0f);
 // Variables used for Skybox
 unsigned int skyboxVAO, skyboxVBO, cubemapTexture_day, cubemapTexture_night;
 
+//Variables for terrain
+float TERRAIN_SMOOTHNESS = 0.99;
+int TERRAIN_BIG_SIZE = 0;
+int TERRAIN_SIZE = 10;
+int VERTEX_COUNT_TERRAIN = 100;
+
 // Variables used for Fog / Sky Color (Fog/ClearColor)
 const float RED = 1.0;
 const float BLUE = 0.0;
@@ -143,6 +149,35 @@ glm::vec3 *g_specularStrength = new glm::vec3[32];
 
 int main(void)
 {
+	//Reading config file for terrain configurations
+	YAML::Node config = YAML::LoadFile("comp371/assignment1/src/config.yaml");
+
+	for (std::size_t i = 0; i < config["Variables"].size(); i++) {
+		std::cout << config["Variables"][i]["name"].as<std::string>() << " = " << config["Variables"][i]["value"].as<std::string>() << "\n";
+
+		if (config["Variables"][i]["name"].as<std::string>().compare("terrainSize") == 0) {
+			if (config["Variables"][i]["value"].as<std::string>().compare("SMALL") == 0) {
+				TERRAIN_BIG_SIZE = 0;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("BIG") == 0) {
+				TERRAIN_BIG_SIZE = 1;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("NORMAL") == 0) {
+				TERRAIN_BIG_SIZE = 2;
+			}
+		}
+		else if (config["Variables"][i]["name"].as<std::string>().compare("terrainTopography") == 0) {
+			if (config["Variables"][i]["value"].as<std::string>().compare("SMOOTH") == 0) {
+				TERRAIN_SMOOTHNESS = 0.99;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("HILLS") == 0) {
+				TERRAIN_SMOOTHNESS = 0.95;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("REALSMOOTH") == 0) {
+				TERRAIN_SMOOTHNESS = 0.999999;
+			}
+		}
+	}
 
 	time_t startTime = time(new time_t());
 	std::cout << "cpp version: " << __cplusplus << std::endl;
@@ -301,24 +336,44 @@ int main(void)
 	models[3] = ziming;
 	models[4] = wayne;
 
-	terrain->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
-	terrain->addTranslation(glm::vec3(-15.0f, 0.1f, -15.0f));
 
-	ben->addScale(glm::vec3(1.5f, 1.5f, 1.5f));
-	ben->addTranslation(glm::vec3(0.0f, 2.0f, 467.0f));
-	//ben->addRotation(0, glm::vec3(1.0f, 0.0f, 0.0f));
+	float sizeModel = 0.55f;
+	if (TERRAIN_BIG_SIZE == 0) {
+		terrain->addScale(glm::vec3(6.0f, 6.0f, 6.0f));
+		terrain->addTranslation(glm::vec3(-30.0f, 0.5f, -30.0f));
+		sizeModel = 0.55f;
+	}
+	else if (TERRAIN_BIG_SIZE == 1) {
+		terrain->addScale(glm::vec3(3.0, 3.0, 3.0));
+		terrain->addTranslation(glm::vec3(-15.0f, 0.5f, -15.0f));
+		sizeModel = 0.25f;
+	}
+	else if (TERRAIN_BIG_SIZE == 2) {
+		terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
+		terrain->addTranslation(glm::vec3(-5.0, 0.5f, -5.0));
+		sizeModel = 0.15f;
+	}
 
-	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	sean->addTranslation(glm::vec3(-5.0f, 0.0f, 0.0f));
 
-	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
+	float terrainHeightBen = t->getHeightOfTerrain(ben->translate_vec.x, ben->translate_vec.z, terrain);
+	ben->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	ben->addTranslation(glm::vec3(0.0f, (terrainHeightBen + 0.75f), 0.0f));
 
-	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	isa->addTranslation(glm::vec3(3.5f, 0.0f, 4.0f));
+	float terrainHeightSean = t->getHeightOfTerrain(sean->translate_vec.x, sean->translate_vec.z, terrain);
+	sean->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	sean->addTranslation(glm::vec3(-5.0f, (terrainHeightSean + 0.75f), 0.0f));
 
-	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
+	float terrainHeightWayne = t->getHeightOfTerrain(wayne->translate_vec.x, wayne->translate_vec.z, terrain);
+	wayne->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	wayne->addTranslation(glm::vec3(-4.0f, (terrainHeightWayne + 0.75f), -4.0f));
+
+	float terrainHeightIsa = t->getHeightOfTerrain(isa->translate_vec.x, isa->translate_vec.z, terrain);
+	isa->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	isa->addTranslation(glm::vec3(3.5f, (terrainHeightIsa + 0.75f), 4.0f));
+
+	float terrainHeightZiming = t->getHeightOfTerrain(ziming->translate_vec.x, ziming->translate_vec.z, terrain);
+	ziming->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	ziming->addTranslation(glm::vec3(-4.0f, (terrainHeightZiming + 0.75f), 4.0f));
 
 	// Skybox load
 	loadSkybox(skyboxShader);
@@ -799,6 +854,7 @@ void setupTextureMapping()
 	g_texLocations[30] = GL_TEXTURE30;
 	g_texLocations[31] = GL_TEXTURE31;
 
+
 	g_textures[0] = Texture("comp371/assignment1/src/Resources/sand.jpg");
 	g_textures[1] = Texture("comp371/assignment1/src/Resources/cast_iron.png");
 	g_textures[2] = Texture("comp371/assignment1/src/Resources/chrome.png");
@@ -818,7 +874,8 @@ void setupTextureMapping()
 	//g_textures[16] // used by skybox
 	g_textures[17] = Texture("comp371/assignment1/src/Resources/63_rusty_dirty_metal.jpg");
 	g_textures[18] = Texture("comp371/assignment1/src/Resources/94_rock_stone.jpg"); 
-
+	g_textures[19] = Texture("comp371/assignment1/src/Resources/blocs.jpg"); 
+	g_textures[20] = Texture("comp371/assignment1/src/Resources/blocs2.jpg"); 
 
 	g_shininess[0] = 32.0f;
 	g_shininess[1] = 2.0f;
@@ -839,6 +896,8 @@ void setupTextureMapping()
 	g_shininess[16] = 64.0f; // used by skybox
 	g_shininess[17] = 2.0f;
 	g_shininess[18] = 2.0f;
+	g_shininess[19] = 2.0f;
+	g_shininess[20] = 2.0f;
 
 	g_specularStrength[0] = glm::vec3(0.5f, 0.5f, 0.5f);
 	g_specularStrength[1] = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -859,6 +918,8 @@ void setupTextureMapping()
 	g_specularStrength[16] = glm::vec3(0.5f, 0.5f, 0.5f);// used by skybox
 	g_specularStrength[17] = glm::vec3(1.0f, 1.0f, 1.0f);
 	g_specularStrength[18] = glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[19] = glm::vec3(1.0f, 1.0f, 1.0f);
+	g_specularStrength[20] = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	g_materials[0] = Material(g_specularStrength[0], g_textures[0], g_shininess[0]);
 	g_materials[1] = Material(g_specularStrength[1], g_textures[1], g_shininess[1]);
@@ -878,6 +939,8 @@ void setupTextureMapping()
 	g_materials[16] = Material(g_specularStrength[16], g_textures[16], g_shininess[16]);
 	g_materials[17] = Material(g_specularStrength[17], g_textures[17], g_shininess[17]);
 	g_materials[18] = Material(g_specularStrength[18], g_textures[18], g_shininess[18]);
+	g_materials[19] = Material(g_specularStrength[19], g_textures[19], g_shininess[19]);
+	g_materials[20] = Material(g_specularStrength[20], g_textures[20], g_shininess[20]);
 }
 
 void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d)
@@ -896,7 +959,7 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 	GLCall(glBindVertexArray(grid_VAOs[1]));
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(35.0f, 35.0f, 35.0f));
+	model = glm::scale(model, glm::vec3(335.0f, 335.0f, 35.0f));
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
 	g_textures[10].bind(g_texLocations[10]);
 	shader->setFloat("material.shininess", g_shininess[10]);
