@@ -78,8 +78,12 @@ bool checkCollision(ModelContainer** models);
 /* Config Setup */
 YAML::Node config = YAML::LoadFile("comp371/assignment1/src/config.yaml");
 bool isDay = config["Variables"][0]["value"].as<std::string>().compare("DAY") == 0;
-std::string TERRAIN_SIZE = config["Variables"][1]["value"].as<std::string>();
-std::string TERRAIN_TOPOGRAPHY = config["Variables"][2]["value"].as<std::string>();
+
+//Variables for terrain
+float TERRAIN_SMOOTHNESS = 0.99;
+int TERRAIN_BIG_SIZE = 0;
+int TERRAIN_SIZE = 10;
+int VERTEX_COUNT_TERRAIN = 100;
 
 /* Global Constants */
 unsigned int WINDOW_WIDTH = 1024;
@@ -143,6 +147,32 @@ glm::vec3 *g_specularStrength = new glm::vec3[32];
 
 int main(void)
 {
+	for (std::size_t i = 0; i < config["Variables"].size(); i++) {
+
+		if (config["Variables"][i]["name"].as<std::string>().compare("terrainSize") == 0) {
+			if (config["Variables"][i]["value"].as<std::string>().compare("SMALL") == 0) {
+				TERRAIN_BIG_SIZE = 0;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("BIG") == 0) {
+				TERRAIN_BIG_SIZE = 1;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("NORMAL") == 0) {
+				TERRAIN_BIG_SIZE = 2;
+			}
+		}
+		else if (config["Variables"][i]["name"].as<std::string>().compare("terrainTopography") == 0) {
+			if (config["Variables"][i]["value"].as<std::string>().compare("SMOOTH") == 0) {
+				TERRAIN_SMOOTHNESS = 0.99;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("HILLS") == 0) {
+				TERRAIN_SMOOTHNESS = 0.95;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("REALSMOOTH") == 0) {
+				TERRAIN_SMOOTHNESS = 0.999999;
+			}
+		}
+	}
+
 	time_t startTime = time(new time_t());
 	std::cout << "cpp version: " << __cplusplus << std::endl;
 
@@ -292,31 +322,20 @@ int main(void)
 	models[4] = wayne;
 
 	float sizeModel = 0.55f;
-	float smoothness = 0.99f;
-	if (TERRAIN_SIZE.compare("SMALL") == 0) {
+	if (TERRAIN_BIG_SIZE == 0) {
 		terrain->addScale(glm::vec3(6.0f, 6.0f, 6.0f));
 		terrain->addTranslation(glm::vec3(-30.0f, 0.5f, -30.0f));
 		sizeModel = 0.55f;
 	}
-	else if (TERRAIN_SIZE.compare("NORMAL") == 0) {
+	else if (TERRAIN_BIG_SIZE == 1) {
 		terrain->addScale(glm::vec3(3.0, 3.0, 3.0));
 		terrain->addTranslation(glm::vec3(-15.0f, 0.5f, -15.0f));
 		sizeModel = 0.25f;
 	}
-	else if (TERRAIN_SIZE.compare("BIG") == 0) {
+	else if (TERRAIN_BIG_SIZE == 2) {
 		terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
 		terrain->addTranslation(glm::vec3(-5.0, 0.5f, -5.0));
 		sizeModel = 0.15f;
-	}
-
-	if (TERRAIN_TOPOGRAPHY.compare("SMOOTH") == 0) {
-		smoothness = 0.99f;
-	}
-	else if (TERRAIN_TOPOGRAPHY.compare("HILLS") == 0) {
-		smoothness = 0.95f;
-	}
-	else if (TERRAIN_TOPOGRAPHY.compare("REALSMOOTH") == 0) {
-		smoothness = 0.999999f;
 	}
 
 	float terrainHeightBen = t->getHeightOfTerrain(ben->translate_vec.x, ben->translate_vec.z, terrain);
