@@ -316,12 +316,17 @@ float* Cube::getVertexArray()
 }
 
 //Method that returns the origin, as a vec3 coordinate, of the combination of the vertices
-std::map<std::string, glm::vec3> Cube::getMinMax()
+std::map<std::string, glm::vec3> Cube::getMinMax(glm::mat4 modelMatrix, bool useMat)
 {
-	return vc->getMinMax();
+	return vc->getMinMax(modelMatrix, useMat);
 }
 
 void Cube::print() 
 {
 	vc->print();
+}
+
+void Cube::printMat(glm::mat4 modelMatrix)
+{
+	vc->printMat(modelMatrix);
 }

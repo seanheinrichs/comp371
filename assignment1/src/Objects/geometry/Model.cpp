@@ -360,7 +360,7 @@ glm::mat4 Model::getShearMatrix()
 glm::mat4 Model::getModelMatrix(bool shear)
 {
 
-	return getTranslation() * getRotationX() * getRotationY() * getRotationZ() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
+	return getTranslation() * getRotationX() * getRotationY() * getRotationZ() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f))* translateToOriginMat;
 }
 
 //Method that adds a polygon object to the list of polygons that this model is composed of
@@ -450,15 +450,19 @@ float* Model::getVertexArray()
 }
 
 //Method that returns the origin coordinate of a model
-std::map<std::string, glm::vec3> Model::getMinMax()
+std::map<std::string, glm::vec3> Model::getMinMax(glm::mat4 modelMatrix, bool useMat)
 {
-	std::map<std::string, glm::vec3> map;
-	map["min"] = glm::vec3(0.0f);
-	map["max"] = glm::vec3(0.0f);
+	std::vector<Polygon*>::iterator it = polygons.begin();
+	std::map<std::string, glm::vec3> map = (**it).getMinMax(modelMatrix, useMat);
 
-	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	if (polygons.size() == 1)
+		return map;
+	else
+		it++;
+
+	for (; it < polygons.end(); it++)
 	{
-		std::map<std::string, glm::vec3> temp = (**it).getMinMax();
+		std::map<std::string, glm::vec3> temp = (**it).getMinMax(modelMatrix, useMat);
 		if (map["max"].x < temp["max"].x)
 			map["max"].x = temp["max"].x;
 
@@ -492,15 +496,31 @@ void Model::translateToOrigin()
 {
 	
 	std::map<std::string, glm::vec3> map;
-	map = getMinMax();
+	map = getMinMax(getModelMatrix(),false);
 
 	glm::vec3 temp;
 	temp.x = -(map["min"].x + map["max"].x) / 2;
 	temp.y = -(map["min"].y + map["max"].y) / 2;
 	temp.z = -(map["min"].z + map["max"].z) / 2;
-
+	std::cout << "x: " << temp.x << " y: " << temp.y << " z: " << temp.z << std::endl;
 	transform(glm::translate(glm::mat4(1.0f), temp));
 	
+}
+
+void Model::setTranslateToOriginMat()
+{
+	if (polygons.size() == 0)
+		std::cout << "could not complete setTranslateToOriginMat() with empty vertices" << std::endl;
+	else {
+		std::map<std::string, glm::vec3> map = getMinMax(getModelMatrix(), false);
+
+		glm::vec3 temp;
+		temp.x = -(map["min"].x + map["max"].x) / 2;
+		temp.y = -(map["min"].y + map["max"].y) / 2;
+		temp.z = -(map["min"].z + map["max"].z) / 2;
+
+		translateToOriginMat = glm::translate(glm::mat4(1.0f), temp);
+	}
 }
 
 void Model::draw(int mode, Shader* shaderProg)
@@ -540,10 +560,10 @@ void Model::drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat)
 
 void Model::setAABB()
 {
-	std::map<std::string, glm::vec3> map = getMinMax();
+	std::map<std::string, glm::vec3> map = getMinMax(getModelMatrix(),false);
 
-	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix();// +glm::vec4(translate_vec, 0.0f);
-	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix();// +glm::vec4(translate_vec, 0.0f);
+	aabb.max = glm::vec4(map["max"], 0.0f); //* getModelMatrix();// +glm::vec4(translate_vec, 0.0f);
+	aabb.min = glm::vec4(map["min"], 0.0f); //* getModelMatrix();// +glm::vec4(translate_vec, 0.0f);
 }
 
 void Model::insertTextures(std::vector<Texture> tex)
@@ -583,4 +603,13 @@ bool Model::textureEquals(Model comp)
 	}
 	return isEqual;
 }
+
+void Model::printMat(glm::mat4 modelMatrix)
+{
+	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
+		(*it)->printMat(modelMatrix);
+}
+
+
+
 

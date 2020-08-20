@@ -351,12 +351,17 @@ float* Shape::getVertexArray()
 }
 
 //Method that returns the origin, as a vec3 coordinate, of the combination of the vertices
-std::map<std::string, glm::vec3> Shape::getMinMax()
+std::map<std::string, glm::vec3> Shape::getMinMax(glm::mat4 modelMatrix, bool useMat)
 {
-	return vc->getMinMax();
+	return vc->getMinMax(modelMatrix, useMat);
 }
 
 void Shape::print() 
 {
 	vc->print();
+}
+
+void Shape::printMat(glm::mat4 modelMatrix) 
+{
+	vc->printMat(modelMatrix);
 }

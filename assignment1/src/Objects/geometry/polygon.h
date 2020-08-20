@@ -24,15 +24,10 @@ class Polygon
 		virtual void setVertexController(bool position, bool texture, bool color, bool normal) = 0;
 		virtual Vertex getSampleVertex() { return Vertex(); }
 		virtual void setBoolean(bool position, bool texture, bool color, bool normal) {}
-		virtual std::map<std::string, glm::vec3> getMinMax()
-		{
-			std::map<std::string, glm::vec3> map;
-			map["min"] = glm::vec3(0.0f);
-			map["max"] = glm::vec3(0.0f);
-			return map;
-		};
+		virtual std::map<std::string, glm::vec3> getMinMax(glm::mat4 modelMatrix, bool useMat)=0;
 		virtual float* getVertexArray() = 0;
 		virtual void print() = 0;
+		virtual void printMat(glm::mat4 modelMatrix) = 0;
 };
 
 

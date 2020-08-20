@@ -169,6 +169,8 @@ static void createTerrain(std::vector<ModelContainer*>* models3d, Shader& shader
 int main(void)
 {
 
+	
+
 	time_t startTime = time(new time_t());
 	std::cout << "cpp version: " << __cplusplus << std::endl;
 	
@@ -225,6 +227,19 @@ int main(void)
 	Shader skyboxShader("comp371/assignment1/src/Shaders/skyboxShader.vertex", "comp371/assignment1/src/Shaders/skyboxShader.fragment");
 	setupTextureMapping();
 
+
+	ModelContainer* palmtree = loadModel("../Assets/Models/palmtree/palmtree.obj", false);
+	std::cout << "one" << std::endl;
+	palmtree->optimizeModels();
+	std::cout << "two" << std::endl;
+	palmtree->setVertexController(true, true, false, true);
+	std::cout << "three" << std::endl;
+	palmtree->bindArrayBuffer();
+	std::cout << "four" << std::endl;
+	palmtree->setTranslateToOriginMat();
+	//palmtree->translateToOrigin();
+	//palmtree->calculateMinMax(false);
+
 	// [Models]
 
 
@@ -243,41 +258,45 @@ int main(void)
 	terrain->bindArrayBuffer(true, terrain);
 	terrainC->addModel(terrain);
 	terrainC->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
-	terrainC->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
+	terrainC->addTranslation(glm::vec3(0.0f, -1.0f, 0.0f));
+	std::cout << "inside" << std::endl;
+	terrainC->setTranslateToOriginMat();
 	models3d.push_back(terrainC);
 
 	
 	//std::lock_guard<std::mutex> lock(ModelMutex);
 	
 	std::cout << "it took : " << difftime(time(new time_t), terrainBefore) << " seconds to generate terrain" << std::endl;
-	/*
+	
 	ModelContainer* rock = loadModel("../Assets/Models/rock0/rock0.obj", false);
 	rock->optimizeModels();
 	rock->setVertexController(true, true, false, true);
 	rock->bindArrayBuffer();
-	rock->addTranslation(glm::vec3(0.0f, 1.0f, -1.0f));
+	//rock->addTranslation(glm::vec3(0.0f, 1.0f, -1.0f));
 	rock->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	rock->addRotationY(90);
-	rock->calculateMinMax();
+	rock->setTranslateToOriginMat();
+	//rock->calculateMinMax(false);
 	//models3d.push_back(rock);
 
 	ModelContainer* bush = loadModel("../Assets/Models/bush/bush1.obj", false);
 	bush->optimizeModels();
 	bush->setVertexController(true, true, false, true);
 	bush->bindArrayBuffer();
-	bush->addTranslation(glm::vec3(0.0f, 1.0f, -1.0f));
+	//bush->addTranslation(glm::vec3(0.0f, 1.0f, -1.0f));
 	bush->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	bush->calculateMinMax();
+	bush->setTranslateToOriginMat();
+	//bush->calculateMinMax(false);
 	//models3d.push_back(palmtree);
-	*/
+	
 
-	ModelContainer* palmtree = loadModel("../Assets/Models/palmtree/palmtree.obj", false);
-	palmtree->optimizeModels();
-	palmtree->setVertexController(true, true, false, true);
-	palmtree->bindArrayBuffer();
+	//ModelContainer* palmtree = loadModel("../Assets/Models/palmtree/palmtree.obj", false);
+	//palmtree->optimizeModels();
+	//palmtree->setVertexController(true, true, false, true);
+	//palmtree->bindArrayBuffer();
 	//palmtree->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
 	palmtree->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	palmtree->calculateMinMax();
+	//palmtree->calculateMinMax(false);
 	//palmtree->print();
 	//models3d.push_back(palmtree);
 
@@ -288,21 +307,31 @@ int main(void)
 	std::vector<glm::mat4> bushes;
 
 
-	terrainC->calculateMinMax();
+	//terrainC->calculateMinMax(false);
+	std::cout << "terrain:" << std::endl;
 	std::cout << "max x : " << terrainC->aabb.max.x << std::endl;
 	std::cout << "max z : " << terrainC->aabb.max.z << std::endl;
+	terrainC->aabb.max.x = 15;
+	terrainC->aabb.min.x = -15;
+	terrainC->aabb.max.z = 15;
+	terrainC->aabb.min.z = -15;
+
+	terrainC->getCurrentBoundingBox();
 
 	srand((unsigned)time(0));
 	for (int i = terrainC->aabb.min.x; i < terrainC->aabb.max.x; i+=3)
 		for (int j = terrainC->aabb.min.z; j < terrainC->aabb.max.z; j += 3) {
-			//float x1 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
-			//float z1 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
+			float x1 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
+			float z1 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
 			//std::cout << "NOISE : " << (((float)rand() - (float)RAND_MAX / 2.0) / (RAND_MAX / 2.0)) << " imput: " << 1 - j << std::endl;
-			//rocks.push_back(rock->getTranslatedModelMatrix(glm::vec3(x1, t->getHeightOfTerrain(x1,z1, terrain), z1)));
-			//float x2 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
-			//float z2 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
-			//if (x2 > terrainC->aabb.min.x && x2 < terrainC->aabb.max.x && z2 > terrainC->aabb.min.z && z2 < terrainC->aabb.max.z)
-			//  bushes.push_back(bush->getTranslatedModelMatrix(glm::vec3(x2, t->getHeightOfTerrain(x2,z2, terrain), z2)));
+			if (x1 > terrainC->aabb.min.x && x1 < terrainC->aabb.max.x && z1 > terrainC->aabb.min.z && z1 < terrainC->aabb.max.z)
+				rocks.push_back(rock->getTranslatedModelMatrix(glm::vec3(x1, t->getHeightOfTerrain(x1,z1, terrain), z1)));
+
+			float x2 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
+			float z2 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
+			if (x2 > terrainC->aabb.min.x && x2 < terrainC->aabb.max.x && z2 > terrainC->aabb.min.z && z2 < terrainC->aabb.max.z)
+			  bushes.push_back(bush->getTranslatedModelMatrix(glm::vec3(x2, t->getHeightOfTerrain(x2,z2, terrain), z2)));
+
 			float x3 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
 			float z3 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
 			if(x3 > terrainC->aabb.min.x && x3 < terrainC->aabb.max.x && z3 > terrainC->aabb.min.z && z3 < terrainC->aabb.max.z)
@@ -310,6 +339,7 @@ int main(void)
 		}
 
 	trees.push_back(palmtree->getTranslatedModelMatrix(glm::vec3(0, 0, 0)));
+
 
 	/*
 	ModelContainer* accarrier = loadModel("../Assets/Models/accarrier/accarrier.obj", true);
@@ -327,7 +357,7 @@ int main(void)
 	createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
-	ben->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
+	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
 	models3d.push_back(ben);
 
 	ModelContainer* sean = new ModelContainer();
@@ -539,7 +569,7 @@ int main(void)
 
 		for(std::vector<glm::mat4>::iterator it = rocks.begin(); it < rocks.end(); it++)
 		{
-			//rock->drawMod(MODE, &modelShader,*it);
+			rock->drawMod(MODE, &modelShader,*it);
 		}
 		for (std::vector<glm::mat4>::iterator it = trees.begin(); it < trees.end(); it++)
 		{
@@ -547,7 +577,7 @@ int main(void)
 		}
 		for (std::vector<glm::mat4>::iterator it = bushes.begin(); it < bushes.end(); it++)
 		{
-			//bush->drawMod(MODE, &modelShader, *it);
+			bush->drawMod(MODE, &modelShader, *it);
 		}
 
 
@@ -998,7 +1028,7 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::scale(model, glm::vec3(335.0f, 335.0f, 35.0f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
+	model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0005f));
 	g_textures[10].bind(g_texLocations[10]);
 	//shader->setFloat("loaded", 1);
 	//shader->setFloat("material.shininess", g_shininess[10]);

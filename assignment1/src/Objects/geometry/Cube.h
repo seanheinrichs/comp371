@@ -31,8 +31,9 @@ class Cube : public Polygon{
 		virtual void setVertexController(bool position, bool texture, bool color, bool normal);
 		virtual void setBoolean(bool position, bool texture, bool color, bool normal);
 		virtual Vertex getSampleVertex();
-		virtual std::map<std::string, glm::vec3> getMinMax();
+		virtual std::map<std::string, glm::vec3> getMinMax(glm::mat4 modelMatrix, bool useMat);
 		virtual void print();
+		virtual void printMat(glm::mat4 modelMatrix);
 		
 
 		glm::vec3 origin;

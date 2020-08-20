@@ -51,6 +51,8 @@ std::string VertexComponent::toString()
 	return comps[type] + " (" + s + ")";
 }
 
+
+
 float* VertexComponent::getData()
 {
 	return data;

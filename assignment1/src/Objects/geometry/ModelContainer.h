@@ -23,7 +23,7 @@ public:
 	void draw(int mode, Shader* shaderProg);
 	void bindArrayBuffer();
 	void deallocate();
-	void calculateMinMax();
+	std::map<std::string, glm::vec3> calculateMinMax(bool useMat);
 	void drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat);
 
 	
@@ -48,6 +48,8 @@ public:
 
 	void optimizeModels();
 
+	void setTranslateToOriginMat();
+
 	glm::mat4 getShearMatrix();
 	glm::mat4 getRotation();
 	glm::mat4 getRotationX();
@@ -64,9 +66,13 @@ public:
 	glm::vec3 scale_vec;
 
 	glm::mat4 shearMatrix;
+	glm::mat4 translateToOriginMat;
 	glm::vec2 shearX;
 	glm::vec2 shearY;
 	glm::vec2 shearZ;
 
 	float rotate_angle, rotate_angleX, rotate_angleY, rotate_angleZ;
+
+	void printMat();
+	void getCurrentBoundingBox();
 };

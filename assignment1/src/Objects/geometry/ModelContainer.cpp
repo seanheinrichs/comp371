@@ -42,6 +42,7 @@ void ModelContainer::resetShear()
 
 ModelContainer::ModelContainer() 
 {
+	translateToOriginMat = glm::mat4(1.0f);
 	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	translate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 	scale_vec = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -82,6 +83,7 @@ void ModelContainer::setupShearMatrix()
 	shearMatrix[3][2] = 0;
 	shearMatrix[3][3] = 0;
 }
+
 Model* ModelContainer::getModelByName(std::string name) 
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -96,7 +98,7 @@ void ModelContainer::draw(int mode, Shader* shaderProg)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
 	{
-		(*it)->draw(mode, shaderProg);
+		(*it)->drawMod(mode, shaderProg, getModelMatrix());
 	}
 }
 
@@ -240,7 +242,7 @@ glm::mat4 ModelContainer::getShearMatrix()
 //Method that calculates the transformation matrix of the model
 glm::mat4 ModelContainer::getModelMatrix(bool shear)
 {
-	return getTranslation() * getRotationX() * getRotationY() * getRotationZ() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f));
+	return getTranslation() * getRotationX() * getRotationY() * getRotationZ() * getScale() * (shear ? getShearMatrix() : glm::mat4(1.0f)) * translateToOriginMat;
 }
 
 //adds shears to model according to the axis passed, which will determine around which axis it will shear
@@ -394,18 +396,18 @@ glm::mat4 ModelContainer::getTranslatedModelMatrix(glm::vec3 position)
 {
 	glm::vec3 mid((aabb.max.x + aabb.min.x) / 2, aabb.min.y, (aabb.max.z + aabb.min.z) / 2);
 	glm::vec3 translate(position.x - mid.x, position.y - mid.y, position.z - mid.z);
-	std::cout << "x: " << translate_vec.x << " y: " << translate_vec.y << " z: " << translate_vec.z << std::endl;
-	return glm::translate(glm::mat4(1.0f), translate + translate_vec) * getRotationX() * getRotationY() * getRotationZ() * getScale();
+	return glm::translate(glm::mat4(1.0f), translate + translate_vec) * getRotationX() * getRotationY() * getRotationZ() * getScale() * translateToOriginMat;
 }
 
-void ModelContainer::calculateMinMax()
+std::map<std::string, glm::vec3> ModelContainer::calculateMinMax(bool useMat)
 {
-	std::map<std::string, glm::vec3> map;
-	map["min"] = glm::vec3(0.0f);
-	map["max"] = glm::vec3(0.0f);
-	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	std::vector<Model *>::iterator it = models.begin();
+	std::map<std::string, glm::vec3> map = (**it).getMinMax(getModelMatrix(), useMat);
+	it++;
+
+	for (; it < models.end(); it++)
 	{
-		std::map<std::string, glm::vec3> temp = (**it).getMinMax();
+		std::map<std::string, glm::vec3> temp = (**it).getMinMax(getModelMatrix(), useMat);
 		if (map["max"].x < temp["max"].x)
 			map["max"].x = temp["max"].x;
 
@@ -425,8 +427,53 @@ void ModelContainer::calculateMinMax()
 			map["min"].z = temp["min"].z;
 
 	}
+
+	return map;
+
+}
+
+
+void ModelContainer::setTranslateToOriginMat()
+{
+	translateToOriginMat = glm::mat4(1.0f);
+	std::map<std::string, glm::vec3> map = calculateMinMax(false);
+
+	glm::vec3 temp;
+	temp.x = -(map["min"].x + map["max"].x) / 2;
+	temp.y = -(map["min"].y + map["max"].y) / 2;
+	temp.z = -(map["min"].z + map["max"].z) / 2;
+
+	std::cout << "mid Point: " << std::endl;
+	std::cout << "x: " << temp.x << " y: " << temp.y << " z: " << temp. z << std::endl;
+
+	translateToOriginMat = glm::translate(glm::mat4(1.0f), temp);
+
 	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix();
 	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix();
 
+	std::cout << "max" << std::endl;
+	std::cout << "x: " << aabb.max.x << " y: " << aabb.max.y << " z: " << aabb.max.z << std::endl;
+	std::cout << "min" << std::endl;
+	std::cout << "x: " << aabb.min.x << " y: " << aabb.min.y << " z: " << aabb.min.z << std::endl;
+}
+
+void ModelContainer::printMat()
+{	
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		(*it)->printMat(getModelMatrix());
+	}
+}
+
+void ModelContainer::getCurrentBoundingBox()
+{
+	std::map<std::string, glm::vec3> map = calculateMinMax(true);
+	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix();
+	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix();
+
+	std::cout << "max" << std::endl;
+	std::cout << "x: " << aabb.max.x << " y: " << aabb.max.y << " z: " << aabb.max.z << std::endl;
+	std::cout << "min" << std::endl;
+	std::cout << "x: " << aabb.min.x << " y: " << aabb.min.y << " z: " << aabb.min.z << std::endl;
 }
 

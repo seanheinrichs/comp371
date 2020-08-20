@@ -44,11 +44,14 @@ public:
 	int getVAVertexCount();
 	float* getVertex(Vertex vert);
 	float* getVertexArray();
-	std::map<std::string, glm::vec3> getMinMax();
+	std::map<std::string, glm::vec3> getMinMax(glm::mat4 modelMatrix, bool useMat);
 
 	void transform(glm::mat4 transmat);
 	void transformOne(glm::mat4 transmat, VertexComponent& vc);
 	void print();
+	void printMat(glm::mat4 modelMatrix);
+
+	
 
 	
 

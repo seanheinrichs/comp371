@@ -73,10 +73,11 @@ public:
 	virtual int getVAVertexCount();
 	virtual int getVertexByteSize();
 	virtual Vertex getSampleVertex();
-	virtual std::map<std::string, glm::vec3> getMinMax();
+	virtual std::map<std::string, glm::vec3> getMinMax(glm::mat4 modelMatrix, bool useMat);
 
 	void draw(int mode, Shader* shaderProg);
 	void translateToOrigin();
+	void setTranslateToOriginMat();
 	void setBoolean(bool position, bool texture, bool color, bool normal);
 
 	std::string name;
@@ -99,6 +100,10 @@ public:
 	glm::vec2 shearY;
 	glm::vec2 shearZ;
 	float rotate_angle, rotate_angleX, rotate_angleY, rotate_angleZ;
+
+	virtual void printMat(glm::mat4 modelMatrix);
+
+	glm::mat4 translateToOriginMat;
 
 	// Collision Components
 	AABB aabb;

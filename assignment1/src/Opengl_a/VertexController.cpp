@@ -278,7 +278,7 @@ float* VertexController::getVertexArray()
 *				"max" is a vec3 conatinig the maximum for each components
 *				"min" is a vec3 conatinig the minimum for each components
 */
-std::map<std::string, glm::vec3> VertexController::getMinMax()
+std::map<std::string, glm::vec3> VertexController::getMinMax(glm::mat4 modelMatrix, bool useMat)
 {
 	std::map<std::string, glm::vec3> map;
 	int count = 0;
@@ -290,37 +290,34 @@ std::map<std::string, glm::vec3> VertexController::getMinMax()
 			{
 				if (count == 0)
 				{
-					glm::vec3* temp1 = new glm::vec3();
-					glm::vec3* temp2 = new glm::vec3();
-					temp1->x = (*it2).data[0];
-					temp1->y = (*it2).data[1];
-					temp1->z = (*it2).data[2];
-					temp2->x = (*it2).data[0];
-					temp2->y = (*it2).data[1];
-					temp2->z = (*it2).data[2];
+					glm::vec4* t1 = new glm::vec4((*it2).data[0], (*it2).data[1], (*it2).data[2], 1.0f);
+					glm::vec4* t2 = new glm::vec4((*it2).data[0], (*it2).data[1], (*it2).data[2], 1.0f);
+					
+					if (useMat) {
+						*t1 = modelMatrix * (*t1);
+						*t2 = modelMatrix * (*t2);
+					}
 
+					map["min"] = glm::vec3(*t1);
+					map["max"] = glm::vec3(*t2);
 
-					map["min"] = *temp1;
-					map["max"] = *temp2;
-
-					delete temp2;
-					delete temp1;
+					delete t1;
+					delete t2;
 				}
 				else 
 				{
-					glm::vec3* temp1 = new glm::vec3();
-					glm::vec3* temp2 = new glm::vec3();
-					temp1->x = (*it2).data[0];
-					temp1->y = (*it2).data[1];
-					temp1->z = (*it2).data[2];
-					temp2->x = (*it2).data[0];
-					temp2->y = (*it2).data[1];
-					temp2->z = (*it2).data[2];
 					std::map<std::string, glm::vec3> temp;
 
-					temp["min"] = *temp1;
-					temp["max"] = *temp2;
+					glm::vec4* t1 = new glm::vec4((*it2).data[0], (*it2).data[1], (*it2).data[2], 1.0f);
+					glm::vec4* t2 = new glm::vec4((*it2).data[0], (*it2).data[1], (*it2).data[2], 1.0f);
 
+					if (useMat) {
+						*t1 = modelMatrix * (*t1);
+						*t2 = modelMatrix * (*t2);
+					}
+
+					temp["min"] = glm::vec3(*t1);
+					temp["max"] = glm::vec3(*t2);
 
 					
 					if (map["max"].x < temp["max"].x)
@@ -341,8 +338,8 @@ std::map<std::string, glm::vec3> VertexController::getMinMax()
 					if (map["min"].z > temp["min"].z)
 						map["min"].z = temp["min"].z;
 
-					delete temp2;
-					delete temp1;
+					delete t1;
+					delete t2;
 				}
 
 				count += 1;
@@ -369,5 +366,22 @@ void VertexController::print()
 {
 	for (std::vector<Vertex>::iterator it = vertices.begin(); it < vertices.end(); it++)
 		std::cout << (*it).toString() << std::endl;
+}
+
+void VertexController::printMat(glm::mat4 modelMatrix)
+{
+	for (std::vector<Vertex>::iterator it = vertices.begin(); it < vertices.end(); it++)
+	{
+		for (std::vector<VertexComponent>::iterator it2 = (*it).vertexComponents.begin(); it2 < (*it).vertexComponents.end(); it2++)
+		{
+			if (position && it2->type == POSITION)
+			{
+				glm::vec4 t1((*it2).data[0], (*it2).data[1], (*it2).data[2], 1.0f);
+				t1 = modelMatrix * t1;
+				std::cout << "POSITION ( " << t1.x << ", " << t1.y << ", " << t1.z << ") " << std::endl;
+				
+			}
+		}
+	}
 }
 
