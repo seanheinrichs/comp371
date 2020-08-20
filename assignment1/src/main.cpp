@@ -275,9 +275,10 @@ int main(void)
 	palmtree->optimizeModels();
 	palmtree->setVertexController(true, true, false, true);
 	palmtree->bindArrayBuffer();
-	palmtree->addTranslation(glm::vec3(0.0f, 1.0f, -1.0f));
+	//palmtree->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
 	palmtree->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
 	palmtree->calculateMinMax();
+	//palmtree->print();
 	//models3d.push_back(palmtree);
 
 	
@@ -294,19 +295,21 @@ int main(void)
 	srand((unsigned)time(0));
 	for (int i = terrainC->aabb.min.x; i < terrainC->aabb.max.x; i+=3)
 		for (int j = terrainC->aabb.min.z; j < terrainC->aabb.max.z; j += 3) {
-			//float x1 = i - 1 + (rand() - RAND_MAX / 2)/(RAND_MAX / 2) * 2.5;
-			//float z1 = j + 1 + (rand() - RAND_MAX / 2) / (RAND_MAX / 2) * 2.5;
-			std::cout << "NOISE : " << (((float)rand() - (float)RAND_MAX / 2.0) / (RAND_MAX / 2.0)) << " imput: " << 1 - j << std::endl;
+			//float x1 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
+			//float z1 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
+			//std::cout << "NOISE : " << (((float)rand() - (float)RAND_MAX / 2.0) / (RAND_MAX / 2.0)) << " imput: " << 1 - j << std::endl;
 			//rocks.push_back(rock->getTranslatedModelMatrix(glm::vec3(x1, t->getHeightOfTerrain(x1,z1, terrain), z1)));
-			//float x2 = i + (rand() - RAND_MAX / 2) / (RAND_MAX / 2) * 2.5;
-			//float z2 = j + 1 + (rand() - RAND_MAX / 2) / (RAND_MAX / 2) * 2.5;
+			//float x2 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
+			//float z2 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
 			//if (x2 > terrainC->aabb.min.x && x2 < terrainC->aabb.max.x && z2 > terrainC->aabb.min.z && z2 < terrainC->aabb.max.z)
 			//  bushes.push_back(bush->getTranslatedModelMatrix(glm::vec3(x2, t->getHeightOfTerrain(x2,z2, terrain), z2)));
-			float x3 = i + (((float)rand() - (float)RAND_MAX / 2.0) / (RAND_MAX / 2.0)) * 10;
-			float z3 = j + (((float)rand() - (float)RAND_MAX / 2.0) / (RAND_MAX / 2.0)) * 10;
+			float x3 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
+			float z3 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 10;
 			if(x3 > terrainC->aabb.min.x && x3 < terrainC->aabb.max.x && z3 > terrainC->aabb.min.z && z3 < terrainC->aabb.max.z)
 				trees.push_back(palmtree->getTranslatedModelMatrix(glm::vec3(x3, t->getHeightOfTerrain(x3,z3, terrain), z3)));
 		}
+
+	trees.push_back(palmtree->getTranslatedModelMatrix(glm::vec3(0, 0, 0)));
 
 	/*
 	ModelContainer* accarrier = loadModel("../Assets/Models/accarrier/accarrier.obj", true);

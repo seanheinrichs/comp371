@@ -44,6 +44,7 @@ public:
 	void resetShear();
 	void setVertexController(bool position, bool texture, bool color, bool normal);
 	void print();
+	void translateToOrigin();
 
 	void optimizeModels();
 
