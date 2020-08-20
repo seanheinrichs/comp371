@@ -40,4 +40,4 @@ Variables:
   value: SMALL
   #set to SMOOTH or HILLS
 - name: terrainTopography
-  value: SMOOTH
+  value: HILLS

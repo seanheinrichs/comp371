@@ -100,16 +100,6 @@ void ModelContainer::deallocate()
 	}
 }
 
-float ModelContainer::getX()
-{
-	return ModelContainer::translate_vec.x;
-}
-
-float ModelContainer::getZ()
-{
-	return ModelContainer::translate_vec.z;
-}
-
 //Method that updates the values of the x-y-z components of the rotation vector used to calculate the model transformation matrix
 void ModelContainer::addRotation(float degrees, glm::vec3 axis)
 {

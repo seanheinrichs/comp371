@@ -45,7 +45,7 @@ static void createSeansModel(ModelContainer* modelContainer, Shader* shader)
 	A->addPolygon(cb4);
 	
 	// [Create 7 Model]
-	Model* seven = new Model(true, true, false, true, "7", shader, &g_materials[14]);
+	Model* seven = new Model(true, true, false, true, "7", shader, &g_materials[16]);
 
 	Shape * cb5 = new Shape(glm::vec3(1.0f, 2.0f, 0.0f));
 	Shape * cb6 = new Shape(glm::vec3(2.0f, 4.5f, 0.0f));

@@ -43,9 +43,6 @@ public:
 
 	void optimizeModels();
 
-	float getZ();
-	float getX();
-
 	glm::mat4 getShearMatrix();
 	glm::mat4 getRotation();
 	glm::mat4 getRotationX();

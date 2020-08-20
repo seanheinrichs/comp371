@@ -82,7 +82,7 @@ unsigned int WINDOW_WIDTH = 1024;
 unsigned int WINDOW_HEIGHT = 768;
 const unsigned int SHADOW_WIDTH = 1024;
 const unsigned int SHADOW_HEIGHT = 1024;
-float SENSITIVITY = 0.9f;
+float SENSITIVITY = 0.1f;
 
 /* Camera Setup */
 Camera camera = Camera(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -333,18 +333,15 @@ int main(void)
 	}
 	else {
 		terrain->addScale(glm::vec3(3.0, 3.0, 3.0));
-		terrain->addTranslation(glm::vec3(-30.0f, 0.5f, -30.0f));
+		terrain->addTranslation(glm::vec3(-15.0f, 0.5f, -15.0f));
 	}
 
-	/*
-	float terrainHeightBen;
-	float x = ben->getX();
-	float z = ben->getZ();
-	terrainHeightBen = t->getHeightOfTerrain(x, z, terrain);
+	
+	float terrainHeightBen= t->getHeightOfTerrain(ben->translate_vec.x, ben->translate_vec.z, terrain);
 
-	*/
+	
 	ben->addScale(glm::vec3(1.5f, 1.5f, 1.5f));
-	ben->addTranslation(glm::vec3(0.0f, 2.0f, 467.0f));
+	ben->addTranslation(glm::vec3(0.0f, (terrainHeightBen + 1.5f), 0.0f));
 	//ben->addRotation(0, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
