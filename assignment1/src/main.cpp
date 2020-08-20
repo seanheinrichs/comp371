@@ -118,7 +118,7 @@ unsigned int skyboxVAO, skyboxVBO, cubemapTexture;
 
 //Variables for terrain
 float TERRAIN_SMOOTHNESS = 0.99;
-bool TERRAIN_BIG_SIZE = false;
+int TERRAIN_BIG_SIZE = 0;
 int TERRAIN_SIZE = 10;
 int VERTEX_COUNT_TERRAIN = 100;
 
@@ -150,10 +150,13 @@ int main(void)
 
 		if (config["Variables"][i]["name"].as<std::string>().compare("terrainSize")==0) {
 			if (config["Variables"][i]["value"].as<std::string>().compare("SMALL")==0) {
-				TERRAIN_BIG_SIZE = false;
+				TERRAIN_BIG_SIZE = 0;
 			}
 			else if (config["Variables"][i]["value"].as<std::string>().compare("BIG")==0) {
-				TERRAIN_BIG_SIZE = true;
+				TERRAIN_BIG_SIZE = 1;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("NORMAL") == 0) {
+				TERRAIN_BIG_SIZE = 2;
 			}
 		} 
 		else if (config["Variables"][i]["name"].as<std::string>().compare("terrainTopography")==0) {
@@ -162,6 +165,9 @@ int main(void)
 			}
 			else if(config["Variables"][i]["value"].as<std::string>().compare("HILLS")==0) {
 				TERRAIN_SMOOTHNESS = 0.95;
+			}
+			else if (config["Variables"][i]["value"].as<std::string>().compare("REALSMOOTH") == 0) {
+				TERRAIN_SMOOTHNESS = 0.999999;
 			}
 		}
 	}
@@ -326,40 +332,47 @@ int main(void)
 	models[4] = wayne;
 	models[5] = terrainC;
 
-
-	if (TERRAIN_BIG_SIZE) {
+	float sizeModel = 0.55f;
+	if (TERRAIN_BIG_SIZE==0) {
 		terrain->addScale(glm::vec3(6.0f, 6.0f, 6.0f));
 		terrain->addTranslation(glm::vec3(-30.0f, 0.5f, -30.0f));
+		sizeModel = 0.55f;
 	}
-	else {
+	else if(TERRAIN_BIG_SIZE==1){
 		terrain->addScale(glm::vec3(3.0, 3.0, 3.0));
 		terrain->addTranslation(glm::vec3(-15.0f, 0.5f, -15.0f));
+		sizeModel = 0.25f;
+	}
+	else if (TERRAIN_BIG_SIZE == 2) {
+		terrain->addScale(glm::vec3(0.5, 0.5, 0.5));
+		terrain->addTranslation(glm::vec3(-15.0f, 0.5f, -15.0f));
+		sizeModel = 0.15f;
 	}
 
 	
-	float terrainHeightBen= t->getHeightOfTerrain(ben->translate_vec.x, ben->translate_vec.z, terrain);
+	float terrainHeightBen= t->getHeightOfTerrain(ben->translate_vec.x, ben->translate_vec.z, terrain);	
+	ben->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	ben->addTranslation(glm::vec3(0.0f, (terrainHeightBen + 0.75f), 0.0f));
 
-	
-	ben->addScale(glm::vec3(1.5f, 1.5f, 1.5f));
-	ben->addTranslation(glm::vec3(0.0f, (terrainHeightBen + 1.5f), 0.0f));
-	//ben->addRotation(0, glm::vec3(1.0f, 0.0f, 0.0f));
+	float terrainHeightSean = t->getHeightOfTerrain(sean->translate_vec.x, sean->translate_vec.z, terrain);
+	sean->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	sean->addTranslation(glm::vec3(-5.0f, (terrainHeightSean + 0.75f), 0.0f));
 
-	sean->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	sean->addTranslation(glm::vec3(-5.0f, 0.0f, 0.0f));
-	//sean->addRotation(90, glm::vec3(0.0f, 1.0f, 0.0f));
+	float terrainHeightWayne = t->getHeightOfTerrain(wayne->translate_vec.x, wayne->translate_vec.z, terrain);
+	wayne->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	wayne->addTranslation(glm::vec3(-4.0f, (terrainHeightWayne + 0.75f), -4.0f));
 
-	wayne->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	wayne->addTranslation(glm::vec3(-4.0f, 0.0f, -4.0f));
-	//wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
+	float terrainHeightIsa= t->getHeightOfTerrain(isa->translate_vec.x, isa->translate_vec.z, terrain);
+	isa->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	isa->addTranslation(glm::vec3(3.5f, (terrainHeightIsa + 0.75f), 4.0f));
 
-	isa->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	isa->addTranslation(glm::vec3(3.5f, 1.50f, 4.0f));
+	float terrainHeightZiming = t->getHeightOfTerrain(ziming->translate_vec.x, ziming->translate_vec.z, terrain);
+	ziming->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	ziming->addTranslation(glm::vec3(-4.0f, (terrainHeightZiming + 0.75f), 4.0f));
 
-	ziming->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	ziming->addTranslation(glm::vec3(-4.0f, 0.0f, 4.0f));
-
+	float terrainHeightLight = t->getHeightOfTerrain(light->translate_vec.x, light->translate_vec.z, terrain);
 	light->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	light->addTranslation(glm::vec3(0.0f, 0.50f, -1.0f));
+	light->addTranslation(glm::vec3(0.0f, (terrainHeightLight + 0.75f), -1.0f));
 
 	// Skybox load
 	loadSkybox(skyboxShader);
