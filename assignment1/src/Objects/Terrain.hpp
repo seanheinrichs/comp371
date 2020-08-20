@@ -33,7 +33,7 @@ public:
 				}
 				float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 				float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
-
+				
 				float y = SimplexNoise::noise(x, z) / smooth;
 
 			/*
@@ -71,6 +71,15 @@ public:
 				{
 					y -= (z - (SIZE - 0.5))*2;
 				}
+
+				/*
+				if (x < 6 && x > 5 && z > 5 && z < 6)
+				{
+					y -= 5;
+				}
+				*/
+
+
 				heights[j][i] = y;
 				float mapping = (glm::pow((x*x + z*z), (1/2)));
 				vertices_temp.push_back(glm::vec3(x, y, z));

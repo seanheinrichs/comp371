@@ -540,8 +540,8 @@ void Model::setAABB()
 {
 	std::map<std::string, glm::vec3> map = getMinMax();
 
-	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
-	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
+	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix();// +glm::vec4(translate_vec, 0.0f);
+	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix();// +glm::vec4(translate_vec, 0.0f);
 }
 
 void Model::insertTextures(std::vector<Texture> tex)

@@ -52,6 +52,7 @@ sand: 	https://gallery.yopriceville.com/Backgrounds/Background_Beach_Sand#.XzsmF
 #include <yaml-cpp/node/parse.h>s
 #include <irrKlang.h>
 #include <future>
+#include "utils/SimplexNoise.h"
 
 // for Skybox
 #include "utils/stb_image.h"
@@ -263,7 +264,7 @@ int main(void)
 
 
 	//futures.push_back(std::async(std::launch::async, [&models3d, &modelShader, terrain]{createTerrain(&models3d, modelShader, terrain); }));
-
+	
 	// [Terrain]
 	time_t terrainBefore = time(new time_t());
 	ModelContainer* terrainC = new ModelContainer();
@@ -275,19 +276,32 @@ int main(void)
 	terrainC->addModel(terrain);
 	terrainC->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
 	terrainC->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
-
-	//std::lock_guard<std::mutex> lock(ModelMutex);
 	models3d.push_back(terrainC);
-	std::cout << "it took : " << difftime(time(new time_t), terrainBefore) << " seconds to generate terrain" << std::endl;
 
+	
+	//std::lock_guard<std::mutex> lock(ModelMutex);
+	
+	std::cout << "it took : " << difftime(time(new time_t), terrainBefore) << " seconds to generate terrain" << std::endl;
+	/*
 	ModelContainer* rock = loadModel("../Assets/Models/rock0/rock0.obj", false);
 	rock->optimizeModels();
 	rock->setVertexController(true, true, false, true);
 	rock->bindArrayBuffer();
 	rock->addTranslation(glm::vec3(0.0f, 1.0f, -1.0f));
 	rock->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	//rock->addRotationY(90);
-	models3d.push_back(rock);
+	rock->addRotationY(90);
+	rock->calculateMinMax();
+	//models3d.push_back(rock);
+
+	ModelContainer* bush = loadModel("../Assets/Models/bush/bush1.obj", false);
+	bush->optimizeModels();
+	bush->setVertexController(true, true, false, true);
+	bush->bindArrayBuffer();
+	bush->addTranslation(glm::vec3(0.0f, 1.0f, -1.0f));
+	bush->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	bush->calculateMinMax();
+	//models3d.push_back(palmtree);
+	*/
 
 	ModelContainer* palmtree = loadModel("../Assets/Models/palmtree/palmtree.obj", false);
 	palmtree->optimizeModels();
@@ -295,21 +309,38 @@ int main(void)
 	palmtree->bindArrayBuffer();
 	palmtree->addTranslation(glm::vec3(0.0f, 1.0f, -1.0f));
 	palmtree->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	//rock->addRotationY(90);
-	models3d.push_back(palmtree);
+	palmtree->calculateMinMax();
+	//models3d.push_back(palmtree);
+
+	
 
 	std::vector<glm::mat4> rocks;
 	std::vector<glm::mat4> trees;
+	std::vector<glm::mat4> bushes;
 
 
-	for (int i = 0; i < 100; i+=3)
-		for (int j = 0; j < 100; j += 3) {
-			rocks.push_back(rock->getTranslatedModelMatrix(glm::vec3(i-1, t->getHeightOfTerrain(i-1,j+1, terrain), j+1)));
-			trees.push_back(palmtree->getTranslatedModelMatrix(glm::vec3(i, t->getHeightOfTerrain(i,j, terrain), j)));
+	terrainC->calculateMinMax();
+	std::cout << "max x : " << terrainC->aabb.max.x << std::endl;
+	std::cout << "max z : " << terrainC->aabb.max.z << std::endl;
 
+	srand((unsigned)time(0));
+	for (int i = terrainC->aabb.min.x; i < terrainC->aabb.max.x; i+=3)
+		for (int j = terrainC->aabb.min.z; j < terrainC->aabb.max.z; j += 3) {
+			//float x1 = i - 1 + (rand() - RAND_MAX / 2)/(RAND_MAX / 2) * 2.5;
+			//float z1 = j + 1 + (rand() - RAND_MAX / 2) / (RAND_MAX / 2) * 2.5;
+			std::cout << "NOISE : " << (((float)rand() - (float)RAND_MAX / 2.0) / (RAND_MAX / 2.0)) << " imput: " << 1 - j << std::endl;
+			//rocks.push_back(rock->getTranslatedModelMatrix(glm::vec3(x1, t->getHeightOfTerrain(x1,z1, terrain), z1)));
+			//float x2 = i + (rand() - RAND_MAX / 2) / (RAND_MAX / 2) * 2.5;
+			//float z2 = j + 1 + (rand() - RAND_MAX / 2) / (RAND_MAX / 2) * 2.5;
+			//if (x2 > terrainC->aabb.min.x && x2 < terrainC->aabb.max.x && z2 > terrainC->aabb.min.z && z2 < terrainC->aabb.max.z)
+			//  bushes.push_back(bush->getTranslatedModelMatrix(glm::vec3(x2, t->getHeightOfTerrain(x2,z2, terrain), z2)));
+			float x3 = i + (((float)rand() - (float)RAND_MAX / 2.0) / (RAND_MAX / 2.0)) * 10;
+			float z3 = j + (((float)rand() - (float)RAND_MAX / 2.0) / (RAND_MAX / 2.0)) * 10;
+			if(x3 > terrainC->aabb.min.x && x3 < terrainC->aabb.max.x && z3 > terrainC->aabb.min.z && z3 < terrainC->aabb.max.z)
+				trees.push_back(palmtree->getTranslatedModelMatrix(glm::vec3(x3, t->getHeightOfTerrain(x3,z3, terrain), z3)));
 		}
 
-
+	/*
 	ModelContainer* accarrier = loadModel("../Assets/Models/accarrier/accarrier.obj", true);
 	accarrier->optimizeModels();
 	accarrier->setVertexController(true, true, false, true);
@@ -318,12 +349,14 @@ int main(void)
 	accarrier->addScale(glm::vec3(0.01f, 0.01f, 0.01f));
 	accarrier->addRotationY(90);
 	models3d.push_back(accarrier);
+	*/
 
 	ModelContainer* ben = new ModelContainer();
+	//ModelContainer* ben = loadModel("../Assets/Models/stoneN3/stoneN3.obj", false);
 	createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
 	ben->addTranslation(glm::vec3(0.0f, 0.0f, 0.0f));
-	ben->addScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	ben->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
 	models3d.push_back(ben);
 
 	ModelContainer* sean = new ModelContainer();
@@ -482,7 +515,7 @@ int main(void)
 	irrklang::ISound* windSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/wind.wav", true, false, true);
 	irrklang::ISound* walkingSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/footsteps.mp3", true, false, true);
 	irrklang::ISound* nightSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/night_sounds.mp3", true, false, true);
-	daySound->setVolume(0.5f);
+	daySound->setVolume(0.3f);
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -522,7 +555,7 @@ int main(void)
 
 		// Check Collision
 		collision = false;
-		collision = checkCollision(models);
+		//collision = checkCollision(models);
 
 		// Set camera y value
 		float terrainHeight;
@@ -570,11 +603,15 @@ int main(void)
 
 		for(std::vector<glm::mat4>::iterator it = rocks.begin(); it < rocks.end(); it++)
 		{
-			rock->drawMod(MODE, &modelShader,*it);
+			//rock->drawMod(MODE, &modelShader,*it);
 		}
 		for (std::vector<glm::mat4>::iterator it = trees.begin(); it < trees.end(); it++)
 		{
 			palmtree->drawMod(MODE, &modelShader, *it);
+		}
+		for (std::vector<glm::mat4>::iterator it = bushes.begin(); it < bushes.end(); it++)
+		{
+			//bush->drawMod(MODE, &modelShader, *it);
 		}
 
 
