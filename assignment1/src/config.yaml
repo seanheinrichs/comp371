@@ -16,7 +16,7 @@ Variables:
   #Default option: 
   #terrainSize:SMALL && terrainTopography:REALSMOOTH
 - name: terrainSize
-  value: BIG
+  value: SMALL
 
   #set to SMOOTH or HILLS or REALSMOOTH
 - name: terrainTopography
