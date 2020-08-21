@@ -154,6 +154,23 @@ void Model::setBoolean(bool position, bool texture, bool color, bool normal)
 
 }
 
+void Model::drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat)
+{
+	shaderProg->use();
+	this->bind();
+	this->material->setShader(shaderProg);
+
+
+	if (textureIndex == -1)
+	{
+		shaderProg->setInt("fill", textureIndex);
+	}
+
+	shaderProg->setMat4("model", modelmat);
+	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
+
+}
+
 //Method that updates the values of the x-y-z components of the rotation vector used to calculate the model transformation matrix
 void Model::addRotation(float degrees, glm::vec3 axis) 
 {
@@ -481,6 +498,38 @@ std::map<std::string, glm::vec3> Model::getMinMax()
 	return map;
 }
 
+std::map<std::string, glm::vec3> Model::getMinMaxT()
+{
+	std::vector<Polygon*>::iterator it = polygons.begin();
+	std::map<std::string, glm::vec3> map = (**it).getMinMax();
+	it++;
+
+	for (; it < polygons.end(); it++)
+	{
+		std::map<std::string, glm::vec3> temp = (**it).getMinMax();
+		if (map["max"].x < temp["max"].x)
+			map["max"].x = temp["max"].x;
+
+		if (map["max"].y < temp["max"].y)
+			map["max"].y = temp["max"].y;
+
+		if (map["max"].z < temp["max"].z)
+			map["max"].z = temp["max"].z;
+
+		if (map["min"].x > temp["min"].x)
+			map["min"].x = temp["min"].x;
+
+		if (map["min"].y > temp["min"].y)
+			map["min"].y = temp["min"].y;
+
+		if (map["min"].z > temp["min"].z)
+			map["min"].z = temp["min"].z;
+	}
+	map["min"] = glm::vec4(map["min"], 1.0f) * getModelMatrix();
+	map["max"] = glm::vec4(map["max"],1.0f) * getModelMatrix();
+	return map;
+}
+
 //Method that returns the vertex byte size
 int Model::getVertexByteSize() 
 {
@@ -525,6 +574,14 @@ void Model::setAABB()
 
 	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
 	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
+}
+
+void Model::setAABBt()
+{
+	std::map<std::string, glm::vec3> map = getMinMax();
+
+	aabbT.max = glm::vec4(map["max"], 0.0f);
+	aabbT.min = glm::vec4(map["min"], 0.0f);
 }
 
 void Model::insertTextures(std::vector<Texture> tex)

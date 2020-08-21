@@ -82,6 +82,13 @@ void Camera::moveRight(float speed)
 	position += glm::normalize(glm::cross(front, up)) * speed;
 }
 
+
+void Camera::moveUp(float speed)
+{
+	position.y += speed;
+}
+
+
 void Camera::ProcessMouseMovement(float xoffset, float yoffset)
 {
 	xoffset *= 0.1f;

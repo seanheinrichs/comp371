@@ -12,9 +12,10 @@ class Terrain
 {
 public:
 	// Constructors & Destructors
-
-	Terrain(int _VERTEX_COUNT, int _SIZE, float smoothValDecrease)
+	float scale;
+	Terrain(int _VERTEX_COUNT, int _SIZE, float smoothValDecrease, float scaleP)
 	{
+		scale = scaleP;
 		VERTEX_COUNT = _VERTEX_COUNT;
 		SIZE = _SIZE;
 
@@ -115,7 +116,7 @@ public:
 		float terrainX = worldX - terrainModel->translate_vec.x;
 		float terrainZ = worldZ - terrainModel->translate_vec.z;
 
-		float gridSquareSize = (float)SIZE * 3.0f / (float)(VERTEX_COUNT - 1);
+		float gridSquareSize = (float)SIZE * scale / (float)(VERTEX_COUNT - 1);
 
 		// Determine which square on the grid the user is in
 		int gridX = (int)glm::floor(terrainX / gridSquareSize);

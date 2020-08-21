@@ -1,3 +1,5 @@
+
+
 #pragma once
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -37,7 +39,7 @@ static std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType 
 	{
 		aiString str;
 		mat->GetTexture(type, i, &str);
-		directory+= "/"+ std::string(str.C_Str());
+		directory += "/" + std::string(str.C_Str());
 		Texture texture = getTexture(directory.c_str(), typeName);
 		textures.push_back(texture);
 	}
@@ -90,14 +92,28 @@ static Model* processMesh(aiMesh *mesh, const aiScene *scene, std::string direct
 					));
 			}
 
-			vertex.addVertexComponent(
-				VertexComponent(NORMAL,
-					glm::vec3(
-						mesh->mNormals[i].x,
-						mesh->mNormals[i].y,
-						mesh->mNormals[i].z)
-				));
+			if (mesh->mNormals)
+			{
 
+				vertex.addVertexComponent(
+					VertexComponent(NORMAL,
+						glm::vec3(
+							mesh->mNormals[i].x,
+							mesh->mNormals[i].y,
+							mesh->mNormals[i].z)
+					));
+			}
+			else
+			{
+				vertex.addVertexComponent(
+					VertexComponent(NORMAL,
+						glm::vec3(
+							1,
+							0,
+							0)
+					));
+
+			}
 
 
 			shape->vc->appendVertex(vertex);

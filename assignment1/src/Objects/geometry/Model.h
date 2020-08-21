@@ -73,8 +73,12 @@ public:
 	virtual int getVertexByteSize();
 	virtual Vertex getSampleVertex();
 	virtual std::map<std::string, glm::vec3> getMinMax();
+	virtual std::map<std::string, glm::vec3> getMinMaxT();
+
+	void setAABBt();
 
 	void draw(int mode, Shader* shaderProg);
+	void drawMod(int mode, Shader* shaderProg, glm::mat4 modelMat);
 	void translateToOrigin();
 	void setBoolean(bool position, bool texture, bool color, bool normal);
 
@@ -101,6 +105,7 @@ public:
 
 	// Collision Components
 	AABB aabb;
+	AABB aabbT;
 	AABB getAABB() const { return aabb; };
 	void setAABB();
 };

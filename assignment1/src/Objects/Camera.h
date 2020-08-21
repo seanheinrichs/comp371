@@ -31,6 +31,9 @@ public:
 	glm::vec3 front;
 	glm::vec3 up;
 
+
+	void moveUp(float speed);
+
 private:
 	// Transformation Variables
 	float yawAngle;

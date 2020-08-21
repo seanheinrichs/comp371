@@ -11,12 +11,22 @@
 *This class was created to avoid future rendering conflicts
 *
 */
+
+
+struct move
+{
+	glm::mat4 mm;
+	glm::vec4 translate;
+};
+
 class ModelContainer 
 {
 public: 
+	move getTranslatedModelMatrixM(glm::vec3 position);
 	std::vector<Model*> models;
 
 	ModelContainer();
+	void drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat);
 
 	Model* getModelByName(std::string name);
 	void addModel(Model* model);
@@ -64,4 +74,8 @@ public:
 	glm::vec2 shearZ;
 
 	float rotate_angle, rotate_angleX, rotate_angleY, rotate_angleZ;
+
+	glm::mat4 getTranslatedModelMatrix(glm::vec3 position);
+	void calculateMinMax();
+	AABB aabb;
 };

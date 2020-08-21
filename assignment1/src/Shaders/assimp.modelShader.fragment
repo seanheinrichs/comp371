@@ -63,6 +63,7 @@ uniform AssimpMat assimpMat;
 uniform int loaded;
 uniform NoTex noTex;
 uniform vec3 skyColor;
+uniform int fog;
 
 float ShadowCalculation(vec4 fragPosLightSpace);
 vec3 CalculateDirLightLoaded(DirLight lightSource, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -81,7 +82,9 @@ void main()
 	}
 	
 	FragColor = vec4(result, 1.0);
-	FragColor = mix(vec4(skyColor, 1.0), FragColor, visibility);
+
+	if (fog == 1)
+		FragColor = mix(vec4(skyColor, 1.0), FragColor, visibility);
 }
 
 // Light Calculation Credit - https://learnopengl.com/Lighting/Basic-Lighting
