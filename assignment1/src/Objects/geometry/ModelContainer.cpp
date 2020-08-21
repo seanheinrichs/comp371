@@ -395,15 +395,15 @@ glm::mat4 ModelContainer::getTranslatedModelMatrix(glm::vec3 position)
 	glm::vec3 mid((aabb.max.x + aabb.min.x) / 2, aabb.min.y, (aabb.max.z + aabb.min.z) / 2);
 	glm::vec3 translate(position.x - mid.x, position.y - mid.y, position.z - mid.z);
 	std::cout << "x: " << translate_vec.x << " y: " << translate_vec.y << " z: " << translate_vec.z << std::endl;
-	return glm::translate(glm::mat4(1.0f), translate + translate_vec) * getRotationX() * getRotationY() * getRotationZ() * getScale();
+	return glm::translate(glm::mat4(1.0f), translate + translate_vec ) * getRotationX() * getRotationY() * getRotationZ() * getScale();
 }
 
 void ModelContainer::calculateMinMax()
 {
-	std::map<std::string, glm::vec3> map;
-	map["min"] = glm::vec3(0.0f);
-	map["max"] = glm::vec3(0.0f);
-	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	std::vector<Model *>::iterator it = models.begin();
+	std::map<std::string, glm::vec3> map = (**it).getMinMax();
+	it++;
+	for (; it < models.end(); it++)
 	{
 		std::map<std::string, glm::vec3> temp = (**it).getMinMax();
 		if (map["max"].x < temp["max"].x)

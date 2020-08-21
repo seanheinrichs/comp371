@@ -452,11 +452,11 @@ float* Model::getVertexArray()
 //Method that returns the origin coordinate of a model
 std::map<std::string, glm::vec3> Model::getMinMax()
 {
-	std::map<std::string, glm::vec3> map;
-	map["min"] = glm::vec3(0.0f);
-	map["max"] = glm::vec3(0.0f);
+	std::vector<Polygon*>::iterator it = polygons.begin();
+	std::map<std::string, glm::vec3> map = (**it).getMinMax();
+	it++;
 
-	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	for (; it < polygons.end(); it++)
 	{
 		std::map<std::string, glm::vec3> temp = (**it).getMinMax();
 		if (map["max"].x < temp["max"].x)
