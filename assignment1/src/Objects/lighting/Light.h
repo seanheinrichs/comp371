@@ -1,23 +1,27 @@
 #pragma once
 
 #include "../../Opengl_a/Shader.h"
+#include "../Camera.h"
 #include "../geometry/Model.h"
 
 class Light
 {
 public:
-	// Constructors & Destructors
+	// [Constructors & Destructors]
 
-	Light(Model * lampModel, glm::vec3 startingPos, bool active);
-	Light(Model * lampModel, glm::vec3 startingPos, glm::vec3 dir, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float line, float quad, bool active);
-	
+	// Default
+	Light();
+	Light(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
+	Light(glm::vec3 startingPos, bool active);
+	Light(glm::vec3 startingPos, glm::vec3 dir, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec, float line, float quad, bool active);
+
 	~Light();
 
 	// Functions
-	void setShaderValues(Shader * shader, bool isSpotLight);
+	void setShaderValues(Shader* shader, bool isSpotLight);
+	void setFlashLightShaderValues(Shader* shader, Camera* camera);
 
 	// Accessors
-	Model* getModel() const { return model; };
 	glm::vec3 getPosition() const { return position; };
 	glm::vec3 getDirection() const { return direction; };
 	glm::vec3 getAmbient() const { return ambient; };
@@ -32,8 +36,6 @@ public:
 	void setActive(bool value) { active = value; };
 
 private:
-	Model * model;
-
 	glm::vec3 direction;
 	glm::vec3 position;
 

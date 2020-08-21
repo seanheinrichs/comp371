@@ -8,34 +8,69 @@
 
 #include "../utils/SimplexNoise.h"
 
-const int VERTEX_COUNT = 100;
-const int SIZE = 10;
-
 class Terrain
 {
 public:
 	// Constructors & Destructors
 
-	Terrain()
+	Terrain(int _VERTEX_COUNT, int _SIZE, float smoothValDecrease)
 	{
+		VERTEX_COUNT = _VERTEX_COUNT;
+		SIZE = _SIZE;
+
 		for (int i = 0; i < VERTEX_COUNT; i++)
 		{
 			if (smooth > 2.0f)
 			{
-				smooth *= 0.995;
+				smooth *= smoothValDecrease;
 			}
 			for (int j = 0; j < VERTEX_COUNT; j++)
 			{
 
 				if (i == j && smooth > 2.0f)
 				{
-					smooth *= 0.99;
+					smooth *= smoothValDecrease;
 				}
 				float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 				float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
 
 				float y = SimplexNoise::noise(x, z) / smooth;
 
+			/*
+				if (x<0.5 && z<0.5) {
+					int h = glm::min(x, z);
+					y-= (0.5 - h) * 2;
+				}
+				else if (x<0.5 && z>SIZE-0.5) {
+					int h = glm::max(0.5 - x, z - (SIZE - 0.5));
+					y -= (h) * 2;
+				}
+				else if (x>SIZE-0.5 && z<0.5) {
+					int h = glm::max(0.5-x, z-(SIZE-0.5));
+					y -= (h) * 2;
+				}
+				else if (x>SIZE-0.5 && z>SIZE-0.5) {
+					int h = glm::min(x, z);
+					y -= (h - (SIZE - 0.5)) * 2;
+				}
+				else
+			*/
+				if (x < 0.5)
+				{
+					y -= (0.5 - x)*2;
+				}
+				else if (z < 0.5)
+				{
+					y -= (0.5 - z)*2;
+				}
+				else if (x > SIZE - 0.5)
+				{
+					y -= (x - (SIZE - 0.5))*2;
+				}
+				else if (z > SIZE - 0.5)
+				{
+					y -= (z - (SIZE - 0.5))*2;
+				}
 				heights[j][i] = y;
 				float mapping = (glm::pow((x*x + z*z), (1/2)));
 				vertices_temp.push_back(glm::vec3(x, y, z));
@@ -135,6 +170,10 @@ public:
 	std::vector<glm::vec3> normals_temp;
 
 	std::vector<int> indices;
+
+
+	 int VERTEX_COUNT = 100;
+	 int SIZE = 10;
 
 	int relief = (rand() % 6);
 	float smooth = 20.0f;
