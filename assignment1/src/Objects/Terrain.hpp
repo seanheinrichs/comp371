@@ -1,4 +1,4 @@
-//  vertex grid && indices from example: https://www.youtube.com/watch?v=l6PEfzQVpvM&fbclid=IwAR0TkM569m6FsOe30NcF_5qdPV8wGODo2qeTYbzT2rkkLCjqLWWu-2J0VXI
+//SOURCE: generation of vertex grid && indices help from:https://www.youtube.com/watch?v=l6PEfzQVpvM&fbclid=IwAR0TkM569m6FsOe30NcF_5qdPV8wGODo2qeTYbzT2rkkLCjqLWWu-2J0VXI
 
 #pragma once
 
@@ -8,17 +8,22 @@
 
 #include "../utils/SimplexNoise.h"
 
+//class that generates the terrain of the scene
 class Terrain
 {
 public:
 	// Constructors & Destructors
 	float scale;
+
+	//constructor: procedurally generates vertices of the terrain 
 	Terrain(int _VERTEX_COUNT, int _SIZE, float smoothValDecrease, float scaleP)
 	{
 		scale = scaleP;
 		VERTEX_COUNT = _VERTEX_COUNT;
 		SIZE = _SIZE;
 
+		//nested for loop to create a grid with Y values for each vertices using a noise function,
+		//which takes into consideration the Y values of the vertices surrounding it, creating a smooth terrain.
 		for (int i = 0; i < VERTEX_COUNT; i++)
 		{
 			if (smooth > 2.0f)
@@ -35,6 +40,7 @@ public:
 				float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 				float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
 
+				//generating Y value and smoothing it down to a smaller value
 				float y = SimplexNoise::noise(x, z) / smooth;
 
 			/*
@@ -56,6 +62,8 @@ public:
 				}
 				else
 			*/
+
+				//if-else bloc to smooth the edges of the terrain below the water
 				if (x < 0.5)
 				{
 					y -= (0.5 - x)*2;
@@ -72,14 +80,20 @@ public:
 				{
 					y -= (z - (SIZE - 0.5))*2;
 				}
+				//storing height value
 				heights[j][i] = y;
+
+				//mapping values for texture coordinates
 				float mapping = (glm::pow((x*x + z*z), (1/2)));
+
+				//creating lists of positions vertices, textures coordinates vertices and normal vertices.
 				vertices_temp.push_back(glm::vec3(x, y, z));
 				textureCoords_temp.push_back(glm::vec2(x*mapping, z*mapping));
 				normals_temp.push_back(glm::vec3(0, 1, 0));
 			}
 		}
 
+		//creating the appropriate indices for the position, texture coordinate and normal vertices
 		for (int gz = 0; gz < VERTEX_COUNT - 1; gz++)
 		{
 			for (int gx = 0; gx < VERTEX_COUNT - 1; gx++)
@@ -97,6 +111,7 @@ public:
 			}
 		}
 
+		//placing the position, texture coordinate and normal vertices with appropriate indices
 		for (unsigned int i = 0; i < indices.size(); i++)
 		{
 			glm::vec3 vertex = vertices_temp[indices[i]];
@@ -110,6 +125,7 @@ public:
 
 	~Terrain() {};
 
+	//method to access the Y values of a specific coordinate in the terrain
 	float getHeightOfTerrain(float worldX, float worldZ, Model* terrainModel)
 	{
 		// Find the terrain relative to camera

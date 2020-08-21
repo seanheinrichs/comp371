@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Binder">
+    <Position X="4.25" Y="4" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAEYAAAEAAAAAAIAgAAAACAgCAAAAAAAAABAA=</HashCode>
+      <FileName>comp371\assignment1\src\Objects\geometry\Binder.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Camera">
+    <Position X="7" Y="1.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACAAABCBQAAAAAQAAAIQCBAAkQAAAQABAACkAAAAQ=</HashCode>
+      <FileName>comp371\assignment1\src\Objects\Camera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Grid">
+    <Position X="9.25" Y="1.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAACAAAAAAAAAAABEAAAAAAQA=</HashCode>
+      <FileName>comp371\assignment1\src\Objects\Grid.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Light">
+    <Position X="11.25" Y="1.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>wAAAIAgCAABAIACAAAAAKgIAAAAAAAAAgIAIICBACgA=</HashCode>
+      <FileName>comp371\assignment1\src\Objects\lighting\Light.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Material">
+    <Position X="13.75" Y="1.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAQAAECAAAAAgAAEAAAAAACBAAgEEAAAAAQECAA=</HashCode>
+      <FileName>comp371\assignment1\src\Opengl_a\Material.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Model">
+    <Position X="1" Y="8.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>DASBAICsBEKQIUQBC0NANAwACAmkAkCwYAiQFERgBCA=</HashCode>
+      <FileName>comp371\assignment1\src\Objects\geometry\Model.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModelContainer">
+    <Position X="7" Y="7" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAQAAICsFAAQMAAACVIABAQACAiiAEAoAAASFEQoBCA=</HashCode>
+      <FileName>comp371\assignment1\src\Objects\geometry\ModelContainer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Polygon">
+    <Position X="1.25" Y="2" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AASAAAAAAAIAAUABAAEAEAAAAAgEAAAAAAAAAAAABAA=</HashCode>
+      <FileName>comp371\assignment1\src\Objects\geometry\polygon.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Shader">
+    <Position X="10" Y="7" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>wDgAAAAAAAAIgBAAABIMCAAAAAAAAAAABAAAEAAAAAA=</HashCode>
+      <FileName>comp371\assignment1\src\Opengl_a\Shader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Shape">
+    <Position X="3.75" Y="8.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>CISEAEAAAAKAAUCBAAEAEAAAAAgEAAAQAAAAAAAABQA=</HashCode>
+      <FileName>comp371\assignment1\src\Objects\geometry\Shape.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimplexNoise">
+    <Position X="12.5" Y="7" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAACAgAAAAAAAAwAAAAAUAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>comp371\assignment1\src\utils\SimplexNoise.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terrain">
+    <Position X="15" Y="7" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AACAQCAkAQAAABAAgAgAEAICAAAQAACAAMAAAAAAgoA=</HashCode>
+      <FileName>comp371\assignment1\src\Objects\Terrain.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Texture">
+    <Position X="10" Y="12.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAQAAICBwAQAQAACAABAAQABAEAAAAICAEAABgA=</HashCode>
+      <FileName>comp371\assignment1\src\Opengl_a\Texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Vertex">
+    <Position X="12.5" Y="12.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAABAAAAAAAABAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>comp371\assignment1\src\Opengl_a\vertex.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VertexComponent">
+    <Position X="15" Y="12.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAIAAAAAIAAAAgAABAAAAAEBAAAAAAQQAAAAAAA=</HashCode>
+      <FileName>comp371\assignment1\src\Opengl_a\VertexComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VertexController">
+    <Position X="18" Y="12.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AESAAAAAAAIBBUAAAAEAJAgAACgUAgCAAAAAAAAAAAA=</HashCode>
+      <FileName>comp371\assignment1\src\Opengl_a\VertexController.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="move">
+    <Position X="7" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>comp371\assignment1\src\Objects\geometry\ModelContainer.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="Components">
+    <Position X="7" Y="19" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAIAAAAAAAAAAAAAAAAAACAAAAAAAAAgAA=</HashCode>
+      <FileName>comp371\assignment1\src\Opengl_a\VertexComponent.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MatType">
+    <Position X="8.75" Y="19" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAEAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>comp371\assignment1\src\Opengl_a\Material.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
