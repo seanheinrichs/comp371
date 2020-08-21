@@ -452,11 +452,11 @@ float* Model::getVertexArray()
 //Method that returns the origin coordinate of a model
 std::map<std::string, glm::vec3> Model::getMinMax()
 {
-	std::map<std::string, glm::vec3> map;
-	map["min"] = glm::vec3(0.0f);
-	map["max"] = glm::vec3(0.0f);
+	std::vector<Polygon*>::iterator it = polygons.begin();
+	std::map<std::string, glm::vec3> map = (**it).getMinMax();
+	it++;
 
-	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
+	for (; it < polygons.end(); it++)
 	{
 		std::map<std::string, glm::vec3> temp = (**it).getMinMax();
 		if (map["max"].x < temp["max"].x)
@@ -490,6 +490,7 @@ int Model::getVertexByteSize()
 //Method that translates the model to its origin
 void Model::translateToOrigin()
 {
+	
 	std::map<std::string, glm::vec3> map;
 	map = getMinMax();
 
@@ -499,6 +500,7 @@ void Model::translateToOrigin()
 	temp.z = -(map["min"].z + map["max"].z) / 2;
 
 	transform(glm::translate(glm::mat4(1.0f), temp));
+	
 }
 
 void Model::draw(int mode, Shader* shaderProg)
@@ -518,13 +520,30 @@ void Model::draw(int mode, Shader* shaderProg)
 
 }
 
+void Model::drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat)
+{
+	shaderProg->use();
+	this->bind();
+	this->material->setShader(shaderProg);
+
+
+	if (textureIndex == -1)
+	{
+		shaderProg->setInt("fill", textureIndex);
+	}
+
+	shaderProg->setMat4("model", modelmat);
+	GLCall(glDrawArrays(mode, 0, this->getVAVertexCount()));
+
+}
+
 
 void Model::setAABB()
 {
 	std::map<std::string, glm::vec3> map = getMinMax();
 
-	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
-	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
+	aabb.max = glm::vec4(map["max"], 0.0f) * getModelMatrix();// +glm::vec4(translate_vec, 0.0f);
+	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix();// +glm::vec4(translate_vec, 0.0f);
 }
 
 void Model::insertTextures(std::vector<Texture> tex)

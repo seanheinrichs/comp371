@@ -15,7 +15,7 @@ class ModelContainer
 {
 public: 
 	std::vector<Model*> models;
-
+	AABB aabb;
 	ModelContainer();
 
 	Model* getModelByName(std::string name);
@@ -23,7 +23,11 @@ public:
 	void draw(int mode, Shader* shaderProg);
 	void bindArrayBuffer();
 	void deallocate();
+	void calculateMinMax();
+	void drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat);
+
 	
+	glm::mat4 getTranslatedModelMatrix(glm::vec3 position);
 	void Reposition(glm::vec3 position);
 	void addRotation(float radians, glm::vec3 axis);
 	void addRotationX(float radians);
@@ -40,6 +44,7 @@ public:
 	void resetShear();
 	void setVertexController(bool position, bool texture, bool color, bool normal);
 	void print();
+	void translateToOrigin();
 
 	void optimizeModels();
 

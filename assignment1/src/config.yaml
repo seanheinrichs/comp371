@@ -12,9 +12,10 @@ Variables:
 - name: useShadows
   value: true
 
-  #set to BIG or SMALL or NORMAL
-  #Default option: 
-  #terrainSize:SMALL && terrainTopography:REALSMOOTH
+
+  ##RECOMMENDED VALUES: NORMAL + SMOOTH
+
+  #Options: SMALL, NORMAL, BIG
 - name: terrainSize
   value: SMALL
 

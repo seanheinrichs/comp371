@@ -17,6 +17,7 @@ public:
 	{
 		VERTEX_COUNT = _VERTEX_COUNT;
 		SIZE = _SIZE;
+		scale = 3.0f;
 
 		for (int i = 0; i < VERTEX_COUNT; i++)
 		{
@@ -33,7 +34,7 @@ public:
 				}
 				float x = (float)j / ((float)VERTEX_COUNT - 1) * SIZE;
 				float z = (float)i / ((float)VERTEX_COUNT - 1) * SIZE;
-
+				
 				float y = SimplexNoise::noise(x, z) / smooth;
 
 			/*
@@ -71,6 +72,15 @@ public:
 				{
 					y -= (z - (SIZE - 0.5))*2;
 				}
+
+				/*
+				if (x < 6 && x > 5 && z > 5 && z < 6)
+				{
+					y -= 5;
+				}
+				*/
+
+
 				heights[j][i] = y;
 				float mapping = (glm::pow((x*x + z*z), (1/2)));
 				vertices_temp.push_back(glm::vec3(x, y, z));
@@ -115,7 +125,7 @@ public:
 		float terrainX = worldX - terrainModel->translate_vec.x;
 		float terrainZ = worldZ - terrainModel->translate_vec.z;
 
-		float gridSquareSize = (float)SIZE * 3.0f / (float)(VERTEX_COUNT - 1);
+		float gridSquareSize = (float)SIZE * (float)scale / (float)(VERTEX_COUNT - 1);
 
 		// Determine which square on the grid the user is in
 		int gridX = (int)glm::floor(terrainX / gridSquareSize);
@@ -180,4 +190,5 @@ public:
 	float smoothInitial = smooth;
 	float offset = VERTEX_COUNT / 3;
 	int vertexPointer = 0;
+	float scale;
 };

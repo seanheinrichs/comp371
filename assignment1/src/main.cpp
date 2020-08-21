@@ -49,8 +49,10 @@ sand: 	https://gallery.yopriceville.com/Backgrounds/Background_Beach_Sand#.XzsmF
 #include <glm/gtx/transform2.hpp>
 #include <yaml-cpp/parser.h>
 #include <yaml-cpp/yaml.h>
-#include <yaml-cpp/node/parse.h>
+#include <yaml-cpp/node/parse.h>s
 #include <irrKlang.h>
+#include <future>
+#include "utils/SimplexNoise.h"
 
 // for Skybox
 #include "utils/stb_image.h"
@@ -157,10 +159,10 @@ int main(void)
 			if (config["Variables"][i]["value"].as<std::string>().compare("BIG") == 0) {
 				TERRAIN_BIG_SIZE = 0;
 			}
-			else if (config["Variables"][i]["value"].as<std::string>().compare("SMALL") == 0) {
+			else if (config["Variables"][i]["value"].as<std::string>().compare("NORMAL") == 0) {
 				TERRAIN_BIG_SIZE = 1;
 			}
-			else if (config["Variables"][i]["value"].as<std::string>().compare("NORMAL") == 0) {
+			else if (config["Variables"][i]["value"].as<std::string>().compare("SMALL") == 0) {
 				TERRAIN_BIG_SIZE = 2;
 			}
 		}
@@ -179,6 +181,7 @@ int main(void)
 
 	time_t startTime = time(new time_t());
 	std::cout << "cpp version: " << __cplusplus << std::endl;
+	
 
 	/* Initialize GLFW */
 	if (!glfwInit())
@@ -233,47 +236,210 @@ int main(void)
 
 	// [Models]
 
-	//ModelContainer* ben = loadModel("../Assets/Models/palmtree/palmtree.obj");
-	//std::cout << ben->models.size() << std::endl;
-	//ben->optimizeModels();
-	//ben->setVertexController(true, true, false, true);
 
-	//for (std::vector<Model *>::iterator it = ben->models.begin(); it < ben->models.end(); it++)
-	//	(*it)->textureIndex = 11; 
-	//	std::cout << ben->models.size() << std::endl;
+	std::vector<ModelContainer*> models3d;
 
-	//ben->print();
+	// [Terrain]
+	time_t terrainBefore = time(new time_t());
+	ModelContainer* terrainC = new ModelContainer();
+	Terrain * t = new Terrain(VERTEX_COUNT_TERRAIN, TERRAIN_SIZE, TERRAIN_SMOOTHNESS);
+	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
+	Model* terrain = new Model(true, true, false, true, "terrain",&modelShader, &g_materials[0]);
+	terrain->addPolygon(loadedShape);
+	terrain->bindArrayBuffer(true, terrain);
+	terrainC->addModel(terrain);
+	//terrainC->addScale(glm::vec3(3.0f, 3.0f, 3.0f));
+	//terrainC->addTranslation(glm::vec3(0.0f - 5, 0.1f, 0.0f - 5));
+	models3d.push_back(terrainC);
 
-	ModelContainer* ben = new ModelContainer();
-	createBensModel(ben, &modelShader);
+	
+	std::cout << "it took : " << difftime(time(new time_t), terrainBefore) << " seconds to generate terrain" << std::endl;
+	
+	ModelContainer* rock = loadModel("../Assets/Models/rock0/rock0.obj", false);
+	rock->optimizeModels();
+	rock->setVertexController(true, true, false, true);
+	rock->bindArrayBuffer();
+	rock->addRotationZ(90);
+	rock->addRotationX(90);
+
+	ModelContainer* bush = loadModel("../Assets/Models/bush/bush1.obj", false);
+	bush->optimizeModels();
+	bush->setVertexController(true, true, false, true);
+	bush->bindArrayBuffer();
+	
+	ModelContainer* palmtree = loadModel("../Assets/Models/palmtree/palmtree.obj", false);
+	palmtree->optimizeModels();
+	palmtree->setVertexController(true, true, false, true);
+	palmtree->bindArrayBuffer();
+	
+
+	
+	ModelContainer* accarrier = loadModel("../Assets/Models/accarrier/accarrier.obj", true);
+	accarrier->optimizeModels();
+	accarrier->setVertexController(true, true, false, true);
+	accarrier->bindArrayBuffer();
+	accarrier->addTranslation(glm::vec3(0.0f, -0.5f, -25.0f));
+	accarrier->addScale(glm::vec3(0.01f, 0.01f, 0.01f));
+	accarrier->addRotationY(90);
+	models3d.push_back(accarrier);
+	
+	float sizeModel = 0.55f;
+	if (TERRAIN_BIG_SIZE == 0) {
+		sizeModel = 0.55f;
+	}
+	else if (TERRAIN_BIG_SIZE == 1) {
+		sizeModel = 0.25f;
+	}
+	else if (TERRAIN_BIG_SIZE == 2) {
+		sizeModel = 0.15f;
+	}
+
+	//ModelContainer* ben = new ModelContainer();
+	ModelContainer* ben = loadModel("../Assets/Models/stoneN3/stoneN3.obj", false);
+	//createBensModel(ben, &modelShader);
 	ben->bindArrayBuffer();
+	models3d.push_back(ben);
 
 	ModelContainer* sean = new ModelContainer();
 	createSeansModel(sean, &modelShader);
 	sean->bindArrayBuffer();
+	float terrainHeightSean = t->getHeightOfTerrain(sean->translate_vec.x, sean->translate_vec.z, terrain);
+	sean->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	sean->addTranslation(glm::vec3(-5.0f, (terrainHeightSean + 0.25f), 0.0f));
+	models3d.push_back(sean);
 
 	ModelContainer* isa = new ModelContainer();
 	createIsabellesModel(isa, &modelShader);
 	isa->bindArrayBuffer();
+	float terrainHeightIsa = t->getHeightOfTerrain(isa->translate_vec.x, isa->translate_vec.z, terrain);
+	isa->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	isa->addTranslation(glm::vec3(3.5f, (terrainHeightIsa + 0.75f), 4.0f));
+	models3d.push_back(isa);
 
 	ModelContainer* ziming = new ModelContainer();
 	createZimingsModel(ziming, &modelShader);
 	ziming->bindArrayBuffer();
+	float terrainHeightZiming = t->getHeightOfTerrain(ziming->translate_vec.x, ziming->translate_vec.z, terrain);
+	ziming->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+	ziming->addTranslation(glm::vec3(-4.0f, (terrainHeightZiming + 0.75f), 4.0f));
+	models3d.push_back(ziming);
 
 	ModelContainer* wayne = new ModelContainer();
 	createWaynesModel(wayne, &modelShader);
 	wayne->bindArrayBuffer();
-
-	// [Terrain]
-
-	Terrain * t = new Terrain(VERTEX_COUNT_TERRAIN, TERRAIN_SIZE, TERRAIN_SMOOTHNESS);
-	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
+	//float terrainHeightWayne = t->getHeightOfTerrain(wayne->translate_vec.x, wayne->translate_vec.z, terrain);
+	wayne->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
 	
-	ModelContainer* terrainC = new ModelContainer();
-	Model* terrain = new Model(true, true, false, true, "terrain", &modelShader, &g_materials[0]);
-	terrain->addPolygon(loadedShape);
-	terrain->bindArrayBuffer(true, terrain);
-	terrainC->addModel(terrain);
+	models3d.push_back(wayne);
+
+	float factor = 0;
+	int offset = 3;
+	if (TERRAIN_BIG_SIZE == 0) {
+		terrainC->addScale(glm::vec3(6.0f, 6.0f, 6.0f));
+		terrainC->addTranslation(glm::vec3(-10.0f, 0.0f, -10.0f));
+
+		palmtree->addTranslation(glm::vec3(-10.0f, 0.0f, -10.0f));
+		palmtree->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+		bush->addTranslation(glm::vec3(-10.0f, 0.2f, -10.0f));
+		bush->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+		rock->addTranslation(glm::vec3(-10.0f, 0.3f, -10.0f));
+		rock->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+		ben->addScale(glm::vec3(4.0, 4.0, 4.0));
+		ben->addTranslation(glm::vec3(12.0f, t->getHeightOfTerrain(12, 12, terrain), 12.0f));
+
+		wayne->addTranslation(glm::vec3(20.0f, 0.5, 10.0f));
+		wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		offset = 4;
+		factor = 2;
+		t->scale = 6.0f;
+		sizeModel = 0.55f;
+	}
+	else if (TERRAIN_BIG_SIZE == 1) {
+		terrainC->addScale(glm::vec3(3.0, 3.0, 3.0));
+		terrainC->addTranslation(glm::vec3(-5.0f, 0.1f, -5.0f));
+
+		palmtree->addTranslation(glm::vec3(-6.0f, 0.0f, -6.0f));
+		palmtree->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+		bush->addTranslation(glm::vec3(-5.0f, 0.2f, -5.0f));
+		bush->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+		rock->addTranslation(glm::vec3(-5.0f, 0.2f, -5.0f));
+		rock->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+		ben->addScale(glm::vec3(4.0, 4.0, 4.0));
+		ben->addTranslation(glm::vec3(12.0f, t->getHeightOfTerrain(12, 12, terrain) , 12.0f));
+
+		offset = 3;
+		factor = 1;
+		t->scale = 3.0f;
+		sizeModel = 0.25f;
+	}
+	else if (TERRAIN_BIG_SIZE == 2) {
+		terrainC->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
+		terrainC->addTranslation(glm::vec3(-5.0 / 3, 0.1f, -5.0 / 3));
+
+		terrainC->addScale(glm::vec3(3.0, 3.0, 3.0));
+		terrainC->addTranslation(glm::vec3(-5.0f, 0.1f, -5.0f));
+
+		palmtree->addTranslation(glm::vec3(-10.0f, 0.0f, -10.0f));
+		palmtree->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+		bush->addTranslation(glm::vec3(-5.0f, 0.2f, -5.0f));
+		bush->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+		rock->addTranslation(glm::vec3(-5.0f, 0.2f, -5.0f));
+		rock->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+		ben->addScale(glm::vec3(10.0, 10.0, 10.0));
+		ben->addTranslation(glm::vec3(12.0f, t->getHeightOfTerrain(12, 12, terrain), 12.0f));
+
+		offset = 4;
+		factor = 1;
+		t->scale = 3.0f;
+		sizeModel = 0.15f;
+	}
+
+
+	std::vector<glm::mat4> rocks;
+	std::vector<glm::mat4> trees;
+	std::vector<glm::mat4> bushes;
+
+	rock->calculateMinMax();
+	bush->calculateMinMax();
+	palmtree->calculateMinMax();
+	terrainC->calculateMinMax();
+	std::cout << "terrain : " << terrainC->aabb.max.x << std::endl;
+	std::cout << "max x : " << terrainC->aabb.max.x << std::endl;
+	std::cout << "max z : " << terrainC->aabb.max.z << std::endl;
+
+	
+	srand((unsigned)time(0));
+
+	for (int i = terrainC->aabb.min.x; i < terrainC->aabb.max.x; i += 1 + factor)
+		for (int j = terrainC->aabb.min.z; j < terrainC->aabb.max.z; j += 1 + factor) {
+			if ((i * 10 + j) % 2 == 0) {
+				float x1 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 5;
+				float z1 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 5;
+				if (x1 > terrainC->aabb.min.x + offset && x1 < terrainC->aabb.max.x - offset && z1 > terrainC->aabb.min.z + offset && z1 < terrainC->aabb.max.z - offset)
+					rocks.push_back(rock->getTranslatedModelMatrix(glm::vec3(x1, t->getHeightOfTerrain(x1, z1, terrain), z1)));
+			}
+			float x2 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 5;
+			float z2 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 5;
+			if (x2 > terrainC->aabb.min.x + offset && x2 < terrainC->aabb.max.x - offset && z2 > terrainC->aabb.min.z + offset && z2 < terrainC->aabb.max.z - offset)
+				bushes.push_back(bush->getTranslatedModelMatrix(glm::vec3(x2, t->getHeightOfTerrain(x2, z2, terrain), z2)));
+			if ((i * 10 + j) % 3 == 0) {
+				float x3 = i + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 5;
+				float z3 = j + (((float)rand() - (float)RAND_MAX / 2.0) / ((float)RAND_MAX / 2.0)) * 5;
+				if (x3 > terrainC->aabb.min.x + offset && x3 < terrainC->aabb.max.x - offset && z3 > terrainC->aabb.min.z + offset && z3 < terrainC->aabb.max.z - offset)
+					trees.push_back(palmtree->getTranslatedModelMatrix(glm::vec3(x3, t->getHeightOfTerrain(x3, z3, terrain), z3)));
+			}
+		}
+
 
 	// [Lighting]
 
@@ -297,6 +463,7 @@ int main(void)
 		0.032,						
 		true						
 	);
+
 
 	// [Grid]
 
@@ -325,42 +492,6 @@ int main(void)
 	models[3] = ziming;
 	models[4] = wayne;
 
-	float sizeModel = 0.55f;
-	if (TERRAIN_BIG_SIZE == 0) {
-		terrain->addScale(glm::vec3(6.0f, 6.0f, 6.0f));
-		terrain->addTranslation(glm::vec3(-30.0f, 0.0f, -30.0f));
-		sizeModel = 0.55f;
-	}
-	else if (TERRAIN_BIG_SIZE == 1) {
-		terrain->addScale(glm::vec3(3.0, 3.0, 3.0));
-		terrain->addTranslation(glm::vec3(-15.0f, 0.0f, -15.0f));
-		sizeModel = 0.25f;
-	}
-	else if (TERRAIN_BIG_SIZE == 2) {
-		terrain->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
-		terrain->addTranslation(glm::vec3(-5.0, 0.0f, -5.0));
-		sizeModel = 0.15f;
-	}
-
-	float terrainHeightBen = t->getHeightOfTerrain(ben->translate_vec.x, ben->translate_vec.z, terrain);
-	ben->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
-	ben->addTranslation(glm::vec3(0.0f, (terrainHeightBen + 0.75f), 0.0f));
-
-	float terrainHeightSean = t->getHeightOfTerrain(sean->translate_vec.x, sean->translate_vec.z, terrain);
-	sean->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
-	sean->addTranslation(glm::vec3(-5.0f, (terrainHeightSean + 0.25f), 0.0f));
-
-	float terrainHeightWayne = t->getHeightOfTerrain(wayne->translate_vec.x, wayne->translate_vec.z, terrain);
-	wayne->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
-	wayne->addTranslation(glm::vec3(-4.0f, (terrainHeightWayne + 0.30f), -4.0f));
-
-	float terrainHeightIsa = t->getHeightOfTerrain(isa->translate_vec.x, isa->translate_vec.z, terrain);
-	isa->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
-	isa->addTranslation(glm::vec3(3.5f, (terrainHeightIsa + 0.75f), 4.0f));
-
-	float terrainHeightZiming = t->getHeightOfTerrain(ziming->translate_vec.x, ziming->translate_vec.z, terrain);
-	ziming->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
-	ziming->addTranslation(glm::vec3(-15.0f, (terrainHeightZiming + 0.05f), 4.0f));
 
 	// Skybox load
 	loadSkybox(skyboxShader);
@@ -392,13 +523,7 @@ int main(void)
 
 	std::cout << "it took " << difftime(time(new time_t), startTime) << " seconds to reach rendering" << std::endl;
 
-	std::vector<ModelContainer*> models3d;
-	models3d.push_back(ben);
-	models3d.push_back(sean);
-	models3d.push_back(wayne);
-	models3d.push_back(isa);
-	models3d.push_back(ziming);
-	models3d.push_back(terrainC);
+	
 
 	/* Sound */
 	irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -406,7 +531,7 @@ int main(void)
 	irrklang::ISound* windSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/wind.wav", true, false, true);
 	irrklang::ISound* walkingSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/footsteps.mp3", true, false, true);
 	irrklang::ISound* nightSound = SoundEngine->play2D("comp371/assignment1/src/Resources/sound/night_sounds.mp3", true, false, true);
-	daySound->setVolume(0.5f);
+	daySound->setVolume(0.3f);
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -490,6 +615,21 @@ int main(void)
 
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
 		ShadowSecondPass(&modelShader, models3d, grid_VAOs, mainGrid);
+
+
+		for(std::vector<glm::mat4>::iterator it = rocks.begin(); it < rocks.end(); it++)
+		{
+			rock->drawMod(MODE, &modelShader,*it);
+		}
+		for (std::vector<glm::mat4>::iterator it = trees.begin(); it < trees.end(); it++)
+		{
+			palmtree->drawMod(MODE, &modelShader, *it);
+		}
+		for (std::vector<glm::mat4>::iterator it = bushes.begin(); it < bushes.end(); it++)
+		{
+			bush->drawMod(MODE, &modelShader, *it);
+		}
+
 
 		// [Objects Not Affected by Light Source Go Below]
 
@@ -596,18 +736,16 @@ void processInput(GLFWwindow *window, ModelContainer** models, bool collision, i
 	// Press "SHIFT + W" to move FORWARD faster
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		if (!collision)
-		{
-			camera.moveForward(cameraSpeed * 1.5);
-			walkingSound->setPlaybackSpeed(1.5f);
-		}
+		camera.moveForward(cameraSpeed * 6 * 1.5);
+		walkingSound->setPlaybackSpeed(1.5f);
 	}
 
 	// Press "SHIFT + S" to move BACKWARD faster
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
-		camera.moveBackward(cameraSpeed * 1.5);
-		walkingSound->setPlaybackSpeed(1.5f);
+			camera.moveBackward(cameraSpeed * 1.5);
+			walkingSound->setPlaybackSpeed(1.5f);
+		
 	}
 
 	// Press "SHIFT + D" to move RIGHT faster
@@ -820,7 +958,7 @@ void setupTextureMapping()
 	g_texLocations[8] = GL_TEXTURE8;
 	g_texLocations[9] = GL_TEXTURE9;
 	g_texLocations[10] = GL_TEXTURE10;
-	//g_texLocations[11] = GL_TEXTURE11; used by shadow map
+	g_texLocations[11] = GL_TEXTURE11; //used by shadow map
 	g_texLocations[12] = GL_TEXTURE12; // used by skybox
 	g_texLocations[13] = GL_TEXTURE13;
 	g_texLocations[14] = GL_TEXTURE14;
@@ -950,9 +1088,11 @@ void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 	model = glm::scale(model, glm::vec3(335.0f, 335.0f, 35.0f));
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0005f));
 	g_textures[10].bind(g_texLocations[10]);
-	shader->setFloat("material.shininess", g_shininess[10]);
-	shader->setVec3("material.specular", g_specularStrength[10]);
-	shader->setInt("material.diffuse", 10);
+	//shader->setFloat("loaded", 1);
+	//shader->setFloat("material.shininess", g_shininess[10]);
+	//shader->setVec3("material.specular", g_specularStrength[10]);
+	//shader->setInt("material.diffuse", 10);
+	g_materials[10].setShader(shader);
 	shader->setMat4("model", model);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -1190,11 +1330,14 @@ bool checkCollision(ModelContainer** models)
 	// Check our models (letters and numbers)
 	for (int i = 0; i < 5; i++)
 	{
+
+		
 		// Check if Number has collision
 		collisionDetected ? true : collisionDetected = distanceFromCamera(camera.position, models[i]->models[0]->getAABB()) < 0.2f ? true : false;
 
 		// Check if Letter has collision
-		collisionDetected ? true : collisionDetected = distanceFromCamera(camera.position, models[i]->models[1]->getAABB()) < 0.2f ? true : false;
+		if(models[i]->models.size() > 1)
+			collisionDetected ? true : collisionDetected = distanceFromCamera(camera.position, models[i]->models[1]->getAABB()) < 0.2f ? true : false;
 	}
 
 	return collisionDetected;

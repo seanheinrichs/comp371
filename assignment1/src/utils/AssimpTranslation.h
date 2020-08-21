@@ -90,14 +90,28 @@ static Model* processMesh(aiMesh *mesh, const aiScene *scene, std::string direct
 					));
 			}
 
-			vertex.addVertexComponent(
-				VertexComponent(NORMAL,
-					glm::vec3(
-						mesh->mNormals[i].x,
-						mesh->mNormals[i].y,
-						mesh->mNormals[i].z)
-				));
+			if (mesh->mNormals)
+			{
 
+				vertex.addVertexComponent(
+					VertexComponent(NORMAL,
+						glm::vec3(
+							mesh->mNormals[i].x,
+							mesh->mNormals[i].y,
+							mesh->mNormals[i].z)
+					));
+			}
+			else 
+			{
+				vertex.addVertexComponent(
+					VertexComponent(NORMAL,
+						glm::vec3(
+							1,
+							0,
+							0)
+					));
+			
+			}
 
 
 			shape->vc->appendVertex(vertex);

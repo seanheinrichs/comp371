@@ -187,6 +187,9 @@ static void createWaynesModel(ModelContainer* modelContainer, Shader* shader)
 
 static void createBensModel(ModelContainer* modelContainer, Shader* shader)
 {
+
+
+
 	Model* three = new Model(true, true, false, true, "3", shader, &g_materials[2]);
 
 	three->addPolygon(new Shape(glm::vec3(6.0f, 3.5f, 0.0f)));
