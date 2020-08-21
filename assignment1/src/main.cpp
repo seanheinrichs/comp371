@@ -126,9 +126,9 @@ glm::mat4 lightView(1.0f);
 unsigned int skyboxVAO, skyboxVBO, cubemapTexture_day, cubemapTexture_night;
 
 // Variables used for Fog / Sky Color (Fog/ClearColor)
-const float RED = 1.0;
-const float BLUE = 0.0;
-const float GREEN = 0.0;
+const float RED = 0.84;
+const float BLUE = 0.80;
+const float GREEN = 0.7;
 
 //globals used for selecting render mode and models
 GLenum MODE = GL_TRIANGLES;
@@ -458,7 +458,6 @@ int main(void)
 
 		// Render
 		GLCall(glClearColor(RED, BLUE, GREEN, 1.0f));
-		//GLCall(glClearColor(0, 0, 0, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		// Start Using Model Shader

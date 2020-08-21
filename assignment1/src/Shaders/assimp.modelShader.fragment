@@ -6,6 +6,7 @@ in vec3 Normal;
 in vec3 FragPos;
 in vec2 v_TexCoord;
 in vec4 FragPosLightSpace;
+in float visibility;
 
 struct Material {
 	sampler2D diffuse;
@@ -61,6 +62,7 @@ uniform DirLight dirLight;
 uniform AssimpMat assimpMat;
 uniform int loaded;
 uniform NoTex noTex;
+uniform vec3 skyColor;
 
 float ShadowCalculation(vec4 fragPosLightSpace);
 vec3 CalculateDirLightLoaded(DirLight lightSource, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -79,6 +81,7 @@ void main()
 	}
 	
 	FragColor = vec4(result, 1.0);
+	FragColor = mix(vec4(skyColor, 1.0), FragColor, visibility);
 }
 
 // Light Calculation Credit - https://learnopengl.com/Lighting/Basic-Lighting
