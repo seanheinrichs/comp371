@@ -274,7 +274,7 @@ int main(void)
 	wayne->bindArrayBuffer();
 	models3d.push_back(wayne);
 
-	// [Terrain]
+	// Terrain scale configuration according to setup in config file
 	float scaleP;
 	if (TERRAIN_BIG_SIZE == 0) {
 		scaleP = 6.0f;
@@ -286,9 +286,11 @@ int main(void)
 		scaleP = 1.0f;
 	}
 
+	//creating the terrain with options set from config file
 	Terrain * t = new Terrain(VERTEX_COUNT_TERRAIN, TERRAIN_SIZE, TERRAIN_SMOOTHNESS, scaleP);
 	Shape * loadedShape = new Shape(glm::vec3(0.0f, 0.0f, 0.0f), t->vertices, t->textureCoords, t->normals);
 	
+	//placing terrain in model Container to apply appropriate matrix transformations
 	ModelContainer* terrainC = new ModelContainer();
 	Model* terrain = new Model(true, true, false, true, "terrain", &modelShader, &g_materials[0]);
 	terrain->addPolygon(loadedShape);
@@ -343,7 +345,7 @@ int main(void)
 
 
 	
-
+	//according to terrain size, place the models at specific locations
 	float factor = 0;
 	int offset = 3;
 	float sizeModel = 0.55f;
@@ -463,6 +465,7 @@ int main(void)
 	//ben->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
 	//ben->addTranslation(glm::vec3(0.0f, (terrainHeightBen + 0.75f), 0.0f));
 
+	//place models at appropriate height according to location on terrain
 	float terrainHeightSean = t->getHeightOfTerrain(sean->translate_vec.x, sean->translate_vec.z, terrain);
 	sean->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
 	sean->addTranslation(glm::vec3(-5.0f, (terrainHeightSean + 0.25f)-0.2, 0.0f));
