@@ -116,6 +116,8 @@ bool firstMouse = true;
 // Variables used for Sound
 bool isWalking = false;
 
+bool FOG = true;
+
 // Variables used for light and shadows
 unsigned int depthMapFBO;
 unsigned int depthMap;
@@ -253,6 +255,7 @@ int main(void)
 	models3d.push_back(terrainC);
 
 	
+	
 	std::cout << "it took : " << difftime(time(new time_t), terrainBefore) << " seconds to generate terrain" << std::endl;
 	
 	ModelContainer* rock = loadModel("../Assets/Models/rock0/rock0.obj", false);
@@ -282,16 +285,21 @@ int main(void)
 	accarrier->addScale(glm::vec3(0.01f, 0.01f, 0.01f));
 	accarrier->addRotationY(90);
 	models3d.push_back(accarrier);
+
+	
 	
 	float sizeModel = 0.55f;
 	if (TERRAIN_BIG_SIZE == 0) {
 		sizeModel = 0.55f;
+		t->scale = 6.0f;
 	}
 	else if (TERRAIN_BIG_SIZE == 1) {
 		sizeModel = 0.25f;
+		t->scale = 3.0f;
 	}
 	else if (TERRAIN_BIG_SIZE == 2) {
 		sizeModel = 0.15f;
+		t->scale = 1.0f;
 	}
 
 	//ModelContainer* ben = new ModelContainer();
@@ -303,9 +311,6 @@ int main(void)
 	ModelContainer* sean = new ModelContainer();
 	createSeansModel(sean, &modelShader);
 	sean->bindArrayBuffer();
-	float terrainHeightSean = t->getHeightOfTerrain(sean->translate_vec.x, sean->translate_vec.z, terrain);
-	sean->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
-	sean->addTranslation(glm::vec3(-5.0f, (terrainHeightSean + 0.25f), 0.0f));
 	models3d.push_back(sean);
 
 	ModelContainer* isa = new ModelContainer();
@@ -332,6 +337,7 @@ int main(void)
 	
 	models3d.push_back(wayne);
 
+	
 	float factor = 0;
 	int offset = 3;
 	if (TERRAIN_BIG_SIZE == 0) {
@@ -355,8 +361,6 @@ int main(void)
 
 		offset = 4;
 		factor = 2;
-		t->scale = 6.0f;
-		sizeModel = 0.55f;
 	}
 	else if (TERRAIN_BIG_SIZE == 1) {
 		terrainC->addScale(glm::vec3(3.0, 3.0, 3.0));
@@ -371,13 +375,17 @@ int main(void)
 		rock->addTranslation(glm::vec3(-5.0f, 0.2f, -5.0f));
 		rock->addScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
-		ben->addScale(glm::vec3(4.0, 4.0, 4.0));
+		ben->addScale(glm::vec3(6.0, 6.0, 6.0));
 		ben->addTranslation(glm::vec3(12.0f, t->getHeightOfTerrain(12, 12, terrain) , 12.0f));
+
+		wayne->addTranslation(glm::vec3(7.0f, 0.5, 7.0f));
+		wayne->addRotation(90, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		sean->addScale(glm::vec3(sizeModel, sizeModel, sizeModel));
+		sean->addTranslation(glm::vec3(10.0f, 2.5, 3.0f));
 
 		offset = 3;
 		factor = 1;
-		t->scale = 3.0f;
-		sizeModel = 0.25f;
 	}
 	else if (TERRAIN_BIG_SIZE == 2) {
 		terrainC->addScale(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -400,8 +408,6 @@ int main(void)
 
 		offset = 4;
 		factor = 1;
-		t->scale = 3.0f;
-		sizeModel = 0.15f;
 	}
 
 
@@ -440,6 +446,7 @@ int main(void)
 			}
 		}
 
+	
 
 	// [Lighting]
 
@@ -582,7 +589,18 @@ int main(void)
 		processInput(window, models, collision, walkingSound);
 
 		// Render
-		GLCall(glClearColor(RED, BLUE, GREEN, 1.0f));
+		if (FOG == true) {
+			GLCall(glClearColor(RED, BLUE, GREEN, 1.0f));
+			modelShader.use();
+			modelShader.setInt("fog", 1);
+		}
+			
+		else {
+			GLCall(glClearColor(0, 0, 0, 1.0f));
+			modelShader.use();
+			modelShader.setInt("fog", 0);
+		}
+
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		// Start Using Model Shader
@@ -616,6 +634,7 @@ int main(void)
 		// Render Scene as normal using the generated depth/shadowmap with modelShader(2ND PASS)
 		ShadowSecondPass(&modelShader, models3d, grid_VAOs, mainGrid);
 
+		
 
 		for(std::vector<glm::mat4>::iterator it = rocks.begin(); it < rocks.end(); it++)
 		{
@@ -629,6 +648,8 @@ int main(void)
 		{
 			bush->drawMod(MODE, &modelShader, *it);
 		}
+
+		
 
 
 		// [Objects Not Affected by Light Source Go Below]
@@ -780,12 +801,13 @@ void processInput(GLFWwindow *window, ModelContainer** models, bool collision, i
 	//TRANSLATE
 
 	// Press "SHIFT + A" to move the selected model to the LEFT
-	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
 	{
-		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-			models[selected]->addTranslation(glm::vec3(0.8f, 0.0f, 0.0f));
+		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)) {
+			FOG = true;
+		}
 		else
-			models[selected]->addTranslation(glm::vec3(0.1f, 0.0f, 0.0f));
+			FOG = false;
 	}
 
 	// Press "SHIFT + D" to move the selected model to the RIGHT

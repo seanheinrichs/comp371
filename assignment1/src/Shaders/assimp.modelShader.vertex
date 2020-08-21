@@ -30,6 +30,7 @@ void main()
 	
 	//fog calculation credit ThinMatrix: https://www.youtube.com/watch?v=qslBNLeSPUc
 	float distance = length(positionRelativeToCam.xyz);
+
 	visibility = exp(-pow((distance*density),gradient));
 	visibility = clamp(visibility,0.0,1.0);
 
