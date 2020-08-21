@@ -619,9 +619,9 @@ int main(void)
 		
 
 		// Set camera y value
-		float terrainHeight;
-		terrainHeight = t->getHeightOfTerrain(camera.position.x, camera.position.z, terrain);
-		camera.position.y = terrainHeight + 1.0f;
+		//float terrainHeight;
+		//terrainHeight = t->getHeightOfTerrain(camera.position.x, camera.position.z, terrain);
+		//camera.position.y = terrainHeight + 1.0f;
 
 		// Event Handling
 		processInput(window, models, collision, walkingSound);
