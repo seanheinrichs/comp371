@@ -53,6 +53,11 @@ Model::Model(bool position, bool texture, bool color, bool normal, std::string n
 	setupShearMatrix();
 }
 
+/*
+*
+*Description: parameterized constructor
+*
+*/
 Model::Model(bool position, bool texture, bool color, bool normal, std::string name, Shader* shader, Material* material)
 {
 	Model::textureIndex = textureIndex;
@@ -109,6 +114,10 @@ Model::Model()
 	setupShearMatrix();
 }
 
+
+/*
+*Description: reset all shear vectors to 0
+*/
 void Model::resetShear() 
 {
 	shearX = glm::vec2(0.0f, 0.0f);
@@ -140,6 +149,16 @@ void Model::setupShearMatrix()
 	shearMatrix[3][2] = 0;
 	shearMatrix[3][3] = 1;
 }
+
+/*
+*Description: set all the boolean values for vertex components we wish to render
+*
+*@params:
+*		position: boolean indicating whether to render positions or not
+*		color: boolean indicating whether to render colors or not
+*		normal: boolean indicating whether to render normals or not
+*		texture: boolean indicating whether to render textures or not
+*/
 void Model::setBoolean(bool position, bool texture, bool color, bool normal) 
 {
 	Model::position = position;
@@ -154,6 +173,15 @@ void Model::setBoolean(bool position, bool texture, bool color, bool normal)
 
 }
 
+/*
+*Description: renders the calling object using a custom model matrix
+*
+*@params:
+*		mode: the opengl rendering mode 
+*		shaderProg: the shader program that is in charge of rendering the current object
+*		modelmat: a 4x4 matrix representing an arbitrary 3d transformation
+*
+*/
 void Model::drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat)
 {
 	shaderProg->use();
@@ -189,6 +217,14 @@ void Model::addRotation(float degrees, glm::vec3 axis)
 	setAABB();
 }
 
+/*
+*Description: sets a rotation value
+*
+*@params:
+*		degrees: the amount of rotations in degrees
+*		axis: vector representing the axis around which to rotate
+*
+*/
 void Model::setRotation(float degrees, glm::vec3 axis)
 {
 	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
@@ -201,6 +237,13 @@ void Model::setRotation(float degrees, glm::vec3 axis)
 	rotate_angle = degrees;
 }
 
+/*
+*Description: adds a value to the X rotation
+*
+*@params:
+*		degrees: the amount of rotations in degrees
+*
+*/
 void Model::addRotationX(float degrees)
 {
 	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
@@ -212,6 +255,13 @@ void Model::addRotationX(float degrees)
 	rotate_angleX += degrees;
 }
 
+/*
+*Description: adds a value to the Y rotation
+*
+*@params:
+*		degrees: the amount of rotations in degrees
+*
+*/
 void Model::addRotationY(float degrees)
 {
 	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
@@ -223,6 +273,13 @@ void Model::addRotationY(float degrees)
 	rotate_angleY += degrees;
 }
 
+/*
+*Description: adds a value to the Z rotation
+*
+*@params:
+*		degrees: the amount of rotations in degrees
+*
+*/
 void Model::addRotationZ(float degrees)
 {
 	for (std::vector<Polygon *>::iterator it = polygons.begin(); it < polygons.end(); it++)
@@ -466,7 +523,7 @@ float* Model::getVertexArray()
 
 }
 
-//Method that returns the origin coordinate of a model
+//Method that returns the bouding box of a model
 std::map<std::string, glm::vec3> Model::getMinMax()
 {
 	std::map<std::string, glm::vec3> map;
@@ -498,6 +555,9 @@ std::map<std::string, glm::vec3> Model::getMinMax()
 	return map;
 }
 
+/*
+*Description: a custom minmax method to work with the minmax in modelContainer, here we mutiply by the model matrix
+*/
 std::map<std::string, glm::vec3> Model::getMinMaxT()
 {
 	std::vector<Polygon*>::iterator it = polygons.begin();
@@ -550,6 +610,13 @@ void Model::translateToOrigin()
 	transform(glm::translate(glm::mat4(1.0f), temp));
 }
 
+/*
+*Description: renders the calling object using its own model matrix and sets shader vlalues usign materials
+*
+*@params:
+*		mode: the opengl rendering mode
+*		shaderProg: the shader program that is in charge of rendering the current object
+*/
 void Model::draw(int mode, Shader* shaderProg)
 {
 	shaderProg->use();
@@ -559,7 +626,7 @@ void Model::draw(int mode, Shader* shaderProg)
 
 	if (textureIndex == -1)
 	{
-	shaderProg->setInt("fill", textureIndex);
+		shaderProg->setInt("fill", textureIndex);
 	}
 
 	shaderProg->setMat4("model", this->getModelMatrix(false));
@@ -567,7 +634,9 @@ void Model::draw(int mode, Shader* shaderProg)
 
 }
 
-
+/*
+*Description: computes the vertex alligned boudary box of the calling model with translation
+*/
 void Model::setAABB()
 {
 	std::map<std::string, glm::vec3> map = getMinMax();
@@ -576,6 +645,9 @@ void Model::setAABB()
 	aabb.min = glm::vec4(map["min"], 0.0f) * getModelMatrix() + glm::vec4(translate_vec, 0.0f);
 }
 
+/*
+*Description: computes the vertex alligned boudary box of the calling model without translation
+*/
 void Model::setAABBt()
 {
 	std::map<std::string, glm::vec3> map = getMinMax();
@@ -584,23 +656,34 @@ void Model::setAABBt()
 	aabbT.min = glm::vec4(map["min"], 0.0f);
 }
 
+/*
+*Description: adds textures to the models
+*/
 void Model::insertTextures(std::vector<Texture> tex)
 {
 	textures.insert(textures.end(), tex.begin(), tex.end());
 }
 
-
+/*
+*Description: adds a model's vertices to the calling model
+*/
 void Model::addModel(Model m) 
 {
 	polygons.insert(polygons.end(), m.polygons.begin(), m.polygons.end());
 }
 
+/*
+*Description: prints out all the vertices contained in the model
+*/
 void Model::print()
 {
 	for (std::vector<Polygon*>::iterator it = polygons.begin(); it < polygons.end(); it++)
 		(*it)->print();
 }
 
+/*
+*Description: check if the calling model object can be considered equivalent to the passed model Object
+*/
 bool Model::textureEquals(Model comp) 
 {
 	if (textures.size() != comp.textures.size())

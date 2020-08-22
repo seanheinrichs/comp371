@@ -31,6 +31,8 @@ static bool operator==(Components& a, Components& b)
 *An abstraction of one component of an opengl vertex,
 *this class may represent a position, color, texture, etc..
 *
+*Yes, this class is sufficiently abstract to represnt any vertex compoent one could imagine
+*
 *@member data : holds the values of this particular vertex component 
 *
 *

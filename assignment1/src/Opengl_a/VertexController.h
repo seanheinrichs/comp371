@@ -12,7 +12,10 @@
 /*
 * Vertex Controller
 *
-*A container of multiple opengl vertices that contains methods to manipulate them 
+*A container of multiple Vertexs that contains methods to manipulate them 
+*
+*Combined with the objects that make it up, this vertex controller provides the 
+* foundation for tracking vertices whenever an opengl object needs to be built 
 *
 *
 *@member vertices : a vector containing a list of multiple vertices 

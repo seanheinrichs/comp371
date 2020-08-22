@@ -32,6 +32,7 @@ Shape::Shape(glm::vec3 origin_a,
 	translate_fromOrigin();
 }
 
+//load in verticies in order based on the indexes from the .obj file
 void Shape::setUpLoadedObj(
 	std::vector<glm::vec3> & in_vertices,
 	std::vector<glm::vec2> & in_uvs,

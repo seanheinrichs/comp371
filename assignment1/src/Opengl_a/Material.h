@@ -12,6 +12,30 @@ enum MatType
 	TEXTURE_DS
 };
 
+
+/*
+Material Class
+
+Depends on: N/A
+
+Description: An abastraction for Phong lighting materials that works with assimp model loading. This material class
+complies with the wavefront .mtl material format for its naming conventions. (WIKIPEDIA)It provides
+custom shader settings for the different options available: TEXTURE_OFF, TEXTURE_D, TEXTURE_DS
+
+NAMING CONVENTION SOURCE(WIKIPEDIA): https://en.wikipedia.org/wiki/Wavefront_.obj_file
+
+MatType type;
+ka: abient color
+kd: diffuse color
+ks: specular color
+ke: emmissive color
+Ns: shininess
+Ni: optical density
+d: the transparency
+illum: the illuminations strength
+textures: a vector of textures containing all the textures needed
+
+*/
 class Material
 {
 public:

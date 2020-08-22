@@ -1,14 +1,5 @@
+
 #pragma once
-/*
-Shape
-Depends on: Polygon.h
-Description: handles the generation on any shape:
-costum:A 3d Shape that forms the basis for amy Shapes  we may want to construct in the future
-loaded obj file: using objloader
-origin: the point of origin for this particular polygon
-vaComponentCount: the number of vertex components in this Shape
-vaByteSize: the number Bytes required to contain the vertices of this Shape
-*/
 
 #include "Polygon.h"
 
@@ -16,6 +7,20 @@ class VertexComponent;
 
 #include "../../Opengl_a/VertexController.h"
 
+/*
+Shape Class 
+
+Depends on: Polygon.h
+Description: handles the generation on any shape:
+
+costum:A 3d Shape that forms the basis for amy Shapes  we may want to construct in the future
+loaded obj file: using objloader
+
+
+origin: the point of origin for this particular polygon
+vaComponentCount: the number of vertex components in this Shape
+vaByteSize: the number Bytes required to contain the vertices of this Shape
+*/
 class Shape : public Polygon {
 
 public:

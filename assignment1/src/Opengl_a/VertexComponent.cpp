@@ -35,6 +35,12 @@ VertexComponent::VertexComponent(Components tp, glm::vec4 dat)
 	floatCount = 4;
 }
 
+
+/*
+*
+*Description: Returns a string representation of the calling vertexComponent
+*
+*/
 std::string VertexComponent::toString()
 {
 	std::ostringstream ss;

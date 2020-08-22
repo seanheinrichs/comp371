@@ -4,7 +4,9 @@
 #include <glm/gtx/transform2.hpp>
 #include <iostream>
 
-
+/*
+*Description: binds all the array buffers for all the objects that it contains
+*/
 void ModelContainer::bindArrayBuffer()
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -13,11 +15,20 @@ void ModelContainer::bindArrayBuffer()
 	}
 }
 
+/*
+*Description: adds a new model to the models vector
+*
+*@param
+*		model: new model to add
+*/
 void ModelContainer::addModel(Model* model) 
 {
 	models.push_back(model);
 }
 
+/*
+*Description: resets the shear vector for all models
+*/
 void ModelContainer::resetShear()
 {
 	shearX = glm::vec2(0.0f, 0.0f);
@@ -32,6 +43,9 @@ void ModelContainer::resetShear()
 
 }
 
+/*
+*Description: default constructor for modelContainer
+*/
 ModelContainer::ModelContainer() 
 {
 	rotate_vec = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -74,6 +88,13 @@ void ModelContainer::setupShearMatrix()
 	shearMatrix[3][2] = 0;
 	shearMatrix[3][3] = 0;
 }
+
+/*
+*Description: returns a model by its name if that model was specified
+*
+*@param
+*		name: name of the model to retrieve
+*/
 Model* ModelContainer::getModelByName(std::string name) 
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -84,6 +105,13 @@ Model* ModelContainer::getModelByName(std::string name)
 	return nullptr;
 }
 
+/*
+*Description: renders all models by calling their draw methdo
+*
+*@params:
+*		mode: the opengl rendering mode
+*		shaderProg: the shader program that is in charge of rendering the current object
+*/
 void ModelContainer::draw(int mode, Shader* shaderProg)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -92,6 +120,10 @@ void ModelContainer::draw(int mode, Shader* shaderProg)
 	}
 }
 
+
+/*
+*Description: deallocates all gpu memory for the models
+*/
 void ModelContainer::deallocate()
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -115,6 +147,14 @@ void ModelContainer::addRotation(float degrees, glm::vec3 axis)
 	rotate_angle += degrees;
 }
 
+/*
+*Description: rotates a model by its name if that model was specified
+*
+*@param:
+*		degrees: the amount of rotations in degrees
+*		axis: vector representing the axis around which to rotate
+*		name: name of the model to change
+*/
 void ModelContainer::addRotation(float degrees, glm::vec3 axis, std::string name)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -127,6 +167,12 @@ void ModelContainer::addRotation(float degrees, glm::vec3 axis, std::string name
 	}
 }
 
+/*
+*Description: rotates a the calling object by a certain amount of degrees about the X axis
+*
+*@param:
+*		degrees: the amount of rotations in degrees
+*/
 void ModelContainer::addRotationX(float degrees)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -136,6 +182,12 @@ void ModelContainer::addRotationX(float degrees)
 	rotate_angleX += degrees;
 }
 
+/*
+*Description: rotates a the calling object by a certain amount of degrees about the Y axis
+*
+*@param:
+*		degrees: the amount of rotations in degrees
+*/
 void ModelContainer::addRotationY(float degrees)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -145,6 +197,12 @@ void ModelContainer::addRotationY(float degrees)
 	rotate_angleY += degrees;
 }
 
+/*
+*Description: rotates a the calling object by a certain amount of degrees about the Z axis
+*
+*@param:
+*		degrees: the amount of rotations in degrees
+*/
 void ModelContainer::addRotationZ(float degrees)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -154,6 +212,13 @@ void ModelContainer::addRotationZ(float degrees)
 	rotate_angleZ += degrees;
 }
 
+/*
+*Description: sets the rotation parameters for all models
+*
+*@param:
+*		degrees: the amount of rotations in degrees
+*		axis: vector representing the axis around which to rotate
+*/
 void ModelContainer::setRotation(float degrees, glm::vec3 axis)
 {
 	rotate_vec = axis;
@@ -201,6 +266,13 @@ void ModelContainer::addScale(glm::vec3 scale)
 
 }
 
+/*
+*Description: adds to the scale for a specific model matching the passed name
+*
+*@param:
+*		scale: a scale vector representing the values to add
+*		name: name of the model to change
+*/
 void ModelContainer::addScale(glm::vec3 scale, std::string name)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -273,6 +345,13 @@ void ModelContainer::addTranslation(glm::vec3 translate)
 	ModelContainer::translate_vec.z += translate.z;
 }
 
+/*
+*Description: adds translation to a specific model
+*
+*@param:
+*		translate: vector representing the translation amounts in each axis
+*		name: name of the model to change
+*/
 void ModelContainer::addTranslation(glm::vec3 translate, std::string name)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -324,7 +403,12 @@ glm::mat4 ModelContainer::getReposition()
 }
 
 
-
+/*
+*Description: Helper method used in combination with assimp that otimizes models that use the same textures
+* the way the system currently works, each model has a unique material. Therefore, if there are multiple models 
+* using the same material, we can combine them into a single model. That is what this method does
+*
+*/
 void ModelContainer::optimizeModels() 
 {	
 	std::vector<Model*> m;
@@ -362,18 +446,41 @@ void ModelContainer::optimizeModels()
 	models = m;
 }
 
+
+/*
+*Description: set all the boolean values for vertex components we wish to render
+*
+*@params:
+*		position: boolean indicating whether to render positions or not
+*		color: boolean indicating whether to render colors or not
+*		normal: boolean indicating whether to render normals or not
+*		texture: boolean indicating whether to render textures or not
+*/
 void ModelContainer::setVertexController(bool position, bool texture, bool color, bool normal)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
 		(*it)->setVertexController(position, texture, color, normal);
 }
 
+
+/*
+*Description: print all the models that the current model container containss
+*/
 void ModelContainer::print() 
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
 		(*it)->print();
 }
 
+/*
+*Description: renders the calling object using a custom model matrix
+*
+*@params:
+*		mode: the opengl rendering mode
+*		shaderProg: the shader program that is in charge of rendering the current object
+*		modelmat: a 4x4 matrix representing an arbitrary 3d transformation
+*
+*/
 void ModelContainer::drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat)
 {
 	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
@@ -382,7 +489,13 @@ void ModelContainer::drawMod(int mode, Shader* shaderProg, glm::mat4 modelmat)
 	}
 }
 
-
+/*
+*Description: returns the transformation of the calling object to the position specified in the constructor
+*
+*@params:
+*		position: the position that we wish to translate the object to
+*
+*/
 glm::mat4 ModelContainer::getTranslatedModelMatrix(glm::vec3 position)
 {
 	glm::vec3 mid((aabb.max.x + aabb.min.x) / 2, aabb.min.y, (aabb.max.z + aabb.min.z) / 2);
@@ -391,6 +504,14 @@ glm::mat4 ModelContainer::getTranslatedModelMatrix(glm::vec3 position)
 	return glm::translate(glm::mat4(1.0f), translate + translate_vec) * getRotationX() * getRotationY() * getRotationZ() * getScale();
 }
 
+/*
+*Description: returns the transformation of the calling object to the position specified in the constructor
+*			and the vector containing the specific translation values computed
+*
+*@params:
+*		position: the position that we wish to translate the object to
+*
+*/
 move ModelContainer::getTranslatedModelMatrixM(glm::vec3 position)
 {
 	glm::vec3 mid((aabb.max.x + aabb.min.x) / 2, aabb.min.y, (aabb.max.z + aabb.min.z) / 2);
@@ -401,6 +522,9 @@ move ModelContainer::getTranslatedModelMatrixM(glm::vec3 position)
 	return temp;
 }
 
+/*
+*Description: calculates the axis alligned boundary box for a modelContainer
+*/
 void ModelContainer::calculateMinMax()
 {
 	std::vector<Model *>::iterator it = models.begin();
@@ -431,4 +555,14 @@ void ModelContainer::calculateMinMax()
 	aabb.max = glm::vec4(map["max"], 0.0f);// *getModelMatrix();
 	aabb.min = glm::vec4(map["min"], 0.0f);// *getModelMatrix();
 
+}
+
+int ModelContainer::getVAVertexCount() 
+{
+	long vertexCount = 0;
+	for (std::vector<Model *>::iterator it = models.begin(); it < models.end(); it++)
+	{
+		vertexCount += (*it)->getVAVertexCount();
+	}
+	return vertexCount;
 }

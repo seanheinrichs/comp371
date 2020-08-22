@@ -2,9 +2,11 @@
 #include <string>
 
 /*
-*Texture 
+*Texture Class
 *
 *Description: provides a simple interface for creating textures and binding them to interfaces in opengl
+*the class is able to check for existing textures and check whether or not they have already been loaded
+*, therefore the class prevent duplicate textures
 *
 */
 class Texture

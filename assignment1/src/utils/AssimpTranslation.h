@@ -1,4 +1,10 @@
-
+/*
+*Although it is heavily adapted to our unique codebase, the following file was inspired
+*from the following source, and would not have been made the same without it
+*
+*source : https://learnopengl.com/Model-Loading/Model
+*
+*/
 
 #pragma once
 #include <assimp/Importer.hpp>
@@ -19,6 +25,15 @@
 #include "../Common.h"
 #include <filesystem>
 
+/*
+*Description: check whether the texture that should be loaded already 
+* exists, if it does not, it renders it
+*
+*@params:
+*		path: path to the texture that we wish to load
+*		typename: the type of texture that we are attempting to load
+*
+*/
 static Texture getTexture(const char* path, std::string typeName)
 {
 	for (unsigned int i = 0; i < MAX_TEX; i++)
@@ -31,6 +46,17 @@ static Texture getTexture(const char* path, std::string typeName)
 	return Texture(path, typeName);
 }
 
+
+/*
+*Description: loads in all the textures passed in the texture vector
+*
+*@params:
+*		mat: the assimp material object that contains the texture
+*		type: the type of texture that we want to load in assimp format
+*		typeName: the type of texture that we are loading in string format
+*		directory: the directory that we are loading textures - relative to
+*
+*/
 static std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName, std::string directory)
 {
 	//std::filesystem::path path(directory);
@@ -46,7 +72,17 @@ static std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType 
 	return textures;
 }
 
-
+/*
+*Description: iterates through all the mesh objects indices and addes the corresponding vertex
+*components to our vertex ojects to create vertex container objects that we can then use to create 
+*a model that we return 
+*
+*@params:
+*		mesh: the assimp mesh that we are loading 
+*		scene: the assimp scene object 
+*		directory: the directory that we are loading textures - relative to
+*
+*/
 static Model* processMesh(aiMesh *mesh, const aiScene *scene, std::string directory)
 {
 	Material* mat = new Material();
@@ -168,6 +204,16 @@ static Model* processMesh(aiMesh *mesh, const aiScene *scene, std::string direct
 	return model;
 }
 
+
+/*
+*Description: this method iterates over all the nodes in an assimp scene and creates a model container from them
+*
+*@params:
+*		node: the assimp node that we iterating over to get all its meshes
+*		scene: the assimp scene object
+*		directory: the directory that we are loading textures - relative to
+*
+*/
 static ModelContainer* processNode(aiNode *node, const aiScene *scene, std::string directory)
 {
 	ModelContainer* mc = new ModelContainer();
@@ -188,6 +234,17 @@ static ModelContainer* processNode(aiNode *node, const aiScene *scene, std::stri
 	return mc;
 }
 
+
+/*
+*Description: this method loads a model from a specified path, and allows 
+*the user to flip the UVs with a boolean, this is helpfull since not all textures images
+*are alligned the same. Some require a flip and others do not
+*
+*@params:
+*		flip: flip the UVs if true, false otherwise
+*		path: path to the assimp model
+*
+*/
 static ModelContainer* loadModel(std::string path, bool flip = false)
 {
 	Assimp::Importer import;

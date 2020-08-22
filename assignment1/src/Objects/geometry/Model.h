@@ -1,7 +1,7 @@
 /*
 Model
 
-Depends on: Polygon.h
+Depends on: Polygon.h, binder.h
 
 Description: A container for groups of related geometry. It handles the creation of
 arbitrarily sized vertex arrays from the polygons that it contains.

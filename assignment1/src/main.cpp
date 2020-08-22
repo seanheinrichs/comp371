@@ -154,6 +154,7 @@ int main(void)
 	//Reading config file for terrain configurations
 	YAML::Node config = YAML::LoadFile("comp371/assignment1/src/config.yaml");
 
+	//parsing yaml components out 
 	for (std::size_t i = 0; i < config["Variables"].size(); i++) {
 
 		if (config["Variables"][i]["name"].as<std::string>().compare("terrainSize") == 0) {
@@ -236,16 +237,10 @@ int main(void)
 
 	std::vector<ModelContainer*> models3d;
 
-	// [Models]
-
-	//ModelContainer* ben = loadModel("../Assets/Models/palmtree/palmtree.obj");
-	//std::cout << ben->models.size() << std::endl;
-	//ben->optimizeModels();
-	//ben->setVertexController(true, true, false, true);
-
-	//for (std::vector<Model *>::iterator it = ben->models.begin(); it < ben->models.end(); it++)
-	//	(*it)->textureIndex = 11; 
-	//	std::cout << ben->models.size() << std::endl;
+	//===========================================================================
+	// [Models] - creating all the models and making the ready for rendering
+	// this inclues loading assimp models
+	//===========================================================================
 
 	//ben->print();
 	//ModelContainer* ben = new ModelContainer();
@@ -330,6 +325,8 @@ int main(void)
 	models3d.push_back(accarrier);
 
 	
+
+	// uncomment this to load a camel model :P
 	/*
 	ModelContainer* camel = loadModel("../Assets/Models/camel/Camel.obj", false);
 	camel->optimizeModels();
@@ -339,6 +336,7 @@ int main(void)
 	camel->addScale(glm::vec3(0.004f, 0.004f, 0.004f));
 	camel->addRotationY(270);
 	camel->addRotationZ(90);
+	camel->addRotationX(90);
 	models3d.push_back(camel);
 	*/
 	
@@ -429,6 +427,9 @@ int main(void)
 
 	srand((unsigned)time(0));
 	
+	//===========================================================================
+	// genrating the trees arbitrarity given a restricted radius
+	//===========================================================================
 
 	for (int i = terrainC->aabb.min.x; i < terrainC->aabb.max.x; i += 1 + factor)
 		for (int j = terrainC->aabb.min.z; j < terrainC->aabb.max.z; j += 1 + factor) {
@@ -506,7 +507,6 @@ int main(void)
 		true
 	);
 
-	// [Grid]
 
 	Grid mainGrid = Grid();
 
@@ -564,7 +564,9 @@ int main(void)
 
 	std::cout << "it took " << difftime(time(new time_t), startTime) << " seconds to reach rendering" << std::endl;
 
-	
+//===========================================================================
+// Loading in the different sound settings
+//===========================================================================
 
 	/* Sound */
 	irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -578,6 +580,15 @@ int main(void)
 	{
 		(*itm)->setAABBt();
 	}
+
+	//compute total vertex count
+	long totalVertexCount = 0;
+	for (std::vector<ModelContainer*>::iterator it = models3d.begin(); it < models3d.end(); it++)
+	{
+		totalVertexCount += (*it)->getVAVertexCount();
+	}
+
+	std::cout << "There are currently : " << totalVertexCount << " vertices loaded in the scene" << std::endl;
 
 	// Main Loop 
 	while (!glfwWindowShouldClose(window))
@@ -622,9 +633,9 @@ int main(void)
 		
 
 		// Set camera y value
-		//float terrainHeight;
-		//terrainHeight = t->getHeightOfTerrain(camera.position.x, camera.position.z, terrain);
-		//camera.position.y = terrainHeight + 1.0f;
+		float terrainHeight;
+		terrainHeight = t->getHeightOfTerrain(camera.position.x, camera.position.z, terrain);
+		camera.position.y = terrainHeight + 1.0f;
 
 		// Event Handling
 		processInput(window, models, collision, walkingSound);
@@ -779,13 +790,8 @@ void processInput(GLFWwindow *window, ModelContainer** models, bool collision, i
 	//Press "SPACE" to JUMP
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)) {
-			camera.moveUp(1.0);
-		}
-		else
-			camera.moveUp(-1.0);
-		//camera.position += cameraJump * cameraSpeed;
-		//jumpCounter++;
+		camera.position += cameraJump * cameraSpeed;
+		jumpCounter++;
 	}
 
 	else if (jumpCounter > 0)
@@ -849,57 +855,6 @@ void processInput(GLFWwindow *window, ModelContainer** models, bool collision, i
 			FOG = false;
 	}
 
-
-	//TRANSLATE
-
-	
-
-	// Press "SHIFT + D" to move the selected model to the RIGHT
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-			models[selected]->addTranslation(glm::vec3(-0.8f, 0.0f, 0.0f));
-		else
-			models[selected]->addTranslation(glm::vec3(-0.1f, 0.0f, 0.0f));
-	}
-
-	// Press "SHIFT + W" to move the selected model UP
-	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-			models[selected]->addTranslation(glm::vec3(0.0f, 0.8f, 0.0f));
-		else
-			models[selected]->addTranslation(glm::vec3(0.0f, 0.1f, 0.0f));
-	}
-
-	// Press "SHIFT + S" to move the selected model DOWN
-	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-			models[selected]->addTranslation(glm::vec3(0.0f, -0.8f, 0.0f));
-		else
-			models[selected]->addTranslation(glm::vec3(0.0f, -0.1f, 0.0f));
-	}
-
-	// Press "SHIFT + Q" to move the selected model DOWN
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-	{
-		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-			models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, -0.8f));
-		else
-			models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, -0.1f));
-	}
-
-	// Press "SHIFT + E" to move the selected model DOWN
-	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-	{
-		if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
-			models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, 0.8f));
-		else
-			models[selected]->addTranslation(glm::vec3(0.0f, 0.0f, 0.1f));
-
-	}
-
 	// [Scale]
 
 	// Press 'U' to scale UP the model
@@ -935,13 +890,13 @@ void processInput(GLFWwindow *window, ModelContainer** models, bool collision, i
 
 	// [Shadow Toggle]
 
-	// Press 'M' to turn shadows OFF
+	// Press 'B' to turn shadows OFF
 	if (!useShadows && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = true;
 	}
 
-	// Press 'SHIFT + M' to turn shadows ON
+	// Press 'SHIFT + B' to turn shadows ON
 	if (useShadows && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))
 	{
 		useShadows = false;
@@ -993,6 +948,9 @@ void processInput(GLFWwindow *window, ModelContainer** models, bool collision, i
 	}
 }
 
+/*
+*Descrition: used to find the new director of the camera after moving the mouse
+*/
 void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 {
 	if (firstMouse)
@@ -1010,7 +968,10 @@ void cursorPositionCallback(GLFWwindow * window, double xPos, double yPos)
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
 }
-//map textures to a global data structure
+
+/*
+*Descrition: setup global data sctructures for textures
+*/
 void setupTextureMapping()
 {
 	g_texLocations[0] = GL_TEXTURE0;
@@ -1135,6 +1096,9 @@ void setupTextureMapping()
 	g_materials[20] = Material(g_specularStrength[20], g_textures[20], g_shininess[20]);
 }
 
+/*
+*Descrition: render all the objects in the scene
+*/
 void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d)
 {
 	bindTextures();
@@ -1144,6 +1108,9 @@ void RenderScene(Shader* shader, std::vector<ModelContainer*> models3d)
 
 }
 
+/*
+*Descrition: render the grid using its own texture
+*/
 void RenderGrid(Shader* shader, unsigned int grid_VAOs[], Grid mainGrid)
 {
 	// [Grid Floor]
@@ -1213,6 +1180,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+/*
+*Descrition: load a cube map and retrieve its textureId
+*/
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;
@@ -1243,6 +1213,9 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 	return textureID;
 }
 
+/*
+*Descrition: create an appropriately sized cube for the cube map
+*/
 void loadSkybox(Shader &skyboxShader)
 {
 	// skybox START // Credit - https://learnopengl.com/Advanced-OpenGL/Cubemaps
@@ -1334,6 +1307,9 @@ void loadSkybox(Shader &skyboxShader)
 	// skybox END
 }
 
+/*
+*Descrition: renders the skybox
+*/
 void drawSkybox(Shader &skyboxShader)
 {
 	// draw skybox as last
@@ -1363,6 +1339,9 @@ void drawSkybox(Shader &skyboxShader)
 	glDepthFunc(GL_LESS); // set depth function back to default
 }
 
+/*
+*Descrition: computes the distance away from the camera of an axis alligned bounding box
+*/
 float distanceFromCamera(glm::vec3 cameraPos, AABB aabb)
 {
 	float sqDist = 0.0f;
@@ -1386,6 +1365,10 @@ float distanceFromCamera(glm::vec3 cameraPos, AABB aabb)
 	return glm::sqrt(sqDist);
 }
 
+
+/*
+*Descrition: checks for collisions in the world
+*/
 float distanceFromCamera1(glm::vec3 cameraPos, AABB aabb, glm::mat4 modelMat, glm::vec4 vec)
 {
 	aabb.max = aabb.max * modelMat;// +vec;

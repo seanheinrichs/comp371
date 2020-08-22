@@ -15,6 +15,9 @@
 
 #include <GL/glew.h>  
 
+/*
+*Description: Load in shader file from path
+*/
 std::string Shader::readShaderCode(const char* path) 
 {
 	std::string code;
@@ -45,6 +48,9 @@ std::string Shader::readShaderCode(const char* path)
 
 }
 
+/*
+*Description: compile the shader
+*/
 unsigned int Shader::compileShader(const char* code, std::string type)
 {
 	unsigned int shader_id = glCreateShader(GL_VERTEX_SHADER);

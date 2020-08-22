@@ -359,12 +359,17 @@ std::map<std::string, glm::vec3> VertexController::getMinMax()
 }
 
 
+/*
+*Description: Returns a string representation of the calling vertexComponent
+*/
 void VertexController::appendVertices(std::vector<Vertex> newVertices) 
 {
 	vertices.insert(vertices.end(), newVertices.begin(), newVertices.end());
 }
 
-
+/*
+*Description: prints all the vertices that the callig object contains
+*/
 void VertexController::print()
 {
 	for (std::vector<Vertex>::iterator it = vertices.begin(); it < vertices.end(); it++)

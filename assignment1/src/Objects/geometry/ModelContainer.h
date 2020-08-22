@@ -3,22 +3,33 @@
 #include <string>
 #include "Model.h"
 
-/*
-*Model Container 
-*
-*A container for many models, the model container allows many models to be rendered in the same method
-*
-*This class was created to avoid future rendering conflicts
-*
-*/
-
-
 struct move
 {
 	glm::mat4 mm;
 	glm::vec4 translate;
 };
 
+
+/*
+*Model Container
+*
+*A container for many models, the model container allows many models be contianed inside of an oject
+* which is necessary for rendering them all in individual ways if we wanted to
+*
+*This class was created to avoid future rendering conflicts
+*
+* @params
+* glm::vec3 shear_vec : vector representing the shearing 
+* glm::vec3 rotate_vec : vector representing the roation 
+* glm::vec3 translate_vec: vector holding the translation values for this object 
+* glm::vec3 scale_vec: vector holding the scaling values for this object 
+* glm::mat4 shearMatrix: matrix containing the shear transformation for this object
+* glm::vec2 shearX: the X shear components for this modelContainer
+* glm::vec2 shearY: the Y shear components for this modelContainer
+* glm::vec2 shearZ: the Z shear components for this modelContainer
+* float rotate_angle, rotate_angleX, rotate_angleY, rotate_angleZ: different roation angles for different axes
+* AABB aabb: axis alligned bounding box
+*/
 class ModelContainer 
 {
 public: 
@@ -72,6 +83,7 @@ public:
 	glm::vec2 shearX;
 	glm::vec2 shearY;
 	glm::vec2 shearZ;
+	int getVAVertexCount();
 
 	float rotate_angle, rotate_angleX, rotate_angleY, rotate_angleZ;
 

@@ -8,24 +8,28 @@ in vec2 v_TexCoord;
 in vec4 FragPosLightSpace;
 in float visibility;
 
+//uniforms for materials using only diffuse texture 
 struct Material {
 	sampler2D diffuse;
 	vec3 specular;
 	float shininess;
 };
 
+//uniforms for materials using no texture at all
 struct NoTex {
 	vec3 diffuse;
 	vec3 specular;
 	float shininess;
 };
 
+//uniforms for materials using both specular and diffuse textures
 struct AssimpMat {
 	sampler2D diffuse;
 	sampler2D specular;
 	float shininess;
 };
 
+//uniforms for directional light
 struct DirLight {
 	vec3 direction;
 
@@ -34,6 +38,7 @@ struct DirLight {
 	vec3 specular;
 };
 
+//uniforms for spot light
 struct SpotLight {
 	vec3 position;
 	vec3 direction;

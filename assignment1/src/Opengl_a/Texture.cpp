@@ -16,7 +16,10 @@
 #include "../Common.h"
 #define MAX_TEX 32
 
-
+/*
+*Description: This method loads in an image from a given path, and sets appropriate 
+*gl parameters for it 
+*/
 void Texture::TextureFromFile(const char* path)
 {
 
@@ -65,7 +68,8 @@ void Texture::TextureFromFile(const char* path)
 
 /*
 *
-*Read texture image and create the texture itself in opengl
+*Description: constructor for texture. If the texture has not already been loaded it reads 
+* the texture image and creates a new texture in opengl.
 *
 */
 Texture::Texture(const std::string& path, std::string type) : filePath(path), localBuffer(nullptr), width(0), height(0), BPP(0), type(type)
@@ -131,7 +135,15 @@ void Texture::unbind() const
 	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
-
+/*
+*
+*Description: checks if a texture is equivalent to another
+*
+*@output: 
+		- true : if equal
+		- flase : otherwise
+*
+*/
 bool Texture::equals(Texture comp) 
 {
 	return renderer_id == comp.renderer_id && path == comp.path;

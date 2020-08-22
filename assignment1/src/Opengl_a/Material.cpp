@@ -4,8 +4,10 @@
 
 
 
-
-
+/*
+*Description: a default constructor for material 
+*
+*/
 Material::Material()
 {
 	ka = glm::vec3(1.0f);
@@ -19,12 +21,20 @@ Material::Material()
 	type = TEXTURE_OFF;
 }
 
-
+/*
+*Description: a parameterized constructor for material
+*
+*/
 Material::Material(glm::vec3 ka, glm::vec3 kd, glm::vec3 ks, glm::vec3 ke, float Ns, float Ni, float d, int illum, MatType type) : ka(ka), kd(kd), ks(ks), ke(ke), Ns(Ns), Ni(Ni), d(d), illum(illum), type(type)
 {
 	
 }
 
+/*
+*Description: a semi-parameterized constructor for material, that allows 
+* non textured materials with limited parameters to be loaded
+*
+*/
 Material::Material(glm::vec3 kd, glm::vec3 ks, float Ns) : kd(kd), ks(ks), Ns(Ns)
 {
 	ka = glm::vec3(1.0f);
@@ -35,6 +45,11 @@ Material::Material(glm::vec3 kd, glm::vec3 ks, float Ns) : kd(kd), ks(ks), Ns(Ns
 	type = TEXTURE_OFF;
 }
 
+/*
+*Description: a semi-parameterized constructor for material, that allows
+* only diffuse-textured materials with limited parameters to be loaded
+*
+*/
 Material::Material(glm::vec3 ks, Texture map_kd, float Ns) : ks(ks), Ns(Ns)
 {
 	addTexture(map_kd);
@@ -43,7 +58,14 @@ Material::Material(glm::vec3 ks, Texture map_kd, float Ns) : ks(ks), Ns(Ns)
 
 
 
-
+/*
+*Description: a method to set the necessary shader uniform values for the selected
+* material renderig option: TEXTURE_OFF, TEXTURE_D, or TEXTURE_DS
+*
+*@input:
+*	shader : the shader program to use when setting the different materials
+*
+*/
 void Material::setShader(Shader* shader) 
 {
 	shader->use();
@@ -90,17 +112,26 @@ void Material::setShader(Shader* shader)
 }
 
 
-
+/*
+*Description: add a texture to the texture vector
+*
+*/
 void Material::addTexture(Texture texture)
 {
 	textures.push_back(texture);
 }
 
+/*
+*Description: equals method to compare the calling material to a passed one
+*/
 bool Material::equals(Material comp)
 {
 	return textures.size() == comp.textures.size() && type == comp.type && Ns == comp.Ns;
 }
 
+/*
+*Description: equals method to compare the calling material to a passed pointer of one
+*/
 bool Material::equals(Material* comp)
 {
 	return textures.size() == comp->textures.size() && type == comp->type && Ns == comp->Ns;
